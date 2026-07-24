@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 820">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e7ddd3"/><stop offset="1" stop-color="#c7b3a5"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".17"/></filter>
+  </defs>
+  <rect width="700" height="820" fill="url(#a)"/>
+  <path d="M0 142c112 12 169 77 179 194M700 95c-125 51-171 128-163 241" fill="none" stroke="#84917b" stroke-width="14" opacity=".8"/>
+  <g fill="#98a28f" opacity=".9"><ellipse cx="70" cy="176" rx="23" ry="49" transform="rotate(-55 70 176)"/><ellipse cx="133" cy="228" rx="22" ry="47" transform="rotate(-37 133 228)"/><ellipse cx="626" cy="153" rx="22" ry="51" transform="rotate(46 626 153)"/><ellipse cx="574" cy="215" rx="23" ry="50" transform="rotate(28 574 215)"/></g>
+  <ellipse cx="350" cy="708" rx="244" ry="48" fill="#554941" opacity=".15"/>
+  <g filter="url(#s)">
+    <path d="M135 308h430l-37 383H171z" fill="#f8f5f1"/>
+    <path d="M111 318h478l-66-91H177z" fill="#fff"/>
+    <path d="M338 228h25v463h-25z" fill="#b28a72"/>
+    <path d="M111 318h478" stroke="#c8a46b" stroke-width="8"/>
+    <path d="M350 240c-109-96-157-8-64 44m67-43c89-117 168-36 78 35" fill="none" stroke="#aa806a" stroke-width="28" stroke-linecap="round"/>
+    <circle cx="350" cy="420" r="95" fill="#e4d5ca"/>
+    <circle cx="350" cy="420" r="79" fill="#f8f5f1" stroke="#c8a46b" stroke-width="3"/>
+    <text x="350" y="410" text-anchor="middle" fill="#5d554e" font-family="Georgia,serif" font-size="25" font-style="italic">Jardim</text>
+    <text x="350" y="440" text-anchor="middle" fill="#5d554e" font-family="Georgia,serif" font-size="22">encantado</text>
+  </g>
+  <g transform="translate(460 492)">
+    <path d="M0 0c46-38 95-5 69 34C39 51 14 34 0 0Z" fill="#b79aa0"/>
+    <path d="M69 34c42-23 77 14 46 44-37 5-51-17-46-44Z" fill="#d7b8bd"/>
+    <circle cx="68" cy="36" r="8" fill="#765321"/>
+  </g>
+</svg>

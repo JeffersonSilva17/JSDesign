@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Protótipo da loja premium JS Designs: papelaria personalizada, convites e detalhes para celebrações.">
+  <title>JS Designs — Celebrações feitas para encantar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <div id="site-shell">
+    <div class="prototype-note" role="note">
+      <span>Protótipo demonstrativo</span>
+      <span aria-hidden="true">•</span>
+      <span>Nenhum pedido ou pagamento é real</span>
+    </div>
+
+    <aside class="trust-strip" aria-label="Compromissos JS Designs">
+      <p><span aria-hidden="true">✦</span> Personalização após a compra</p>
+      <p><span aria-hidden="true">✦</span> <span id="production-timing" aria-describedby="production-condition">Produção em 7 dias corridos*</span><span id="production-condition" hidden>após o briefing completo</span></p>
+      <p><span aria-hidden="true">✦</span> Entrega para toda a Europa</p>
+    </aside>
+
+    <header class="site-header" id="inicio">
+      <div class="header-inner">
+        <button class="icon-button menu-trigger" type="button" aria-label="Abrir menu" aria-controls="mobile-menu" aria-expanded="false" data-open-surface="menu">
+          <span class="menu-lines" aria-hidden="true"></span>
+        </button>
+
+        <a class="brand" href="#inicio" aria-label="JS Designs, página inicial">
+          <span class="brand-mark" aria-hidden="true">JS</span>
+          <span class="brand-name">JS Designs</span>
+          <span class="brand-tagline">celebrações autorais</span>
+        </a>
+
+        <nav class="desktop-nav" aria-label="Navegação principal">
+          <a href="#mais-pedidos">Mais pedidos</a>
+          <a href="#categorias">Loja</a>
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#sobre">Sobre</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="icon-button search-trigger" type="button" aria-label="Abrir busca" aria-controls="search-panel" aria-expanded="false" data-open-surface="search">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          </button>
+          <button class="icon-button account-button" type="button" aria-label="Área da cliente — demonstração" data-demo-message="A área da cliente fará parte da loja completa.">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.7-4 3.1-6 7-6s6.3 2 7 6"></path></svg>
+          </button>
+          <button class="icon-button cart-button" type="button" aria-label="Carrinho, vazio" data-demo-message="Seu carrinho demonstrativo está vazio.">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.2 10.2h9.9l2-7H6"></path><circle cx="9" cy="19" r="1"></circle><circle cx="17" cy="19" r="1"></circle></svg>
+            <span class="cart-count" aria-hidden="true">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Papelaria afetiva &amp; design autoral</p>
+          <h1 id="hero-title">Detalhes que transformam momentos em memória.</h1>
+          <p class="hero-lead">Peças personalizadas, acabamento artesanal e uma experiência simples — da escolha à celebração.</p>
+          <a class="button button-primary" href="#mais-pedidos">Comprar agora</a>
+          <a class="text-link" href="#exclusivo">Não encontrou o seu tema? Projeto exclusivo <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-visual">
+          <img src="assets/hero-atelier.svg" width="900" height="1000" alt="Composição editorial de caixas, laços e papelaria em tons claros">
+          <div class="hero-seal" aria-hidden="true"><span>feito com</span><strong>cuidado</strong></div>
+        </div>
+      </section>
+
+      <section class="search-feature" aria-labelledby="search-feature-title">
+        <div>
+          <p class="eyebrow">Encontre com facilidade</p>
+          <h2 id="search-feature-title">Qual tema vai contar a sua história?</h2>
+          <p>Pesquise por tema, ocasião ou estilo. Nós mostramos os produtos disponíveis e caminhos semelhantes.</p>
+        </div>
+        <button class="search-field-button" type="button" data-open-surface="search" aria-controls="search-panel" aria-expanded="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          <span>Ex.: fazendinha, jardim, céu...</span>
+          <strong>Buscar</strong>
+        </button>
+      </section>
+
+      <section class="section products-section" id="mais-pedidos" aria-labelledby="best-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Os favoritos das clientes</p>
+            <h2 id="best-title">Produtos mais pedidos</h2>
+          </div>
+          <div class="carousel-controls" role="group" aria-label="Navegar pelos produtos">
+            <button class="round-button" type="button" data-carousel-prev="best-list" aria-label="Ver produtos anteriores">←</button>
+            <button class="round-button" type="button" data-carousel-next="best-list" aria-label="Ver próximos produtos">→</button>
+          </div>
+        </div>
+
+        <div class="product-scroller" id="best-list" tabindex="0" aria-label="Produtos mais pedidos">
+          <article class="product-card" id="produto-fazendinha" data-search-name="Kit Festa Fazendinha" data-search-terms="fazendinha animais campo lembrancinha kit">
+            <div class="product-image">
+              <img src="assets/product-fazendinha.svg" width="700" height="820" alt="Kit de lembrancinhas Fazendinha em tons de terracota e verde">
+              <span class="badge">Mais pedido</span>
+              <button class="favorite-button" type="button" aria-label="Adicionar Kit Festa Fazendinha aos favoritos" aria-pressed="false" data-product="Kit Festa Fazendinha">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.5-7.5-10A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10Z"></path></svg>
+              </button>
+            </div>
+            <div class="product-content">
+              <p class="product-type">Kit personalizado · 20 peças</p>
+              <h3>Kit Festa Fazendinha</h3>
+              <p class="price">A partir de € 48,00</p>
+              <button class="button button-secondary add-cart" type="button" data-product="Kit Festa Fazendinha">Comprar agora</button>
+            </div>
+          </article>
+
+          <article class="product-card" id="produto-jardim" data-search-name="Lembrancinhas Jardim Encantado" data-search-terms="jardim encantado flores borboleta lembrancinha">
+            <div class="product-image">
+              <img src="assets/product-jardim.svg" width="700" height="820" alt="Lembrancinhas Jardim Encantado com flores delicadas e laço">
+              <span class="badge badge-light">Personalização incluída</span>
+              <button class="favorite-button" type="button" aria-label="Adicionar Lembrancinhas Jardim Encantado aos favoritos" aria-pressed="false" data-product="Lembrancinhas Jardim Encantado">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.5-7.5-10A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10Z"></path></svg>
+              </button>
+            </div>
+            <div class="product-content">
+              <p class="product-type">Lembrancinhas · 20 unidades</p>
+              <h3>Jardim Encantado</h3>
+              <p class="price">A partir de € 42,00</p>
+              <button class="button button-secondary add-cart" type="button" data-product="Lembrancinhas Jardim Encantado">Comprar agora</button>
+            </div>
+          </article>
+
+          <article class="product-card" id="produto-ceu" data-search-name="Topo de Bolo Sonho no Céu" data-search-terms="céu ceu nuvens estrelas topo bolo batizado">
+            <div class="product-image">
+              <img src="assets/product-ceu.svg" width="700" height="820" alt="Topo de bolo Sonho no Céu com nuvens, estrelas e detalhes dourados">
+              <span class="badge">Mais pedido</span>
+              <button class="favorite-button" type="button" aria-label="Adicionar Topo de Bolo Sonho no Céu aos favoritos" aria-pressed="false" data-product="Topo de Bolo Sonho no Céu">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.5-7.5-10A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10Z"></path></svg>
+              </button>
+            </div>
+            <div class="product-content">
+              <p class="product-type">Topo de bolo · Modelo pronto</p>
+              <h3>Sonho no Céu</h3>
+              <p class="price">A partir de € 18,00</p>
+              <button class="button button-secondary add-cart" type="button" data-product="Topo de Bolo Sonho no Céu">Comprar agora</button>
+            </div>
+          </article>
+
+          <article class="product-card" id="produto-convite" data-search-name="Convite Digital Jardim Dourado" data-search-terms="convite digital jardim dourado casamento aniversário flores">
+            <div class="product-image">
+              <img src="assets/product-convite.svg" width="700" height="820" alt="Convite digital Jardim Dourado em composição floral minimalista">
+              <span class="badge badge-light">Digital personalizado</span>
+              <button class="favorite-button" type="button" aria-label="Adicionar Convite Digital Jardim Dourado aos favoritos" aria-pressed="false" data-product="Convite Digital Jardim Dourado">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.5-7.5-10A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10Z"></path></svg>
+              </button>
+            </div>
+            <div class="product-content">
+              <p class="product-type">Convite digital · Interativo</p>
+              <h3>Jardim Dourado</h3>
+              <p class="price">A partir de € 24,00</p>
+              <button class="button button-secondary add-cart" type="button" data-product="Convite Digital Jardim Dourado">Comprar agora</button>
+            </div>
+          </article>
+        </div>
+        <p class="section-footnote">*Prazo de produção física após o briefing completo. Demonstração de catálogo; preços e pedidos não são reais.</p>
+      </section>
+
+      <section class="section category-section" id="categorias" aria-labelledby="category-title">
+        <div class="centered-heading">
+          <p class="eyebrow">Escolha o detalhe perfeito</p>
+          <h2 id="category-title">Descubra por categoria</h2>
+          <p>Uma coleção criada para acompanhar cada capítulo da sua celebração.</p>
+        </div>
+        <div class="category-grid">
+          <a class="category-card category-card-large" href="#produto-ceu">
+            <img src="assets/category-topos.svg" width="880" height="1040" alt="Composição de topos de bolo artesanais">
+            <span><small>Para o momento principal</small><strong>Topos de bolo</strong><em>Ver coleção →</em></span>
+          </a>
+          <a class="category-card" href="#produto-fazendinha">
+            <img src="assets/category-kits.svg" width="880" height="680" alt="Caixas e kits de festa personalizados">
+            <span><small>Um universo coordenado</small><strong>Kits &amp; lembrancinhas</strong><em>Ver coleção →</em></span>
+          </a>
+          <a class="category-card category-text" href="#produto-convite">
+            <span><small>Convites que antecipam a emoção</small><strong>Convites digitais</strong><em>Conhecer formatos →</em></span>
+          </a>
+        </div>
+      </section>
+
+      <section class="process-section" id="como-funciona" aria-labelledby="process-title">
+        <div class="process-intro">
+          <p class="eyebrow">Simples do início ao fim</p>
+          <h2 id="process-title">Você celebra.<br>Nós cuidamos dos detalhes.</h2>
+          <p>A personalização começa após a confirmação da compra demonstrativa, em uma jornada clara e acompanhada.</p>
+        </div>
+        <ol class="process-list">
+          <li><span>01</span><div><h3>Escolha o seu produto</h3><p>Encontre por tema ou explore as coleções.</p></div></li>
+          <li><span>02</span><div><h3>Conte a sua história</h3><p>Após a compra, preencha um briefing simples e protegido.</p></div></li>
+          <li><span>03</span><div><h3>Aprove cada detalhe</h3><p>Receba a prévia e acompanhe a criação antes da produção.</p></div></li>
+          <li><span>04</span><div><h3>Receba e celebre</h3><p>Produzimos com cuidado e enviamos para toda a Europa.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="quality-section" id="sobre" aria-labelledby="quality-title">
+        <div class="quality-image">
+          <img src="assets/instagram-details.svg" width="900" height="1000" alt="Detalhe de acabamento em papel, fita de cetim e selo dourado">
+        </div>
+        <div class="quality-copy">
+          <p class="eyebrow">Qualidade que você pode ver</p>
+          <h2 id="quality-title">Feito à mão.<br>Pensado para emocionar.</h2>
+          <p>Cada dobra, recorte e acabamento é tratado como parte da história. Materiais escolhidos com atenção e produção acompanhada do briefing à embalagem.</p>
+          <ul class="feature-list">
+            <li><span aria-hidden="true">✦</span><div><strong>Acabamento artesanal</strong><small>Precisão, textura e cuidado em cada peça.</small></div></li>
+            <li><span aria-hidden="true">✦</span><div><strong>Personalização simples</strong><small>Briefing e prévia depois da compra.</small></div></li>
+            <li><span aria-hidden="true">✦</span><div><strong>Acompanhamento humano</strong><small>Suporte disponível quando você precisar.</small></div></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="exclusive-section" id="exclusivo" aria-labelledby="exclusive-title">
+        <div>
+          <p class="eyebrow">Uma ideia só sua</p>
+          <h2 id="exclusive-title">Não encontrou o tema que imaginou?</h2>
+        </div>
+        <div>
+          <p>Criamos projetos exclusivos para celebrações que pedem algo inteiramente novo. Conte a sua ideia e vamos avaliar juntos as possibilidades.</p>
+          <button class="text-link text-link-button" type="button" data-demo-message="O contato para projeto exclusivo será conectado na loja completa.">Conversar sobre um projeto <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+
+      <section class="journal-section" aria-labelledby="journal-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">No Instagram · @jsdesignsstudio</p>
+            <h2 id="journal-title">Detalhes que fazem a diferença</h2>
+          </div>
+          <div class="instagram-callout">
+            <p>Texturas, acabamentos e combinações para inspirar a sua celebração.</p>
+            <button class="text-link text-link-button" type="button" data-demo-message="O perfil @jsdesignsstudio será conectado na loja publicada.">Acompanhar no Instagram <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+        <div class="detail-grid" role="group" aria-label="Galeria do Instagram @jsdesignsstudio com detalhes artesanais">
+          <div class="detail-tile detail-paper"><span>Papel &amp; textura</span></div>
+          <div class="detail-tile detail-ribbon"><span>Laços &amp; acabamentos</span></div>
+          <div class="detail-tile detail-cut"><span>Recortes precisos</span></div>
+        </div>
+      </section>
+
+      <section class="newsletter" aria-labelledby="newsletter-title">
+        <div>
+          <p class="eyebrow">Um convite para ficar por perto</p>
+          <h2 id="newsletter-title">Receba novidades do ateliê</h2>
+          <p>Inspirações e lançamentos, sem excesso. Este formulário é apenas demonstrativo.</p>
+        </div>
+        <form class="newsletter-form" novalidate data-email-form="newsletter">
+          <label for="newsletter-email">Seu melhor e-mail</label>
+          <div class="input-row">
+            <input id="newsletter-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" aria-describedby="newsletter-help newsletter-error">
+            <button class="button button-primary" type="submit">Quero receber</button>
+          </div>
+          <p class="form-help" id="newsletter-help">Demonstração: nenhum dado será enviado ou armazenado.</p>
+          <p class="form-error" id="newsletter-error" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a class="brand brand-footer" href="#inicio" aria-label="JS Designs, voltar ao início">
+            <span class="brand-mark" aria-hidden="true">JS</span>
+            <span class="brand-name">JS Designs</span>
+          </a>
+          <p>Peças autorais para celebrar histórias únicas, feitas com cuidado e enviadas para toda a Europa.</p>
+        </div>
+        <div>
+          <h2>Loja</h2>
+          <a href="#mais-pedidos">Mais pedidos</a>
+          <a href="#categorias">Topos de bolo</a>
+          <a href="#categorias">Kits &amp; lembrancinhas</a>
+          <a href="#categorias">Convites digitais</a>
+        </div>
+        <div>
+          <h2>Atendimento</h2>
+          <a href="#como-funciona">Como funciona</a>
+          <button type="button" data-demo-message="O suporte será conectado na loja completa.">Fale conosco</button>
+          <button type="button" data-demo-message="O acompanhamento de pedidos será conectado na loja completa.">Acompanhar pedido</button>
+          <a href="#exclusivo">Projeto exclusivo</a>
+        </div>
+        <div>
+          <h2>Informações</h2>
+          <button type="button" data-demo-message="A política de envio será publicada na loja completa.">Envios para a Europa</button>
+          <button type="button" data-demo-message="A política de privacidade será publicada na loja completa.">Privacidade</button>
+          <button type="button" data-demo-message="Os termos serão publicados na loja completa.">Termos de uso</button>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 JS Designs. Protótipo visual demonstrativo.</p>
+        <p>Estrutura de pagamentos prevista com parceiros certificados — demonstração sem transações reais.</p>
+      </div>
+    </footer>
+  </div>
+
+  <div class="floating-actions" role="group" aria-label="Atendimento rápido">
+    <button type="button" aria-label="Abrir chat — demonstração" data-demo-message="O chat estará disponível na loja completa.">
+      <span aria-hidden="true">···</span><em>Chat</em>
+    </button>
+    <button type="button" aria-label="Abrir WhatsApp — demonstração" data-demo-message="O WhatsApp será usado apenas para suporte e projetos exclusivos.">
+      <span aria-hidden="true">↗</span><em>WhatsApp</em>
+    </button>
+  </div>
+
+  <div class="surface-backdrop" data-surface-backdrop hidden></div>
+
+  <aside class="surface drawer" id="mobile-menu" aria-labelledby="menu-title" aria-modal="true" role="dialog" hidden data-surface="menu">
+    <div class="surface-header">
+      <div>
+        <p class="eyebrow">Navegue</p>
+        <h2 id="menu-title">Menu</h2>
+      </div>
+      <button class="round-button" type="button" aria-label="Fechar menu" data-close-surface>×</button>
+    </div>
+    <nav class="mobile-nav" aria-label="Menu móvel">
+      <a href="#mais-pedidos"><span>01</span>Mais pedidos</a>
+      <a href="#categorias"><span>02</span>Loja</a>
+      <a href="#como-funciona"><span>03</span>Como funciona</a>
+      <a href="#sobre"><span>04</span>Sobre a JS Designs</a>
+      <a href="#exclusivo"><span>05</span>Projeto exclusivo</a>
+    </nav>
+    <div class="drawer-note">
+      <strong>Feito com intenção</strong>
+      <p>Produção artesanal e entrega para toda a Europa.</p>
+    </div>
+  </aside>
+
+  <section class="surface search-panel" id="search-panel" aria-labelledby="search-title" aria-modal="true" role="dialog" hidden data-surface="search">
+    <div class="search-panel-inner">
+      <div class="surface-header">
+        <div>
+          <p class="eyebrow">Busca por tema ou ocasião</p>
+          <h2 id="search-title">O que você imagina para a sua festa?</h2>
+        </div>
+        <button class="round-button" type="button" aria-label="Fechar busca" data-close-surface>×</button>
+      </div>
+      <div class="panel-search-form" role="search">
+        <label for="panel-search-input">Pesquisar no catálogo demonstrativo</label>
+        <div class="panel-search-input">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          <input id="panel-search-input" type="search" autocomplete="off" maxlength="120" placeholder="Ex.: fazendinha" aria-describedby="search-hint" aria-controls="search-results">
+        </div>
+        <p id="search-hint">Digite para filtrar. Termo vazio mostra sugestões populares.</p>
+      </div>
+      <div class="search-results-wrap">
+        <p class="results-label" id="results-label">Sugestões populares</p>
+        <section class="search-results" id="search-results" aria-live="polite" aria-labelledby="results-label"></section>
+      </div>
+      <div class="search-exclusive">
+        <p><strong>Não encontrou?</strong> Uma ideia inédita será identificada como projeto exclusivo.</p>
+        <button class="text-link text-link-button" type="button" data-search-target="exclusivo">Conhecer projeto exclusivo <span aria-hidden="true">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface promo-modal" id="promo-modal" aria-labelledby="promo-title" aria-describedby="promo-description" aria-modal="true" role="dialog" hidden data-surface="promo">
+    <button class="round-button promo-close" type="button" aria-label="Fechar promoção" data-close-surface>×</button>
+    <div class="promo-decoration" aria-hidden="true"><span>JS</span></div>
+    <div class="promo-content">
+      <p class="eyebrow">Primeira compra</p>
+      <h2 id="promo-title"><strong>10%</strong> para começar a sua celebração</h2>
+      <p id="promo-description">Cadastre o e-mail e veja uma confirmação demonstrativa do benefício. Nenhum dado será enviado ou armazenado.</p>
+      <form class="promo-form" novalidate data-email-form="promo">
+        <label for="promo-email">Seu melhor e-mail</label>
+        <input id="promo-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" aria-describedby="promo-help promo-error">
+        <p class="form-help" id="promo-help">Benefício demonstrativo, sem validade comercial.</p>
+        <p class="form-error" id="promo-error" aria-live="polite"></p>
+        <button class="button button-primary" type="submit">Quero meu benefício</button>
+      </form>
+      <button class="decline-button" type="button" data-close-surface>Agora não, obrigada</button>
+    </div>
+  </section>
+
+  <div class="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+</body>
+</html>

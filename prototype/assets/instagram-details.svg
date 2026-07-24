@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1000">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7ccc1"/><stop offset="1" stop-color="#a9988a"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="20" stdDeviation="19" flood-opacity=".2"/></filter>
+    <pattern id="grain" width="33" height="33" patternUnits="userSpaceOnUse"><circle cx="8" cy="11" r=".8" fill="#fff" opacity=".28"/><circle cx="27" cy="25" r=".6" fill="#463c35" opacity=".11"/></pattern>
+  </defs>
+  <rect width="900" height="1000" fill="url(#a)"/>
+  <rect width="900" height="1000" fill="url(#grain)"/>
+  <g filter="url(#s)" transform="rotate(-8 450 500)">
+    <rect x="142" y="188" width="616" height="638" rx="4" fill="#f8f5f1"/>
+    <rect x="174" y="220" width="552" height="574" fill="none" stroke="#c8a46b" stroke-width="3"/>
+    <path d="M142 482h616v77H142z" fill="#8d7160"/>
+    <path d="M449 188v638" stroke="#8d7160" stroke-width="77"/>
+    <path d="M444 490c-163-176-251-27-104 76m118-74c102-207 265-85 137 58" fill="none" stroke="#806454" stroke-width="52" stroke-linecap="round"/>
+    <circle cx="450" cy="520" r="93" fill="#c8a46b"/>
+    <circle cx="450" cy="520" r="76" fill="none" stroke="#fff" stroke-width="3"/>
+    <text x="450" y="535" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="53" font-style="italic">JS</text>
+  </g>
+  <path d="M96 121c126 65 154 170 146 291" fill="none" stroke="#6f7b68" stroke-width="17" stroke-linecap="round"/>
+  <g fill="#829078"><ellipse cx="114" cy="165" rx="30" ry="63" transform="rotate(-49 114 165)"/><ellipse cx="177" cy="234" rx="28" ry="61" transform="rotate(-29 177 234)"/><ellipse cx="220" cy="330" rx="26" ry="59" transform="rotate(-8 220 330)"/></g>
+  <path d="M690 743c58-79 106-104 178-115" fill="none" stroke="#f4eee8" stroke-width="13"/>
+  <g fill="#f4eee8"><ellipse cx="740" cy="704" rx="24" ry="53" transform="rotate(45 740 704)"/><ellipse cx="808" cy="663" rx="24" ry="54" transform="rotate(62 808 663)"/></g>
+</svg>
