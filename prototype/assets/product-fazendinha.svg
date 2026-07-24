@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 820">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9c6b3"/><stop offset="1" stop-color="#a8b09b"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="15" stdDeviation="13" flood-opacity=".18"/></filter>
+  </defs>
+  <rect width="700" height="820" fill="url(#a)"/>
+  <circle cx="112" cy="115" r="68" fill="#f8f5f1" opacity=".35"/>
+  <circle cx="625" cy="190" r="116" fill="#c8a46b" opacity=".24"/>
+  <ellipse cx="351" cy="700" rx="260" ry="48" fill="#4b453f" opacity=".16"/>
+  <g filter="url(#s)">
+    <path d="M120 351h200l-18 320H138z" fill="#f5eee7"/>
+    <path d="m108 348 112-95 112 95z" fill="#a66849"/>
+    <rect x="180" y="440" width="83" height="229" fill="#b17b59"/>
+    <circle cx="245" cy="548" r="7" fill="#f3d6a8"/>
+    <path d="M378 326h205l-15 344H393z" fill="#e9ded2"/>
+    <path d="M360 328h241l-54-69H414z" fill="#77836e"/>
+    <path d="M438 327v343" stroke="#9d7252" stroke-width="17"/>
+    <path d="M503 327v343" stroke="#9d7252" stroke-width="17"/>
+    <ellipse cx="478" cy="465" rx="58" ry="64" fill="#f9f5ef"/>
+    <path d="M441 457c20-38 54-38 75 0-10 59-63 62-75 0Z" fill="#bb855f"/>
+    <circle cx="460" cy="450" r="5" fill="#2d2d2d"/><circle cx="495" cy="450" r="5" fill="#2d2d2d"/>
+    <path d="M468 476q10 10 20 0" fill="none" stroke="#2d2d2d" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <path d="M94 245c68 21 99 60 110 120" fill="none" stroke="#68745f" stroke-width="9" stroke-linecap="round"/>
+  <g fill="#78846e"><ellipse cx="105" cy="264" rx="17" ry="34" transform="rotate(-50 105 264)"/><ellipse cx="158" cy="300" rx="17" ry="35" transform="rotate(-34 158 300)"/></g>
+  <rect x="236" y="604" width="115" height="55" rx="27" fill="#c8a46b"/>
+  <text x="294" y="639" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="22" font-style="italic">feito para você</text>
+</svg>

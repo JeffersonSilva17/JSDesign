@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Síntese visual da sessão de brainstorming para o website premium e a loja online da JS Designs.">
+  <meta name="theme-color" content="#f7f2e9">
+  <title>JS Designs — Brainstorming da experiência digital</title>
+  <style>
+    :root {
+      --paper: #fffdf9;
+      --ivory: #f7f2e9;
+      --sand: #e8dfd1;
+      --champagne: #b9955b;
+      --gold: #92713f;
+      --ink: #25221f;
+      --muted: #706860;
+      --taupe: #9a8b7a;
+      --line: rgba(75, 61, 45, .16);
+      --white: #fff;
+      --success: #4e6658;
+      --danger: #81564d;
+      --shadow: 0 24px 70px rgba(70, 56, 38, .10);
+      --radius: 1.5rem;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --max: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 5% 8%, rgba(185,149,91,.11), transparent 26rem),
+        radial-gradient(circle at 94% 42%, rgba(154,139,122,.09), transparent 30rem),
+        var(--paper);
+      font-family: var(--sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .25;
+      z-index: 30;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+    }
+    a { color: inherit; }
+    button { font: inherit; }
+    :focus-visible { outline: 3px solid var(--champagne); outline-offset: 4px; }
+    .skip {
+      position: fixed; left: 1rem; top: -5rem; z-index: 100;
+      padding: .7rem 1rem; background: var(--ink); color: white; border-radius: .5rem;
+    }
+    .skip:focus { top: 1rem; }
+    .progress {
+      position: fixed; z-index: 60; inset: 0 0 auto;
+      height: 3px; transform-origin: left; transform: scaleX(0);
+      background: linear-gradient(90deg, var(--taupe), #d1b179, var(--gold));
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,253,249,.86);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+    .topbar-inner {
+      max-width: var(--max); margin: auto; min-height: 4.5rem;
+      padding: .8rem clamp(1rem, 3vw, 2.5rem);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .brand { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+    .brand-mark {
+      width: 2.65rem; height: 2.65rem; display: grid; place-items: center;
+      border: 1px solid var(--champagne); border-radius: 50%;
+      font: 600 .9rem var(--serif); letter-spacing: -.08em;
+    }
+    .brand-copy { line-height: 1.15; }
+    .brand-copy strong { display: block; font: 600 1rem var(--serif); letter-spacing: .02em; }
+    .brand-copy span { font-size: .65rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
+    .topnav { display: flex; gap: .35rem; align-items: center; }
+    .topnav a, .focus-toggle {
+      border: 0; background: transparent; color: var(--muted); text-decoration: none;
+      padding: .55rem .7rem; border-radius: 999px; font-size: .78rem; cursor: pointer;
+    }
+    .topnav a:hover, .focus-toggle:hover { color: var(--ink); background: var(--ivory); }
+    .focus-toggle { border: 1px solid var(--line); color: var(--ink); }
+
+    main { overflow: hidden; }
+    .wrap { max-width: var(--max); margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2.5rem); }
+    .hero {
+      min-height: min(830px, calc(100svh - 4.5rem));
+      display: grid; align-items: center; position: relative;
+      padding: clamp(4rem, 9vw, 8rem) 0;
+    }
+    .hero::after {
+      content: ""; position: absolute; width: 34rem; height: 34rem; right: -18rem; top: 3rem;
+      border: 1px solid rgba(185,149,91,.22); border-radius: 50%;
+      box-shadow: 0 0 0 5rem rgba(185,149,91,.025), 0 0 0 10rem rgba(185,149,91,.018);
+    }
+    .hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(2.5rem, 8vw, 7rem); align-items: center; }
+    .eyebrow {
+      margin: 0 0 1.1rem; color: var(--gold); font-size: .7rem; font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase;
+    }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.06; }
+    h1 { margin: 0; font-size: clamp(3.5rem, 8.5vw, 7.4rem); letter-spacing: -.055em; max-width: 8ch; }
+    h1 em { color: var(--gold); font-weight: 400; }
+    .hero-lead {
+      max-width: 44rem; margin: 1.75rem 0 0; font-size: clamp(1rem, 2vw, 1.25rem); color: var(--muted);
+    }
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: .6rem 1.5rem; margin-top: 2rem;
+      color: var(--muted); font-size: .77rem; text-transform: uppercase; letter-spacing: .1em;
+    }
+    .hero-art { position: relative; min-height: 32rem; display: grid; place-items: center; }
+    .orbit {
+      position: absolute; width: min(28rem, 80vw); aspect-ratio: 1; border: 1px solid var(--line);
+      border-radius: 50%; animation: turn 34s linear infinite;
+    }
+    .orbit::before, .orbit::after {
+      content: ""; position: absolute; border-radius: 50%; background: var(--champagne);
+      width: .65rem; height: .65rem; top: 14%; left: 12%; box-shadow: 21rem 15rem 0 -.1rem var(--taupe);
+    }
+    .orbit::after { width: 1px; height: 120%; left: 50%; top: -10%; background: var(--line); box-shadow: none; }
+    .hero-card {
+      position: relative; z-index: 2; width: min(20rem, 68vw); aspect-ratio: .76;
+      display: flex; flex-direction: column; justify-content: space-between; padding: 2rem;
+      border-radius: 10rem 10rem 1rem 1rem; background: var(--ink); color: var(--white);
+      box-shadow: 0 40px 90px rgba(37,34,31,.23);
+    }
+    .hero-card .number { color: #dbc198; font: 400 4.5rem var(--serif); line-height: 1; }
+    .hero-card blockquote { margin: 0; font: 400 1.65rem/1.2 var(--serif); }
+    .hero-card small { color: #c8beb2; letter-spacing: .11em; text-transform: uppercase; }
+    .scroll-cue { margin-top: 3rem; display: inline-flex; gap: .65rem; align-items: center; color: var(--muted); font-size: .78rem; text-decoration: none; }
+    .scroll-cue i { display: block; width: 2rem; height: 1px; background: var(--champagne); }
+    @keyframes turn { to { transform: rotate(360deg); } }
+
+    .manifesto {
+      padding: clamp(5rem, 10vw, 9rem) 0;
+      background: var(--ink); color: white; position: relative;
+    }
+    .manifesto::before {
+      content: "“"; position: absolute; right: 4vw; top: -2rem;
+      font: 20rem/.8 var(--serif); color: rgba(255,255,255,.035);
+    }
+    .manifesto-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: clamp(2rem, 9vw, 8rem); align-items: start; }
+    .manifesto h2 { margin: 0; font-size: clamp(2.5rem, 6vw, 5.2rem); letter-spacing: -.04em; }
+    .manifesto h2 span { color: #d5b885; }
+    .manifesto-copy { font: 400 clamp(1.3rem, 2.6vw, 2.15rem)/1.35 var(--serif); color: #eee7dc; }
+    .manifesto-copy p { margin-top: 0; }
+    .promises { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,.15); margin-top: 3rem; }
+    .promise { background: var(--ink); padding: 1.25rem 1rem; color: #c9c0b5; font-size: .77rem; }
+    .promise strong { display: block; color: white; font: 500 1rem var(--serif); margin-bottom: .25rem; }
+
+    .section { padding: clamp(5rem, 10vw, 9rem) 0; }
+    .section-head { display: grid; grid-template-columns: .65fr 1.35fr; gap: 2rem; align-items: end; margin-bottom: clamp(2.5rem, 6vw, 5rem); }
+    .section-head h2 { margin: 0; font-size: clamp(2.6rem, 6vw, 5.2rem); letter-spacing: -.045em; }
+    .section-head p { max-width: 44rem; margin: 0 0 .5rem; color: var(--muted); font-size: 1.05rem; }
+    .chapter { display: inline-flex; align-items: center; gap: .7rem; margin-bottom: .8rem; color: var(--gold); text-transform: uppercase; letter-spacing: .18em; font-size: .68rem; font-weight: 700; }
+    .chapter::before { content: ""; width: 2rem; height: 1px; background: currentColor; }
+
+    .tech-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.2rem; }
+    .tech-card {
+      grid-column: span 6; border: 1px solid var(--line); border-radius: var(--radius);
+      padding: clamp(1.4rem, 3vw, 2.2rem); min-height: 26rem; position: relative; overflow: hidden;
+      background: rgba(255,255,255,.66); box-shadow: 0 12px 35px rgba(70,56,38,.04);
+      transition: transform .35s ease, box-shadow .35s ease;
+    }
+    .tech-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .tech-card.wide { grid-column: span 12; }
+    .tech-no { color: var(--champagne); font: 400 3rem var(--serif); line-height: 1; }
+    .tech-card h3 { font-size: clamp(1.8rem, 3vw, 2.7rem); margin: .5rem 0 .7rem; letter-spacing: -.03em; }
+    .tech-intro { color: var(--muted); max-width: 36rem; margin: 0; }
+    .tag {
+      display: inline-block; padding: .35rem .65rem; margin: .3rem .25rem .3rem 0;
+      border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .7rem;
+    }
+    .micro-label { color: var(--gold); font-size: .65rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+
+    /* JTBD — percurso */
+    .jtbd { background: linear-gradient(145deg, #fff 0 65%, var(--ivory)); }
+    .job-track { margin-top: 2.5rem; position: relative; display: grid; gap: 1.4rem; }
+    .job-track::before { content: ""; position: absolute; left: .46rem; top: .6rem; bottom: .6rem; width: 1px; background: linear-gradient(var(--champagne), var(--line)); }
+    .job { display: grid; grid-template-columns: 1rem 1fr; gap: 1rem; align-items: start; }
+    .job-dot { width: .95rem; height: .95rem; margin-top: .3rem; background: var(--paper); border: 3px solid var(--champagne); border-radius: 50%; z-index: 1; }
+    .job strong { display: block; font-family: var(--serif); font-size: 1.05rem; }
+    .job span { display: block; color: var(--muted); font-size: .82rem; }
+
+    /* Reversal — espelho */
+    .reversal { background: linear-gradient(115deg, var(--ink) 0 49.9%, #f4eee5 50%); color: white; }
+    .reversal .tech-intro { color: #bfb7ae; max-width: 45%; }
+    .mirror { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2.3rem; }
+    .mirror-side { min-width: 0; }
+    .mirror-side:last-child { color: var(--ink); }
+    .mirror-side ul { padding: 0; list-style: none; margin: 1rem 0 0; }
+    .mirror-side li { padding: .7rem 0; border-bottom: 1px solid rgba(255,255,255,.12); font-size: .83rem; }
+    .mirror-side:last-child li { border-color: var(--line); }
+    .discard { text-decoration: line-through; text-decoration-color: #cf9c91; opacity: .7; }
+
+    /* Cross-pollination — constelação */
+    .cross { background: #f0e7da; }
+    .constellation { margin-top: 2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; position: relative; }
+    .seed {
+      min-height: 8rem; padding: 1rem; border-radius: 1rem; background: rgba(255,255,255,.64);
+      border: 1px solid rgba(146,113,63,.18);
+    }
+    .seed b { font: 500 1.05rem var(--serif); display: block; }
+    .seed span { color: var(--muted); font-size: .75rem; }
+    .seed::before { content: "✦"; color: var(--champagne); display: block; margin-bottom: .45rem; }
+
+    /* Lotus */
+    .lotus { background: var(--paper); }
+    .lotus-map { margin-top: 2.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; }
+    .petal, .lotus-heart {
+      min-height: 7.6rem; border-radius: 1.2rem; display: flex; flex-direction: column;
+      justify-content: center; padding: 1rem; text-align: center; border: 1px solid var(--line);
+    }
+    .petal { background: var(--ivory); }
+    .petal strong { font: 500 1rem var(--serif); }
+    .petal small { color: var(--muted); margin-top: .3rem; line-height: 1.35; }
+    .lotus-heart { background: var(--ink); color: white; border-radius: 50% 50% 1.2rem 50%; }
+    .lotus-heart small { color: #cfc5ba; }
+
+    /* Empathy */
+    .empathy { background: #fff; }
+    .empathy-map { margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 1.25rem; overflow: hidden; }
+    .empathy-cell { background: var(--paper); min-height: 8.4rem; padding: 1rem; }
+    .empathy-cell b { display: block; color: var(--gold); font: 500 1rem var(--serif); }
+    .empathy-cell p { margin: .35rem 0 0; color: var(--muted); font-size: .78rem; }
+
+    /* What if */
+    .whatif { background: linear-gradient(160deg, #2e2a26, #1e1c1a); color: white; }
+    .whatif .tech-intro { color: #c6bdb4; }
+    .branches { margin-top: 2rem; display: grid; gap: .7rem; }
+    .branch { display: grid; grid-template-columns: 2.8rem 1fr; gap: 1rem; align-items: center; padding: .8rem; border: 1px solid rgba(255,255,255,.12); border-radius: 1rem; }
+    .branch i { font: normal 1.5rem var(--serif); color: #d4b57f; width: 2.8rem; aspect-ratio: 1; display: grid; place-items: center; border: 1px solid rgba(212,181,127,.45); border-radius: 50%; }
+    .branch b { display: block; font: 500 1rem var(--serif); }
+    .branch span { display: block; color: #bdb5ac; font-size: .76rem; }
+
+    /* Build */
+    .build { background: linear-gradient(155deg, #fbf7ef, #ede2d4); }
+    .traction { margin-top: 2.7rem; display: flex; align-items: stretch; gap: .5rem; }
+    .traction-step { flex: 1; padding: 1rem; background: rgba(255,255,255,.7); border-radius: 1rem; text-align: center; }
+    .traction-step b { display: block; font: 500 1rem var(--serif); }
+    .traction-step small { color: var(--muted); }
+    .traction-arrow { align-self: center; color: var(--gold); font-size: 1.2rem; }
+    .proof { margin-top: 1.2rem; padding: 1.15rem; border-left: 2px solid var(--champagne); font: italic 1.1rem var(--serif); }
+
+    /* Crazy 8 */
+    .crazy { background: var(--ink); color: white; }
+    .crazy .tech-intro { color: #c7beb4; }
+    .eight { margin-top: 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; }
+    .idea-tile { min-height: 8rem; border: 1px solid rgba(255,255,255,.12); border-radius: 1rem; padding: .9rem; display: flex; flex-direction: column; justify-content: space-between; }
+    .idea-tile:nth-child(2n) { background: rgba(185,149,91,.1); }
+    .idea-tile b { color: #d8bc8b; font: 400 1.8rem var(--serif); }
+    .idea-tile span { font-size: .75rem; color: #ddd5cc; line-height: 1.35; }
+
+    .decision-ribbon {
+      margin-top: 1.2rem; grid-column: span 12; border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 1.35rem 1.6rem; display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center;
+      background: #fff;
+    }
+    .decision-ribbon strong { font: 500 1.1rem var(--serif); }
+    .decision-ribbon p { margin: 0; color: var(--muted); font-size: .84rem; }
+    .seal { width: 3.2rem; aspect-ratio: 1; display: grid; place-items: center; border: 1px solid var(--champagne); color: var(--gold); border-radius: 50%; }
+
+    .journey-section { background: var(--ivory); }
+    .journey {
+      display: grid; grid-template-columns: repeat(8, minmax(8.5rem, 1fr)); gap: .75rem;
+      overflow-x: auto; padding: 1rem .1rem 2rem; scrollbar-color: var(--champagne) transparent;
+    }
+    .journey-step {
+      position: relative; min-height: 18rem; padding: 1.2rem 1rem;
+      background: var(--paper); border: 1px solid var(--line); border-radius: 1.2rem;
+      display: flex; flex-direction: column;
+    }
+    .journey-step::after {
+      content: "→"; position: absolute; right: -.75rem; top: 2.2rem; z-index: 2;
+      color: var(--gold); background: var(--ivory); width: 1.4rem; text-align: center;
+    }
+    .journey-step:last-child::after { display: none; }
+    .journey-step .step-no { color: var(--champagne); font: 400 2rem var(--serif); }
+    .journey-step h3 { font-size: 1.12rem; margin: .55rem 0; }
+    .journey-step p { color: var(--muted); font-size: .73rem; margin: 0; }
+    .journey-step .outcome { margin-top: auto; padding-top: 1rem; color: var(--ink); font-weight: 650; font-size: .7rem; }
+
+    .order-flow { margin-top: 4rem; padding: clamp(1.5rem, 4vw, 3rem); border-radius: var(--radius); background: var(--ink); color: white; }
+    .order-flow-head { display: flex; justify-content: space-between; gap: 2rem; align-items: end; }
+    .order-flow h3 { margin: 0; font-size: clamp(1.8rem, 3.5vw, 3rem); }
+    .deadline { text-align: right; color: #c8bfb5; font-size: .8rem; }
+    .deadline strong { display: block; color: #d8bb89; font: 400 2.5rem var(--serif); }
+    .timeline { margin-top: 2.2rem; display: grid; grid-template-columns: repeat(8, 1fr); gap: 0; }
+    .status { position: relative; padding-top: 1.5rem; color: #c7bfb7; font-size: .66rem; line-height: 1.35; }
+    .status::before { content: ""; position: absolute; left: 0; right: 0; top: .35rem; height: 1px; background: rgba(255,255,255,.2); }
+    .status::after { content: ""; position: absolute; left: 0; top: 0; width: .75rem; height: .75rem; border: 2px solid #c7a86f; background: var(--ink); border-radius: 50%; }
+    .status strong { color: white; display: block; font-size: .7rem; }
+    .pause-note { margin-top: 1.8rem; padding: 1rem; border: 1px solid rgba(255,255,255,.12); border-radius: 1rem; color: #d1c8be; font-size: .78rem; }
+
+    .rules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .rule { padding: 1.2rem; border: 1px solid var(--line); border-radius: 1rem; background: white; }
+    .rule b { display: block; font: 500 1.1rem var(--serif); }
+    .rule span { color: var(--muted); font-size: .76rem; }
+
+    .convergence { background: #fff; }
+    .affinities { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 4rem; }
+    .affinity { padding: .75rem 1rem; border-radius: 999px; background: var(--ivory); border: 1px solid var(--line); font: 500 .92rem var(--serif); }
+    .moscow { display: grid; grid-template-columns: 1.35fr 1fr 1fr .8fr; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .scope { padding: 1.5rem; min-height: 25rem; border-right: 1px solid var(--line); }
+    .scope:last-child { border: 0; }
+    .scope:nth-child(1) { background: var(--ink); color: white; }
+    .scope:nth-child(2) { background: #f4ecdf; }
+    .scope:nth-child(3) { background: #faf7f1; }
+    .scope:nth-child(4) { background: #eeeae4; }
+    .scope-code { font: 400 3rem var(--serif); color: var(--champagne); }
+    .scope h3 { margin: .2rem 0 1rem; font-size: 1.4rem; }
+    .scope ul { margin: 0; padding-left: 1.1rem; }
+    .scope li { margin: .65rem 0; font-size: .75rem; color: var(--muted); }
+    .scope:first-child li { color: #d3cbc2; }
+    .scope-note { margin-top: 1.2rem; color: var(--muted); font-size: .74rem; }
+
+    .commerce {
+      margin-top: 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+    }
+    .commerce-card { padding: 1.5rem; border: 1px solid var(--line); border-radius: 1.2rem; }
+    .commerce-card h3 { margin: .3rem 0 1rem; font-size: 1.45rem; }
+    .commerce-card dl { margin: 0; }
+    .commerce-card dt { color: var(--gold); font-size: .67rem; text-transform: uppercase; letter-spacing: .1em; margin-top: .9rem; }
+    .commerce-card dd { margin: .2rem 0; color: var(--muted); font-size: .78rem; }
+
+    .security { background: #26231f; color: white; position: relative; }
+    .security::after {
+      content: ""; position: absolute; width: 30rem; aspect-ratio: 1; right: -10rem; bottom: -14rem;
+      border: 1px solid rgba(185,149,91,.2); border-radius: 50%; box-shadow: inset 0 0 0 4rem rgba(185,149,91,.025);
+    }
+    .security .section-head p { color: #c7bfb5; }
+    .security-grid { display: grid; grid-template-columns: .75fr 1.25fr; gap: clamp(2rem, 7vw, 6rem); }
+    .shield {
+      min-height: 28rem; display: grid; place-items: center; position: relative;
+      background: radial-gradient(circle, rgba(185,149,91,.13), transparent 65%);
+    }
+    .shield-core {
+      width: 14rem; aspect-ratio: .82; clip-path: polygon(50% 0, 93% 16%, 88% 68%, 50% 100%, 12% 68%, 7% 16%);
+      display: grid; place-items: center; text-align: center; padding: 2rem;
+      background: linear-gradient(145deg, #d1b37e, #8a6938); color: #211e1a;
+      box-shadow: 0 0 80px rgba(185,149,91,.2);
+    }
+    .shield-core b { display: block; font: 500 1.5rem var(--serif); }
+    .shield-core span { font-size: .72rem; }
+    .security-list { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .security-item { padding: 1.1rem; border: 1px solid rgba(255,255,255,.1); border-radius: 1rem; background: rgba(255,255,255,.025); }
+    .security-item b { display: block; color: #e0c38f; font: 500 1rem var(--serif); }
+    .security-item p { margin: .35rem 0 0; color: #bbb3aa; font-size: .73rem; }
+    .security-message {
+      margin-top: 1rem; padding: 1.2rem; border-left: 2px solid #d1b37e;
+      color: #e5ddd3; font: 400 1.1rem var(--serif);
+    }
+
+    .finale {
+      min-height: 90svh; display: grid; place-items: center; text-align: center; position: relative;
+      padding: clamp(6rem, 12vw, 11rem) 0;
+      background: linear-gradient(var(--paper), #f6efe5);
+    }
+    .finale::before, .finale::after {
+      content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: min(54rem, 85vw); aspect-ratio: 1; border: 1px solid rgba(185,149,91,.18); border-radius: 50%;
+    }
+    .finale::after { width: min(40rem, 70vw); border-style: dashed; animation: turn 50s linear infinite reverse; }
+    .finale-inner { position: relative; z-index: 2; max-width: 61rem; }
+    .finale h2 { margin: 0; font-size: clamp(3rem, 8vw, 7rem); letter-spacing: -.055em; }
+    .finale h2 em { color: var(--gold); }
+    .finale p { max-width: 47rem; margin: 2rem auto 0; color: var(--muted); font-size: clamp(1rem, 2vw, 1.25rem); }
+    .finale-rule { width: 5rem; height: 1px; background: var(--champagne); margin: 2.2rem auto; }
+    .essence { font: 400 clamp(1.45rem, 3vw, 2.5rem)/1.3 var(--serif); }
+    .final-stamps { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 2rem; }
+    .final-stamps span { padding: .55rem .85rem; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .72rem; }
+
+    footer { padding: 2rem 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .72rem; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .75s ease, transform .75s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    body.focus-mode .tech-card:not(:hover), body.focus-mode .journey-step:not(:hover) { opacity: .52; filter: saturate(.55); }
+    body.focus-mode .tech-card:hover, body.focus-mode .journey-step:hover { transform: translateY(-5px) scale(1.01); }
+
+    @media (max-width: 900px) {
+      .topnav a { display: none; }
+      .hero-grid, .manifesto-grid, .section-head, .security-grid { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .hero-art { min-height: 27rem; }
+      .promises { grid-template-columns: 1fr 1fr; }
+      .tech-card { grid-column: span 12; }
+      .reversal { background: linear-gradient(180deg, var(--ink) 0 48%, #f4eee5 48%); }
+      .reversal .tech-intro { max-width: 100%; }
+      .mirror { grid-template-columns: 1fr; gap: 3.6rem; }
+      .moscow { grid-template-columns: 1fr 1fr; }
+      .scope { border-bottom: 1px solid var(--line); }
+      .rules, .commerce { grid-template-columns: 1fr 1fr; }
+      .timeline { grid-template-columns: repeat(4, 1fr); row-gap: 1.5rem; }
+      .status:nth-child(4)::before, .status:nth-child(8)::before { right: 0; }
+    }
+    @media (max-width: 620px) {
+      html { scroll-padding-top: 4.8rem; }
+      .brand-copy span { display: none; }
+      .topbar-inner { min-height: 4.1rem; }
+      .focus-toggle { padding: .45rem .65rem; }
+      h1 { font-size: clamp(3.2rem, 18vw, 5rem); }
+      .hero-card { width: min(17rem, 72vw); }
+      .hero-art { min-height: 23rem; }
+      .orbit { width: min(22rem, 90vw); }
+      .promises, .constellation, .empathy-map, .security-list, .rules, .commerce, .moscow { grid-template-columns: 1fr; }
+      .eight { grid-template-columns: 1fr 1fr; }
+      .lotus-map { gap: .4rem; }
+      .petal, .lotus-heart { min-height: 6.5rem; padding: .6rem; }
+      .petal small { display: none; }
+      .traction { flex-direction: column; }
+      .traction-arrow { transform: rotate(90deg); }
+      .decision-ribbon { grid-template-columns: 1fr; }
+      .order-flow-head { align-items: start; flex-direction: column; }
+      .deadline { text-align: left; }
+      .timeline { grid-template-columns: 1fr 1fr; }
+      .status { min-height: 4.5rem; }
+      .scope { min-height: auto; border-right: 0; }
+      .shield { min-height: 22rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+    @media print {
+      .topbar, .progress, .scroll-cue, .focus-toggle { display: none !important; }
+      body { background: white; }
+      .hero { min-height: auto; }
+      .section, .manifesto, .security, .finale { break-inside: avoid; padding: 3rem 0; }
+      .reveal { opacity: 1; transform: none; }
+      .tech-card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <div class="progress" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#inicio" aria-label="JS Designs — voltar ao início">
+        <span class="brand-mark" aria-hidden="true">JS</span>
+        <span class="brand-copy"><strong>JS Designs</strong><span>Visão da experiência digital</span></span>
+      </a>
+      <nav class="topnav" aria-label="Navegação principal">
+        <a href="#tecnicas">Técnicas</a>
+        <a href="#jornada">Jornada</a>
+        <a href="#prioridades">Prioridades</a>
+        <a href="#seguranca">Segurança</a>
+        <button class="focus-toggle" type="button" aria-pressed="false" title="Atenuar os demais cartões ao passar o cursor">Modo foco</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" id="inicio" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">Brainstorming · modo Parceiro Criativo</p>
+          <h1 id="hero-title">Uma loja <em>simples</em> por fora.</h1>
+          <p class="hero-lead">A visão para transformar descoberta, personalização, pagamento e acompanhamento em uma experiência premium — sem depender do WhatsApp.</p>
+          <div class="hero-meta" aria-label="Dados da sessão">
+            <span>23–24 jul 2026</span>
+            <span>8 técnicas</span>
+            <span>9 afinidades</span>
+            <span>Status: concluída</span>
+          </div>
+          <a class="scroll-cue" href="#norte"><i aria-hidden="true"></i> Percorrer a síntese</a>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit"></div>
+          <div class="hero-card">
+            <span class="number">01</span>
+            <blockquote>Escolher.<br>Personalizar.<br>Celebrar.</blockquote>
+            <small>Da ideia à encomenda</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="manifesto" id="norte" aria-labelledby="north-title">
+      <div class="wrap">
+        <div class="manifesto-grid">
+          <div>
+            <span class="chapter">Norte da experiência</span>
+            <h2 id="north-title">Premium é <span>clareza.</span></h2>
+          </div>
+          <div class="manifesto-copy">
+            <p>A cliente encontra o que procura, entende o que acontece depois da compra e acompanha cada cuidado da produção.</p>
+            <div class="promises" aria-label="Quatro promessas da marca">
+              <div class="promise"><strong>Versatilidade</strong>para cada celebração</div>
+              <div class="promise"><strong>Qualidade</strong>artesanal visível</div>
+              <div class="promise"><strong>Personalização</strong>simples e guiada</div>
+              <div class="promise"><strong>Apoio humano</strong>quando necessário</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tecnicas" aria-labelledby="tech-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <div>
+            <span class="chapter">Divergência</span>
+            <h2 id="tech-title">Oito lentes,<br>uma direção.</h2>
+          </div>
+          <p>Cada técnica abriu um ângulo diferente: o trabalho que a cliente quer realizar, as premissas a inverter, as referências a combinar e os mecanismos que sustentam confiança e recompra.</p>
+        </header>
+
+        <div class="tech-grid">
+          <article class="tech-card jtbd reveal">
+            <span class="tech-no">01</span>
+            <h3>Job to Be Done</h3>
+            <p class="tech-intro">Realizar a festa dos sonhos com qualidade e preço acessível — escolhendo diretamente em um catálogo, sem uma consultoria de orçamento.</p>
+            <div class="job-track">
+              <div class="job"><span class="job-dot"></span><div><strong>Descobrir</strong><span>Modelos, kits e formatos disponíveis.</span></div></div>
+              <div class="job"><span class="job-dot"></span><div><strong>Comprar</strong><span>Escolha clara do produto e da quantidade.</span></div></div>
+              <div class="job"><span class="job-dot"></span><div><strong>Personalizar</strong><span>Briefing adaptado aparece após o pagamento.</span></div></div>
+              <div class="job"><span class="job-dot"></span><div><strong>Aprovar</strong><span>Prévia, histórico e até três alterações gratuitas.</span></div></div>
+            </div>
+          </article>
+
+          <article class="tech-card reversal reveal">
+            <span class="tech-no">02</span>
+            <h3>Assumption Reversal</h3>
+            <p class="tech-intro">Menos decisões expostas de uma vez. A informação aparece no ponto exato em que se torna útil.</p>
+            <div class="mirror">
+              <div class="mirror-side">
+                <span class="micro-label">Fora da direção</span>
+                <ul>
+                  <li class="discard">Vários CTAs por modalidade</li>
+                  <li class="discard">Cabeçalho carregado</li>
+                  <li class="discard">Regras inteiras nos cartões</li>
+                  <li class="discard">Ofertas genéricas</li>
+                </ul>
+              </div>
+              <div class="mirror-side">
+                <span class="micro-label">Direção aprovada</span>
+                <ul>
+                  <li>“Comprar agora” como chamada principal</li>
+                  <li>Menu Loja bem organizado</li>
+                  <li>Divulgação progressiva</li>
+                  <li>“Complete sua festa” contextual</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="tech-card cross reveal">
+            <span class="tech-no">03</span>
+            <h3>Cross-Pollination</h3>
+            <p class="tech-intro">Práticas de rastreamento, transparência artesanal, fiscalidade e comparação alimentam uma encomenda mais previsível.</p>
+            <div class="constellation">
+              <div class="seed"><b>Rastreamento</b><span>Linha do tempo com oito estados e datas estimadas.</span></div>
+              <div class="seed"><b>Ateliê de luxo</b><span>Foto da encomenda na verificação de qualidade.</span></div>
+              <div class="seed"><b>Operação fiscal</b><span>NIF opcional e fatura entregue digitalmente.</span></div>
+              <div class="seed"><b>Produção</b><span>Sete dias corridos após briefing completo.</span></div>
+              <div class="seed"><b>Europa</b><span>Frete calculado pelo endereço para toda a Europa.</span></div>
+              <div class="seed"><b>Convites</b><span>Famílias comparáveis, preservando oito formatos.</span></div>
+            </div>
+          </article>
+
+          <article class="tech-card lotus reveal">
+            <span class="tech-no">04</span>
+            <h3>Lotus Blossom</h3>
+            <p class="tech-intro">A experiência desabrochou em oito pétalas conectadas ao mesmo centro: praticidade.</p>
+            <div class="lotus-map" aria-label="Oito pétalas da experiência">
+              <div class="petal"><strong>Descoberta</strong><small>Mais pedidos e pesquisa por personagem</small></div>
+              <div class="petal"><strong>Escolha</strong><small>Resultados agrupados por categoria</small></div>
+              <div class="petal"><strong>Personalização</strong><small>Incluída, dispensável ou expandida</small></div>
+              <div class="petal"><strong>Pagamento</strong><small>Compra sem cadastro e checkout único</small></div>
+              <div class="lotus-heart"><strong>Praticidade</strong><small>o centro</small></div>
+              <div class="petal"><strong>Briefing</strong><small>Adaptativo, salvo e reutilizável</small></div>
+              <div class="petal"><strong>Aprovação</strong><small>Versões e alterações restantes</small></div>
+              <div class="petal"><strong>Produção</strong><small>Fila visual e ficha automática</small></div>
+              <div class="petal"><strong>Pós-venda</strong><small>Calendário e recompra editável</small></div>
+            </div>
+          </article>
+
+          <div class="decision-ribbon reveal">
+            <span class="seal" aria-hidden="true">✓</span>
+            <div><strong>Primeiro lote concluído</strong><p>Da lógica comercial à jornada completa: o campo já apontava para uma operação complexa protegendo uma compra simples.</p></div>
+          </div>
+
+          <article class="tech-card empathy reveal">
+            <span class="tech-no">05</span>
+            <h3>Empathy Map</h3>
+            <p class="tech-intro">A cliente precisa perceber versatilidade, acabamento, facilidade de escolha e suporte disponível.</p>
+            <div class="empathy-map">
+              <div class="empathy-cell"><b>Percebe</b><p>Fotografias grandes, acabamento perfeito e organização intuitiva.</p></div>
+              <div class="empathy-cell"><b>Procura</b><p>Produtos pelo personagem, tema e tipo de celebração.</p></div>
+              <div class="empathy-cell"><b>Questiona</b><p>Customização, prazo, frete e estado da encomenda.</p></div>
+              <div class="empathy-cell"><b>Confia</b><p>Quando vê laços, pedras, embalagem, recortes e montagem em detalhe.</p></div>
+            </div>
+            <div style="margin-top:1rem">
+              <span class="tag">Chat automático primeiro</span><span class="tag">WhatsApp quando necessário</span>
+            </div>
+          </article>
+
+          <article class="tech-card whatif reveal">
+            <span class="tech-no">06</span>
+            <h3>What If Scenarios</h3>
+            <p class="tech-intro">Cenários-limite definiram a forma do suporte e guardrails para prazo e urgência.</p>
+            <div class="branches">
+              <div class="branch"><i>?</i><div><b>O robô não resolve</b><span>Assume o limite e permite mensagem para atendimento posterior.</span></div></div>
+              <div class="branch"><i>↗</i><div><b>WhatsApp indisponível</b><span>O chat no site continua como alternativa independente.</span></div></div>
+              <div class="branch"><i>7</i><div><b>Evento em menos de sete dias</b><span>A cliente consulta viabilidade e taxa; nada é prometido automaticamente.</span></div></div>
+              <div class="branch"><i>×</i><div><b>Durante o checkout</b><span>Os dois botões de suporte ficam ocultos para evitar distração.</span></div></div>
+            </div>
+          </article>
+
+          <article class="tech-card build reveal">
+            <span class="tech-no">07</span>
+            <h3>Build on What Works</h3>
+            <p class="tech-intro">A descoberta já acontece no Instagram; a oportunidade é encurtar o caminho até um produto comprável.</p>
+            <div class="traction" aria-label="Fluxo de tração">
+              <div class="traction-step"><b>Publicação</b><small>Instagram</small></div><span class="traction-arrow" aria-hidden="true">→</span>
+              <div class="traction-step"><b>Link direto</b><small>produto ou tema</small></div><span class="traction-arrow" aria-hidden="true">→</span>
+              <div class="traction-step"><b>Configuração</b><small>salva e recuperável</small></div><span class="traction-arrow" aria-hidden="true">→</span>
+              <div class="traction-step"><b>Compra</b><small>sem reconstruir</small></div>
+            </div>
+            <div class="proof">“Ficou lindo” e “top”: avaliações espontâneas com fotos reais provam o resultado visual.</div>
+          </article>
+
+          <article class="tech-card crazy reveal">
+            <span class="tech-no">08</span>
+            <h3>Crazy 8s</h3>
+            <p class="tech-intro">Oito provocações fecharam a divergência com princípios de aquisição, preço justo e fidelização.</p>
+            <div class="eight">
+              <div class="idea-tile"><b>1</b><span>Qualidade consistente</span></div>
+              <div class="idea-tile"><b>2</b><span>Atendimento rápido</span></div>
+              <div class="idea-tile"><b>3</b><span>Expectativa atendida</span></div>
+              <div class="idea-tile"><b>4</b><span>Recomendação espontânea</span></div>
+              <div class="idea-tile"><b>5</b><span>Promoções pontuais</span></div>
+              <div class="idea-tile"><b>6</b><span>Desconto progressivo</span></div>
+              <div class="idea-tile"><b>7</b><span>Newsletter de packs</span></div>
+              <div class="idea-tile"><b>8</b><span>Recuperação com oferta real</span></div>
+            </div>
+          </article>
+
+          <div class="decision-ribbon reveal">
+            <span class="seal" aria-hidden="true">✓</span>
+            <div><strong>Divergência encerrada</strong><p>Sem recompensa por avaliações e sem urgência artificial: a confiança deve nascer do produto, do serviço e de oportunidades verdadeiras.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section journey-section" id="jornada" aria-labelledby="journey-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <div>
+            <span class="chapter">Experiência ponta a ponta</span>
+            <h2 id="journey-title">Uma jornada<br>que se explica.</h2>
+          </div>
+          <p>A cliente vê apenas o necessário em cada momento. A operação absorve regras, versões, prazos e materiais nos bastidores.</p>
+        </header>
+
+        <div class="journey reveal" tabindex="0" aria-label="Jornada em oito etapas; em telas menores, role horizontalmente">
+          <article class="journey-step"><span class="step-no">01</span><h3>Descoberta</h3><p>Mais pedidos, busca visível e produtos relevantes ao longo da página.</p><span class="outcome">Encontrar sem esforço</span></article>
+          <article class="journey-step"><span class="step-no">02</span><h3>Escolha</h3><p>Busca por personagem reúne convites, lembrancinhas, kits, topos e digitais.</p><span class="outcome">Comparar por categoria</span></article>
+          <article class="journey-step"><span class="step-no">03</span><h3>Produto</h3><p>Foto, preço e compra primeiro; detalhes, material, prazo e processo sob demanda.</p><span class="outcome">Entender sem excesso</span></article>
+          <article class="journey-step"><span class="step-no">04</span><h3>Carrinho</h3><p>Customização, miniatura e até três complementos do mesmo tema com desconto progressivo.</p><span class="outcome">Completar a festa</span></article>
+          <article class="journey-step"><span class="step-no">05</span><h3>Checkout</h3><p>Uma página, sem cadastro obrigatório, NIF opcional e botão “Finalizar e comprar”.</p><span class="outcome">Concluir com fluidez</span></article>
+          <article class="journey-step"><span class="step-no">06</span><h3>Briefing</h3><p>Surge após o pagamento, adapta perguntas, salva progresso e reutiliza dados do evento.</p><span class="outcome">Personalizar com contexto</span></article>
+          <article class="journey-step"><span class="step-no">07</span><h3>Aprovação</h3><p>Prévias numeradas, três alterações gratuitas e conferência final dos dados.</p><span class="outcome">Aprovar com segurança</span></article>
+          <article class="journey-step"><span class="step-no">08</span><h3>Produção</h3><p>Contador transparente, evidência fotográfica, envio e acompanhamento na conta.</p><span class="outcome">Acompanhar até receber</span></article>
+        </div>
+
+        <div class="order-flow reveal">
+          <div class="order-flow-head">
+            <div><span class="micro-label">Linha do tempo da encomenda</span><h3>Do pagamento à porta.</h3></div>
+            <div class="deadline"><strong>7 dias</strong>corridos após o briefing completo</div>
+          </div>
+          <div class="timeline" aria-label="Estados da encomenda">
+            <div class="status"><strong>Pedido confirmado</strong>pagamento validado</div>
+            <div class="status"><strong>Aguardando briefing</strong>dados pendentes</div>
+            <div class="status"><strong>Arte em criação</strong>trabalho iniciado</div>
+            <div class="status"><strong>Aguardando aprovação</strong>ação da cliente</div>
+            <div class="status"><strong>Em produção</strong>confecção</div>
+            <div class="status"><strong>Verificação de qualidade</strong>foto final</div>
+            <div class="status"><strong>Preparando para envio</strong>embalagem</div>
+            <div class="status"><strong>Enviado</strong>transporte</div>
+          </div>
+          <div class="pause-note"><strong>Regra de confiança:</strong> o contador pausa quando a continuidade depende de resposta, alteração ou aprovação da cliente — e mostra claramente o motivo.</div>
+        </div>
+
+        <div class="rules reveal" aria-label="Regras comerciais essenciais">
+          <div class="rule"><b>3 dias</b><span>Prazo para preencher o briefing; depois disso, o pedido permanece ativo.</span></div>
+          <div class="rule"><b>3 alterações</b><span>Rodadas gratuitas em cada arte personalizada.</span></div>
+          <div class="rule"><b>48 horas</b><span>Reserva do pedido enquanto a transferência aguarda confirmação.</span></div>
+          <div class="rule"><b>1 cobrança</b><span>A mesma miniatura criada pode ser aplicada a vários itens compatíveis.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section convergence" id="prioridades" aria-labelledby="scope-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <div>
+            <span class="chapter">Convergência</span>
+            <h2 id="scope-title">Do campo<br>ao foco.</h2>
+          </div>
+          <p>Nove afinidades organizaram as ideias; MoSCoW separou a experiência essencial das camadas que podem amadurecer depois.</p>
+        </header>
+
+        <div class="affinities reveal" aria-label="Nove grupos de afinidade">
+          <span class="affinity">Marca &amp; UX</span><span class="affinity">Catálogo &amp; busca</span><span class="affinity">Modelos de produto</span>
+          <span class="affinity">Personalização</span><span class="affinity">Checkout &amp; fiscalidade</span><span class="affinity">Briefing &amp; aprovação</span>
+          <span class="affinity">Produção &amp; acompanhamento</span><span class="affinity">Suporte</span><span class="affinity">Marketing &amp; recompra</span>
+        </div>
+
+        <div class="moscow reveal" aria-label="Priorização MoSCoW">
+          <article class="scope">
+            <span class="scope-code">M</span><h3>Precisa no lançamento</h3>
+            <ul>
+              <li>Jornada completa de descoberta e compra</li>
+              <li>Personalização, briefing e aprovação</li>
+              <li>Produção e acompanhamento</li>
+              <li>Núcleo administrativo e fiscal</li>
+              <li>Operação internacional</li>
+              <li>Segurança e RGPD</li>
+            </ul>
+          </article>
+          <article class="scope">
+            <span class="scope-code">S</span><h3>Logo após o núcleo</h3>
+            <ul>
+              <li>Comparação avançada de convites</li>
+              <li>Pagamentos adicionais</li>
+              <li>Busca preditiva e favoritos</li>
+              <li>Avaliações e suporte automático</li>
+              <li>Orçamentos recuperáveis</li>
+              <li>SEO e automações</li>
+            </ul>
+          </article>
+          <article class="scope">
+            <span class="scope-code">C</span><h3>Pode vir depois</h3>
+            <ul>
+              <li>Calendário de celebrações</li>
+              <li>Fidelização e cartões-presente</li>
+              <li>Recomendações avançadas</li>
+              <li>Logins sociais e blog completo</li>
+              <li>Francês, espanhol e pré-visualização automática</li>
+              <li>Relatórios avançados</li>
+            </ul>
+          </article>
+          <article class="scope">
+            <span class="scope-code">W</span><h3>Fora da direção</h3>
+            <ul>
+              <li>Consultoria por orçamento</li>
+              <li>Vários CTAs por modalidade</li>
+              <li>Personagens como caminho principal</li>
+              <li>Suporte no checkout</li>
+              <li>Urgência automática</li>
+              <li>Recompensa por avaliações</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="commerce reveal">
+          <article class="commerce-card">
+            <span class="micro-label">Modelos de produto</span><h3>O catálogo deixa o fluxo claro.</h3>
+            <dl>
+              <dt>Arquivo digital pronto</dt><dd>Entrega automática, sem customização.</dd>
+              <dt>Modelo personalizado</dt><dd>Compra, briefing, criação e aprovação.</dd>
+              <dt>Projeto exclusivo</dt><dd>Questionário detalhado e contato dedicado.</dd>
+            </dl>
+          </article>
+          <article class="commerce-card">
+            <span class="micro-label">Convites digitais</span><h3>Complexidade define o prazo.</h3>
+            <dl>
+              <dt>Essenciais</dt><dd>Até 24 horas.</dd>
+              <dt>Interativos</dt><dd>Até 48 horas.</dd>
+              <dt>Infinito</dt><dd>Até 72 horas.</dd>
+              <dt>Cinemágicos</dt><dd>De três a cinco dias úteis.</dd>
+            </dl>
+          </article>
+          <article class="commerce-card">
+            <span class="micro-label">Benefícios</span><h3>Desconto sem confusão.</h3>
+            <dl>
+              <dt>Primeira compra</dt><dd>10%, sem valor mínimo, mediante cadastro do e-mail.</dd>
+              <dt>Conjuntos</dt><dd>Desconto progressivo em complementos relacionados.</dd>
+              <dt>Não cumulativo</dt><dd>O sistema aplica automaticamente o melhor benefício.</dd>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section security" id="seguranca" aria-labelledby="security-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <div>
+            <span class="chapter">Requisito de lançamento</span>
+            <h2 id="security-title">Confiança<br>por design.</h2>
+          </div>
+          <p>Dados pessoais, fiscais, fotografias, uploads e pagamentos entram no produto como critérios de aceite — não como acabamento posterior.</p>
+        </header>
+        <div class="security-grid">
+          <div class="shield reveal" aria-hidden="true">
+            <div class="shield-core"><div><b>Privado<br>por padrão</b><span>RGPD · ASVS N2 · PCI DSS</span></div></div>
+          </div>
+          <div>
+            <div class="security-list reveal">
+              <article class="security-item"><b>Pagamentos tokenizados</b><p>Cartões somente por fornecedor certificado; nunca guardar número completo, CVV ou PIN.</p></article>
+              <article class="security-item"><b>Acesso mínimo</b><p>Funções, privilégio mínimo, MFA administrativo e registos de auditoria.</p></article>
+              <article class="security-item"><b>Uploads privados</b><p>Validação, renomeação, análise antimalware e links temporários assinados.</p></article>
+              <article class="security-item"><b>Infância protegida</b><p>Fotos e miniaturas nunca públicas; marketing apenas com consentimento separado.</p></article>
+              <article class="security-item"><b>Dados minimizados</b><p>Retenção definida e direitos de acesso, correção e eliminação.</p></article>
+              <article class="security-item"><b>Infraestrutura protegida</b><p>TLS, HSTS, encriptação, CSP, CSRF, WAF, cookies seguros e proteção contra bots.</p></article>
+              <article class="security-item"><b>Credenciais robustas</b><p>Palavras-passe com Argon2id e segredos geridos com segurança.</p></article>
+              <article class="security-item"><b>Verificação contínua</b><p>Revisão de código, dependências, automação, varreduras e teste de intrusão.</p></article>
+            </div>
+            <div class="security-message reveal">“Pagamentos protegidos e processados por parceiros certificados.”</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="finale" aria-labelledby="finale-title">
+      <div class="wrap finale-inner reveal">
+        <span class="chapter">Síntese</span>
+        <h2 id="finale-title">A sofisticação está em <em>não parecer difícil.</em></h2>
+        <div class="finale-rule"></div>
+        <p class="essence">Praticidade para escolher e finalizar a compra. Clareza para confiar. Acompanhamento para sentir o cuidado.</p>
+        <p>A complexidade vive no briefing inteligente, nas aprovações, automações, fichas e fila de produção. Para a cliente, fica uma jornada intuitiva, elegante e transparente.</p>
+        <div class="final-stamps" aria-label="Princípios finais">
+          <span>Descoberta direta</span><span>Divulgação progressiva</span><span>Acabamento visível</span>
+          <span>Preço justo</span><span>Suporte contextual</span><span>Privacidade por design</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>JS Designs · Website premium e loja online completa</span>
+      <span>Sessão concluída em 24 de julho de 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      "use strict";
+      const progress = document.querySelector(".progress");
+      const focusButton = document.querySelector(".focus-toggle");
+      const reveals = [...document.querySelectorAll(".reveal")];
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+        progress.style.transform = `scaleX(${ratio})`;
+      };
+      updateProgress();
+      window.addEventListener("scroll", updateProgress, { passive: true });
+      window.addEventListener("resize", updateProgress);
+
+      focusButton.addEventListener("click", () => {
+        const active = document.body.classList.toggle("focus-mode");
+        focusButton.setAttribute("aria-pressed", String(active));
+        focusButton.textContent = active ? "Sair do foco" : "Modo foco";
+      });
+
+      if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: .12, rootMargin: "0px 0px -5% 0px" });
+        reveals.forEach(item => observer.observe(item));
+      } else {
+        reveals.forEach(item => item.classList.add("visible"));
+      }
+    })();
+  </script>
+</body>
+</html>
