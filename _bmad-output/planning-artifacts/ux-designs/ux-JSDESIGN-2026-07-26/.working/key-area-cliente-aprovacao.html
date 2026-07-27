@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JS Designs — Área da Cliente e aprovação</title>
+  <style>
+    /*
+      Governado por DESIGN.md: Timeline, approval panel, buttons, QA photo.
+      Governado por EXPERIENCE.md: UJ-1, UJ-2, State Patterns, Accessibility Floor.
+    */
+    :root{--surface-base:#fff;--surface-soft:#f8f5f1;--ink-primary:#2d2d2d;--ink-secondary:#5d554e;--ink-muted:#74685e;--accent-primary:#765321;--accent-calm:#7d8974;--border-subtle:#d8cec3;--danger:#a12626;--serif:Georgia,"Times New Roman",serif;--sans:Inter,"Helvetica Neue",Arial,sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#e8e2da;color:var(--ink-primary);font-family:var(--sans)}.phone{width:min(390px,100vw);min-height:844px;background:var(--surface-base);border:12px solid #242424;border-radius:34px;overflow:hidden;box-shadow:0 28px 80px rgb(45 45 45 / 22%)}header{padding:18px 20px;border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center}.brand{font-family:var(--serif);font-size:20px}.code{font-size:12px;color:var(--ink-muted)}main{padding:18px 20px 28px}h1{margin:0 0 4px;font-family:var(--serif);font-size:28px;font-weight:400}.lead{margin:0 0 16px;color:var(--ink-secondary);font-size:14px;line-height:1.45}.next{padding:14px;border-radius:12px;background:var(--surface-soft);border:1px solid var(--border-subtle);margin-bottom:16px}.next span{display:block;color:var(--ink-muted);font-size:12px}.next strong{display:block;margin-top:2px;font-size:15px}.timeline{display:grid;gap:10px;margin:0 0 18px;padding:0;list-style:none}.step{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}.dot{width:28px;height:28px;border-radius:999px;border:1px solid var(--border-subtle);display:grid;place-items:center;font-size:12px;background:#fff}.done .dot{background:var(--accent-calm);border-color:var(--accent-calm);color:#fff}.current .dot{background:var(--ink-primary);border-color:var(--ink-primary);color:#fff}.step strong{display:block;font-size:14px}.step small{display:block;color:var(--ink-muted);line-height:1.4}.approval{border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;background:#fff}.preview{height:218px;background:linear-gradient(135deg,#f8f5f1,#efe8df);display:grid;place-items:center;position:relative}.preview::before{content:"Prévia 02";position:absolute;left:12px;top:12px;border-radius:999px;background:#fff;padding:6px 9px;color:var(--accent-primary);font-size:12px;font-weight:800}.invite{width:158px;height:178px;border-radius:10px;background:#fff;border:1px solid var(--border-subtle);box-shadow:0 18px 40px rgb(45 45 45 / 12%);display:grid;place-items:center;text-align:center;padding:18px;font-family:var(--serif);font-size:20px;line-height:1.2}.approval-body{padding:14px}.free{display:inline-block;border-radius:999px;background:var(--surface-soft);padding:6px 9px;color:var(--accent-primary);font-size:12px;font-weight:800;margin-bottom:10px}.approval h2{margin:0 0 6px;font-family:var(--serif);font-weight:400;font-size:22px}.approval p{margin:0 0 14px;color:var(--ink-secondary);font-size:13px;line-height:1.45}.actions{display:grid;gap:10px}.primary,.secondary{min-height:46px;border-radius:8px;font-weight:800}.primary{border:0;background:var(--ink-primary);color:#fff}.secondary{border:1px solid var(--border-subtle);background:#fff;color:var(--ink-primary)}.note{margin-top:12px;color:var(--ink-muted);font-size:12px;line-height:1.4}.qa{margin-top:16px;padding:12px;border:1px dashed var(--border-subtle);border-radius:12px;background:var(--surface-soft)}.qa strong{display:block;font-size:14px}.qa small{display:block;margin-top:3px;color:var(--ink-muted);line-height:1.4}
+  </style>
+</head>
+<body>
+  <div class="phone" role="img" aria-label="Mockup mobile da Área da Cliente com linha do tempo e aprovação de arte">
+    <header>
+      <div class="brand">JS Designs</div>
+      <div class="code">Pedido #JSD-1048</div>
+    </header>
+    <main>
+      <h1>Área da Cliente</h1>
+      <p class="lead">Acompanhe seu pedido, aprove a arte e veja a próxima ação.</p>
+
+      <section class="next">
+        <span>Próxima ação</span>
+        <strong>Aprovar arte ou pedir alteração</strong>
+      </section>
+
+      <ol class="timeline" aria-label="Linha do tempo do pedido">
+        <li class="step done"><span class="dot">✓</span><div><strong>Pedido confirmado</strong><small>Pagamento aprovado.</small></div></li>
+        <li class="step done"><span class="dot">✓</span><div><strong>Briefing enviado</strong><small>Fotos e referências recebidas.</small></div></li>
+        <li class="step done"><span class="dot">✓</span><div><strong>Arte em criação</strong><small>Primeira versão preparada.</small></div></li>
+        <li class="step current"><span class="dot">4</span><div><strong>Aguardando aprovação</strong><small>Você ainda tem 2 alterações gratuitas.</small></div></li>
+        <li class="step"><span class="dot">5</span><div><strong>Produção</strong><small>7 dias corridos após aprovação final.</small></div></li>
+      </ol>
+
+      <section class="approval">
+        <div class="preview"><div class="invite">Mateus<br>faz 3<br><small>Fazendinha</small></div></div>
+        <div class="approval-body">
+          <span class="free">2 alterações gratuitas restantes</span>
+          <h2>Prévia pronta para revisão</h2>
+          <p>Confira nome, data, tema e composição. Após aprovar, essa versão segue para produção.</p>
+          <div class="actions">
+            <button class="primary">Aprovar arte</button>
+            <button class="secondary">Pedir alteração</button>
+          </div>
+          <p class="note">Ao pedir alteração, você pode escrever em texto livre, marcar pontos na imagem ou usar os dois.</p>
+        </div>
+      </section>
+
+      <section class="qa">
+        <strong>Depois da produção</strong>
+        <small>A foto privada de controle de qualidade será apenas informativa, sem nova aprovação.</small>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

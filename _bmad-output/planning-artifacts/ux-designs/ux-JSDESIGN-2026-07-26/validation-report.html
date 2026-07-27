@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Validation Report — JSDESIGN</title>
+  <style>
+    body{margin:0;padding:40px;font-family:Inter,"Helvetica Neue",Arial,sans-serif;line-height:1.6;color:#2d2d2d;background:#f8f5f1}
+    main{max-width:920px;margin:0 auto;background:#fff;border:1px solid #d8cec3;border-radius:16px;padding:32px}
+    h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;line-height:1.2}
+    h1{font-size:36px;margin:0 0 16px} h2{font-size:24px;margin-top:30px}
+    code{background:#f8f5f1;padding:2px 5px;border-radius:4px}
+    .verdict{border:1px solid #d8cec3;border-radius:12px;background:#f8f5f1;padding:16px;margin:18px 0}
+    table{width:100%;border-collapse:collapse;margin:16px 0} th,td{border-bottom:1px solid #d8cec3;text-align:left;padding:10px;vertical-align:top} th{background:#f8f5f1}
+    .sev{font-weight:700;color:#765321}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Validation Report — JSDESIGN</h1>
+    <p><strong>Run at:</strong> 2026-07-27</p>
+    <p><strong>DESIGN.md:</strong> <code>J:\JSDESIGN\_bmad-output\planning-artifacts\ux-designs\ux-JSDESIGN-2026-07-26\DESIGN.md</code></p>
+    <p><strong>EXPERIENCE.md:</strong> <code>J:\JSDESIGN\_bmad-output\planning-artifacts\ux-designs\ux-JSDESIGN-2026-07-26\EXPERIENCE.md</code></p>
+
+    <section class="verdict">
+      <h2>Overall verdict</h2>
+      <p>O par de spines está pronto para handoff. A cobertura é suficiente para arquitetura, épicos, histórias e implementação inicial da loja, com ressalvas não bloqueantes sobre regras finais de negócio e integrações.</p>
+    </section>
+
+    <h2>Category verdicts</h2>
+    <table>
+      <tr><th>Categoria</th><th>Veredito</th></tr>
+      <tr><td>Flow coverage</td><td>strong</td></tr>
+      <tr><td>Token completeness</td><td>strong</td></tr>
+      <tr><td>Component coverage</td><td>strong</td></tr>
+      <tr><td>State coverage</td><td>adequate</td></tr>
+      <tr><td>Visual reference coverage</td><td>strong</td></tr>
+      <tr><td>Bloat & overspecification</td><td>adequate</td></tr>
+      <tr><td>Inheritance discipline</td><td>strong</td></tr>
+      <tr><td>Shape fit</td><td>strong</td></tr>
+    </table>
+
+    <h2>Findings by severity</h2>
+    <p><span class="sev">Critical:</span> 0 · <span class="sev">High:</span> 0 · <span class="sev">Medium:</span> 0 · <span class="sev">Low:</span> 3</p>
+    <ul>
+      <li>Administração e políticas sem estados por subtela. Detalhar em arquitetura/admin stories.</li>
+      <li>Checkout depende de regras finais de frete, NIF e pagamento. Completar quando as integrações forem escolhidas.</li>
+      <li><code>EXPERIENCE.md</code> é extenso, mas justificado pela complexidade. Usar como fonte para histórias menores.</li>
+    </ul>
+
+    <h2>Reviewer files</h2>
+    <ul><li><code>review-rubric.md</code></li></ul>
+  </main>
+</body>
+</html>
