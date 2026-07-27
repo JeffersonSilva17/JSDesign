@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JS Designs — Home mobile</title>
+  <style>
+    /*
+      Governado por DESIGN.md: Brand & Style, Colors, Typography, Layout & Spacing, Components.
+      Governado por EXPERIENCE.md: Information Architecture, Component Patterns, UJ-1, Responsive & Platform.
+    */
+    :root {
+      --surface-base: #fff;
+      --surface-soft: #f8f5f1;
+      --surface-muted: #efe8df;
+      --ink-primary: #2d2d2d;
+      --ink-secondary: #5d554e;
+      --ink-muted: #74685e;
+      --accent-primary: #765321;
+      --accent-soft: #c8a46b;
+      --accent-calm: #7d8974;
+      --border-subtle: #d8cec3;
+      --danger: #a12626;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: Inter, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #e8e2da; color: var(--ink-primary); font-family: var(--sans); }
+    .phone { width: min(390px, 100vw); min-height: 844px; background: var(--surface-base); border: 12px solid #242424; border-radius: 34px; overflow: hidden; box-shadow: 0 28px 80px rgb(45 45 45 / 22%); }
+    .topbar { display: grid; grid-template-columns: 44px 1fr 44px 44px 44px; align-items: center; gap: 4px; padding: 14px 14px 10px; border-bottom: 1px solid var(--border-subtle); background: var(--surface-base); }
+    .icon { width: 40px; height: 40px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--surface-base); display: grid; place-items: center; font-size: 18px; }
+    .brand { text-align: center; line-height: 1.1; }
+    .brand strong { display: block; font-family: var(--serif); font-size: 21px; font-weight: 400; }
+    .brand span { display: block; font-size: 11px; color: var(--ink-muted); }
+    .promo { margin: 14px 20px 0; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--surface-soft); font-size: 13px; display: flex; justify-content: space-between; gap: 12px; }
+    .promo button { border: 0; background: transparent; color: var(--accent-primary); font-weight: 700; }
+    main { padding: 18px 20px 28px; }
+    h1 { margin: 0 0 10px; font-family: var(--serif); font-size: 31px; line-height: 1.12; font-weight: 400; letter-spacing: 0; }
+    .lead { margin: 0 0 18px; color: var(--ink-secondary); font-size: 15px; line-height: 1.5; }
+    .search { border: 2px solid var(--ink-primary); border-radius: 12px; padding: 14px; display: flex; gap: 10px; align-items: center; background: var(--surface-base); font-weight: 600; }
+    .section-title { display: flex; justify-content: space-between; align-items: end; margin: 24px 0 12px; }
+    .eyebrow { margin: 0 0 4px; color: var(--accent-primary); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    h2 { margin: 0; font-family: var(--serif); font-size: 23px; font-weight: 400; }
+    .see-all { color: var(--accent-primary); font-size: 13px; font-weight: 700; }
+    .rail { display: grid; grid-auto-flow: column; grid-auto-columns: 76%; gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+    .card { scroll-snap-align: start; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; background: var(--surface-base); }
+    .card img { width: 100%; height: 178px; display: block; object-fit: cover; background: var(--surface-soft); }
+    .card-body { padding: 12px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge { border-radius: 999px; padding: 5px 8px; background: var(--surface-soft); color: var(--accent-primary); font-size: 11px; font-weight: 700; }
+    .badge.digital { background: var(--accent-calm); color: #fff; }
+    .type { margin: 0 0 4px; color: var(--ink-muted); font-size: 12px; }
+    h3 { margin: 0 0 8px; font-family: var(--serif); font-size: 19px; font-weight: 400; }
+    .meta { margin: 0 0 10px; color: var(--ink-secondary); font-size: 13px; line-height: 1.35; }
+    .price { margin: 0 0 12px; font-weight: 800; }
+    .cta { width: 100%; min-height: 44px; border: 0; border-radius: 8px; background: var(--ink-primary); color: #fff; font-weight: 800; }
+    .cats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+    .cat { padding: 14px; min-height: 78px; border-radius: 12px; background: var(--surface-soft); border: 1px solid var(--border-subtle); display: grid; align-content: space-between; }
+    .cat small { color: var(--ink-muted); }
+    .cat strong { font-family: var(--serif); font-weight: 400; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div class="phone" role="img" aria-label="Mockup mobile da home JS Designs com busca e produtos mais procurados">
+    <header class="topbar">
+      <button class="icon" aria-label="Abrir menu">☰</button>
+      <div class="brand"><strong>JS Designs</strong><span>celebrações autorais</span></div>
+      <button class="icon" aria-label="Buscar">⌕</button>
+      <button class="icon" aria-label="Área da Cliente">♡</button>
+      <button class="icon" aria-label="Carrinho">🛒</button>
+    </header>
+
+    <aside class="promo">
+      <span>10% na primeira compra com seu e-mail.</span>
+      <button>Ver</button>
+    </aside>
+
+    <main>
+      <h1>Detalhes personalizados para celebrar com cuidado.</h1>
+      <p class="lead">Encontre lembrancinhas, convites e arquivos digitais com preço, prazo e próximos passos claros.</p>
+      <div class="search">⌕ Buscar por tema, produto ou ocasião</div>
+
+      <section aria-labelledby="mais-procurados">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Logo de cara</p>
+            <h2 id="mais-procurados">Mais procurados</h2>
+          </div>
+          <span class="see-all">Ver tudo</span>
+        </div>
+
+        <div class="rail">
+          <article class="card">
+            <img src="../../../../../prototype/assets/product-fazendinha.svg" alt="">
+            <div class="card-body">
+              <div class="badges"><span class="badge">Lembrancinha</span><span class="badge">Personalizável</span></div>
+              <p class="type">Kit personalizado · a partir de 20 peças</p>
+              <h3>Kit Festa Fazendinha</h3>
+              <p class="meta">Preço por quantidade. Produção após aprovação final.</p>
+              <p class="price">A partir de € 48,00</p>
+              <button class="cta">Ver produto</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="../../../../../prototype/assets/product-convite.svg" alt="">
+            <div class="card-body">
+              <div class="badges"><span class="badge">Convite</span><span class="badge">Prévia antes da entrega</span></div>
+              <p class="type">Digital personalizado</p>
+              <h3>Convite Jardim Dourado</h3>
+              <p class="meta">Escolha modelo, tema e dados principais.</p>
+              <p class="price">A partir de € 24,00</p>
+              <button class="cta">Ver modelos</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="../../../../../prototype/assets/product-ceu.svg" alt="">
+            <div class="card-body">
+              <div class="badges"><span class="badge digital">Produto digital</span><span class="badge">Download imediato</span></div>
+              <p class="type">Silhouette Studio · sem personalização</p>
+              <h3>Topo Céu Encantado</h3>
+              <p class="meta">Arquivo pronto enviado por e-mail.</p>
+              <p class="price">€ 9,90</p>
+              <button class="cta">Comprar agora</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="cats" aria-label="Categorias principais">
+        <div class="cat"><small>Físico</small><strong>Lembrancinhas</strong></div>
+        <div class="cat"><small>Digital</small><strong>Convites</strong></div>
+        <div class="cat"><small>Pronto</small><strong>Produtos digitais</strong></div>
+        <div class="cat"><small>Sob medida</small><strong>Projeto exclusivo</strong></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

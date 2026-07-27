@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JS Designs — Convites digitais</title>
+  <style>
+    /*
+      Governado por DESIGN.md: product card, badge, form field, buttons.
+      Governado por EXPERIENCE.md: UJ-2, Component Patterns, Product-Specific Rules.
+    */
+    :root{--base:#fff;--soft:#f8f5f1;--ink:#2d2d2d;--muted:#74685e;--copy:#5d554e;--gold:#765321;--line:#d8cec3;--green:#7d8974;--serif:Georgia,"Times New Roman",serif;--sans:Inter,"Helvetica Neue",Arial,sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#e8e2da;color:var(--ink);font-family:var(--sans)}.phone{width:min(390px,100vw);min-height:844px;background:var(--base);border:12px solid #242424;border-radius:34px;overflow:hidden;box-shadow:0 28px 80px rgb(45 45 45 / 22%)}header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}.back{width:40px;height:40px;border:1px solid var(--line);border-radius:8px;background:#fff}.brand{font-family:var(--serif);font-size:20px}main{padding:18px 20px 32px}h1{margin:0 0 8px;font-family:var(--serif);font-size:31px;font-weight:400;line-height:1.1}.lead{margin:0 0 18px;color:var(--copy);font-size:14px;line-height:1.5}.compare{display:grid;gap:12px}.card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}.card.selected{border:2px solid var(--ink)}.thumb{height:128px;background:linear-gradient(135deg,#f8f5f1,#efe8df);display:grid;place-items:center}.invite{width:92px;height:104px;border-radius:8px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;text-align:center;font-family:var(--serif);font-size:16px;box-shadow:0 14px 28px rgb(45 45 45 / 10%)}.body{padding:12px}.top{display:flex;justify-content:space-between;gap:10px;align-items:start}.badge{display:inline-block;border-radius:999px;background:var(--soft);color:var(--gold);padding:6px 9px;font-size:11px;font-weight:800}.badge.complex{background:var(--green);color:#fff}.body h2{margin:8px 0 5px;font-family:var(--serif);font-size:21px;font-weight:400}.body p{margin:0;color:var(--copy);font-size:13px;line-height:1.4}.price{font-weight:900;color:var(--ink);white-space:nowrap}.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.fact{padding:9px;border-radius:8px;background:var(--soft);font-size:12px}.form{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--soft)}label{display:block;margin:0 0 6px;font-size:13px;font-weight:800}.input{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;padding:12px;font:inherit;margin-bottom:10px}.addon{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px;border-radius:10px;background:#fff;border:1px solid var(--line);font-size:13px}.toggle{width:48px;height:28px;border-radius:999px;background:var(--green);position:relative}.toggle:after{content:"";position:absolute;right:4px;top:4px;width:20px;height:20px;border-radius:999px;background:#fff}.cta{width:100%;min-height:48px;margin-top:12px;border:0;border-radius:8px;background:var(--ink);color:#fff;font-weight:900}
+  </style>
+</head>
+<body>
+  <div class="phone" role="img" aria-label="Mockup mobile de comparação e configuração de convite digital">
+    <header><button class="back">←</button><div class="brand">JS Designs</div></header>
+    <main>
+      <h1>Escolha seu convite digital</h1>
+      <p class="lead">Compare modelos, prazo e nível de personalização antes de informar o tema.</p>
+
+      <section class="compare">
+        <article class="card selected">
+          <div class="thumb"><div class="invite">Convite<br>Jardim<br>Dourado</div></div>
+          <div class="body">
+            <div class="top"><span class="badge">Convite Padrão</span><strong class="price">€ 24,00</strong></div>
+            <h2>Jardim Dourado</h2>
+            <p>Personalização com dados essenciais e tema escolhido pela cliente.</p>
+            <div class="facts"><div class="fact">Até 24h após dados completos</div><div class="fact">Prévia para aprovação</div></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="thumb"><div class="invite">Convite<br>Interativo<br>Premium</div></div>
+          <div class="body">
+            <div class="top"><span class="badge complex">Convite Complexo</span><strong class="price">€ 49,00</strong></div>
+            <h2>Interativo Premium</h2>
+            <p>Mais recursos, briefing completo e criação com prazo maior.</p>
+            <div class="facts"><div class="fact">Até 48h após briefing</div><div class="fact">Mais seções e recursos</div></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="form">
+        <label for="tema">Tema desejado</label>
+        <input class="input" id="tema" value="Fazendinha delicada">
+        <label for="dados">Dados principais</label>
+        <input class="input" id="dados" value="Mateus, 3 anos, 18/09 às 15h">
+        <div class="addon">
+          <span><strong>Usar miniatura do aniversariante</strong><br>Pago uma vez no pedido/personagem.</span>
+          <span class="toggle" aria-label="Miniatura selecionada"></span>
+        </div>
+        <button class="cta">Adicionar ao carrinho</button>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
