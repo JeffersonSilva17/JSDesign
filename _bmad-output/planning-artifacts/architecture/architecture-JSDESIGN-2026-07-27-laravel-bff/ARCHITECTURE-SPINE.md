@@ -92,7 +92,7 @@ O navegador fala com o BFF Next.js. O BFF fala com a API Laravel. O Laravel é a
 
 - **Escopo:** backend Laravel, testes, manutenção
 - **Risco evitado:** acoplamento a framework/provedor, baixa testabilidade e regras espalhadas
-- **Regra:** entidades/objetos de domínio não dependem de HTTP, Eloquent, filas, storage ou gateways. Dependências externas entram por interfaces/ports e implementações em Infrastructure.
+- **Regra:** entidades/objetos de domínio não dependem de HTTP, Eloquent, filas, storage ou gateways. Eloquent está incluso como ORM do Laravel, mas fica restrito à camada Infrastructure/persistência, repositories, queries e migrations. Dependências externas entram por interfaces/ports e implementações em Infrastructure.
 
 ### AD-5 — PostgreSQL é a fonte transacional de verdade [ADOTADO]
 
@@ -203,6 +203,7 @@ Seed verificado em 2026-07-27; patches exatos passam a ser controlados pelo cód
 | CI/CD | GitHub Actions |
 | API contract | REST JSON `/api/v1`, OpenAPI documentável |
 | Arquitetura backend | SOLID + Domain Pattern + Ports/Adapters |
+| ORM backend | Eloquent em Infrastructure/persistência |
 
 ## Estrutura Inicial
 
