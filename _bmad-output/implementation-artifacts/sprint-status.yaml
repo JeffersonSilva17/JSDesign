@@ -1,0 +1,107 @@
+# generated: 2026-07-31
+# last_updated: 2026-07-31
+# project: JSDESIGN
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: J:/JSDESIGN/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories in epic reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review
+# - Retrospective appends its action items to action_items; sprint-status surfaces open ones
+
+generated: "2026-07-31"
+last_updated: "2026-07-31"
+project: "JSDESIGN"
+project_key: "NOKEY"
+tracking_system: "file-system"
+story_location: "J:/JSDESIGN/_bmad-output/implementation-artifacts"
+
+development_status:
+  epic-1: backlog
+  1-1-inicializar-a-fundacao-tecnica-da-plataforma: backlog
+  1-2-criar-o-layout-publico-base-da-loja: backlog
+  1-3-implementar-idioma-textos-base-e-estrutura-publica-em-portugues-do-brasil: backlog
+  1-4-criar-a-home-publica-com-entrada-para-os-produtos-mais-procurados: backlog
+  1-5-exibir-captura-de-e-mail-com-cupom-de-primeira-compra: backlog
+  epic-1-retrospective: optional
+  epic-2: backlog
+  2-1-cadastrar-produtos-com-estrutura-de-catalogo-comercial: backlog
+  2-2-exibir-listagens-publicas-por-categoria-ocasiao-e-tipo: backlog
+  2-3-implementar-busca-publica-por-intencao: backlog
+  2-4-preparar-paginas-publicas-de-catalogo-para-seo-e-compartilhamento: backlog
+  epic-2-retrospective: optional
+  epic-3: backlog
+  3-1-exibir-pagina-propria-de-produto-com-diferencas-entre-modelos: backlog
+  3-2-configurar-quantidade-e-calcular-preco-antes-do-carrinho: backlog
+  3-3-coletar-personalizacao-essencial-no-adicionar-ao-carrinho: backlog
+  3-4-oferecer-miniatura-do-aniversariante-como-adicional-pago-uma-unica-vez: backlog
+  3-5-diferenciar-produtos-digitais-prontos-e-personalizados-antes-da-compra: backlog
+  3-6-sugerir-produtos-complementares-por-tema-ou-ocasiao: backlog
+  epic-3-retrospective: optional
+  epic-4: backlog
+  4-1-gerenciar-carrinho-com-itens-configurados-e-persistencia-por-conta: backlog
+  4-2-aplicar-cupom-manual-e-desconto-progressivo-automatico: backlog
+  4-3-coletar-dados-de-checkout-nif-opcional-e-consentimentos: backlog
+  4-4-calcular-frete-para-produtos-fisicos-com-envio-normal-ou-rapido: backlog
+  4-5-confirmar-pagamento-por-parceiro-certificado-ou-transferencia-bancaria: backlog
+  4-6-enviar-confirmacao-do-pedido-e-proximos-passos-por-modalidade: backlog
+  epic-4-retrospective: optional
+  epic-5: backlog
+  5-1-criar-acesso-seguro-a-area-da-cliente: backlog
+  5-2-preencher-briefing-pos-pagamento-com-referencias-e-observacoes: backlog
+  5-3-gerenciar-previas-de-arte-e-pedidos-de-alteracao: backlog
+  5-4-aprovar-arte-e-bloquear-inicio-de-producao-ate-aprovacao: backlog
+  5-5-registrar-autorizacao-de-publicacao-com-opcao-marcada-e-removivel: backlog
+  5-6-notificar-a-cliente-sobre-pendencias-e-mudancas-de-estado: backlog
+  epic-5-retrospective: optional
+  epic-6: backlog
+  6-1-entregar-produto-digital-pronto-apos-pagamento-confirmado: backlog
+  6-2-entregar-convite-digital-personalizado-somente-apos-criacao-e-aprovacao: backlog
+  6-3-acompanhar-producao-fisica-e-foto-privada-de-qa: backlog
+  6-4-registrar-envio-e-rastreio-quando-disponivel: backlog
+  epic-6-retrospective: optional
+  epic-7: backlog
+  7-1-oferecer-suporte-dentro-do-site-com-contexto-da-navegacao: backlog
+  7-2-usar-respostas-cadastradas-e-escalonar-para-atendimento-humano: backlog
+  7-3-solicitar-projeto-exclusivo-sem-pagamento-imediato: backlog
+  epic-7-retrospective: optional
+  epic-8: backlog
+  8-1-criar-painel-administrativo-de-pedidos-e-estados-operacionais: backlog
+  8-2-administrar-catalogo-precos-descontos-e-adicionais: backlog
+  8-3-confirmar-manualmente-pagamentos-e-controlar-excecoes-financeiras: backlog
+  8-4-administrar-producao-qa-envio-e-rastreio: backlog
+  8-5-gerenciar-papeis-permissoes-e-auditoria: backlog
+  8-6-exibir-metricas-operacionais-e-comerciais-essenciais: backlog
+  8-7-tratar-excecoes-operacionais-explicitamente: backlog
+  epic-8-retrospective: optional

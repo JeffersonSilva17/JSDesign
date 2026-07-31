@@ -9,14 +9,14 @@ inputDocuments:
   - prds/prd-JSDESIGN-2026-07-25/addendum.md
   - ux-designs/ux-JSDESIGN-2026-07-26/DESIGN.md
   - ux-designs/ux-JSDESIGN-2026-07-26/EXPERIENCE.md
-  - architecture/architecture-JSDESIGN-2026-07-27/ARCHITECTURE-SPINE.md
+  - architecture/architecture-JSDESIGN-2026-07-27-laravel-bff/ARCHITECTURE-SPINE.md
 ---
 
 # JSDESIGN — Quebra em Épicos e Histórias
 
 ## Visão geral
 
-Este documento reúne o inventário de requisitos extraído do PRD, adendo, especificação UX e arquitetura final da loja online JS Designs. As próximas etapas transformarão este inventário em épicos, mapa de cobertura e histórias implementáveis.
+Este documento reinicia a quebra de épicos e histórias da loja online JS Designs com a arquitetura atual: Next.js como Frontend+BFF, Laravel como API de domínio, PostgreSQL como banco transacional principal, Redis para cache/fila, SOLID + Domain Pattern e CI/CD com testes.
 
 ## Inventário de requisitos
 
@@ -28,9 +28,9 @@ FR-2: A cliente deve acessar Loja, categorias, busca, conta e Carrinho por uma n
 
 FR-3: O sistema deve permitir que páginas públicas relevantes sejam descobertas e compreendidas por mecanismos de busca.
 
-FR-4: A cliente deve alternar entre português do Brasil, inglês e espanhol e escolher entre as moedas suportadas sem perder a página, o Carrinho ou o contexto do Pedido.
+FR-4: A cliente deve alternar entre português do Brasil, inglês e espanhol e escolher entre moedas suportadas sem perder página, Carrinho ou contexto do Pedido.
 
-FR-5: A operação deve cadastrar produtos com natureza, categoria, fotos, preço, quantidade ou variante, tema demonstrado, ocasião, personalização, prazo, materiais, composição, disponibilidade e tipo de entrega. Personagens ou outros ativos protegidos somente podem ser cadastrados após verificação de direitos de uso comercial.
+FR-5: A operação deve cadastrar produtos com natureza, categoria, fotos, preço, quantidade ou variante, tema demonstrado, ocasião, personalização, prazo, materiais, composição, disponibilidade e tipo de entrega. Personagens ou ativos protegidos só podem ser cadastrados após verificação de direitos de uso comercial.
 
 FR-6: A cliente deve pesquisar por título, produto, tema, personagem, ocasião e grafias alternativas.
 
@@ -40,7 +40,7 @@ FR-8: A descoberta e a página de convite devem explicar cada Tipo de Convite po
 
 FR-9: A página de Produto Digital Pronto deve informar que o produto não inclui personalização, quais arquivos serão entregues, compatibilidade com o Silhouette Studio, condições de uso e entrega imediata após pagamento.
 
-FR-10: A cliente deve iniciar uma solicitação de Projeto Exclusivo quando desejar formato, recurso ou escopo fora das opções configuradas; ausência de tema de convite no catálogo não exige avaliação exclusiva.
+FR-10: A cliente deve iniciar solicitação de Projeto Exclusivo quando desejar formato, recurso ou escopo fora das opções configuradas; ausência de tema de convite no catálogo não exige avaliação exclusiva.
 
 FR-11: A cliente deve escolher quantidade, ativar ou dispensar personalização básica e selecionar opção de Miniatura compatível em produto físico.
 
@@ -48,7 +48,7 @@ FR-12: A cliente deve antecipar Tipo de Convite, tema em texto livre, cores, dat
 
 FR-13: O Carrinho pode oferecer dois ou três produtos complementares do mesmo tema ou ocasião.
 
-FR-14: Quando desconto progressivo por quantidade, desconto de conjunto ou cupom forem aplicáveis, o sistema deve recalcular e aplicar automaticamente o benefício válido mais vantajoso, sem acumulação indevida.
+FR-14: Quando desconto progressivo por quantidade, desconto de conjunto ou cupom forem aplicáveis, o sistema deve recalcular e aplicar o benefício válido conforme regra comercial, sem acumulação indevida.
 
 FR-15: O Carrinho deve aceitar vários produtos no mesmo Pedido e preservar cada item, quantidade e configuração durante a sessão e nas transições de idioma.
 
@@ -86,7 +86,7 @@ FR-31: A cliente deve preencher Briefing, comentar Prévia, solicitar alteraçã
 
 FR-32: Antes da postagem de produto físico, Sharom deve anexar fotografia privada da encomenda concluída.
 
-FR-33: Sharom deve registrar transportadora e código ou link de rastreamento; a cliente deve recebê-los e consultá-los na Área da Cliente.
+FR-33: Sharom deve registrar transportadora e código ou link de rastreamento quando houver; a cliente deve recebê-los e consultá-los na Área da Cliente.
 
 FR-34: Após Aprovação Final, a cliente deve escolher receber o convite por e-mail ou WhatsApp.
 
@@ -124,7 +124,7 @@ FR-50: O painel deve calcular tempo por estado, pedidos pausados, cumprimento de
 
 ### Requisitos não funcionais
 
-NFR-1: As jornadas essenciais devem atender WCAG 2.2 AA, incluindo teclado, foco visível, nomes acessíveis, contraste, mensagens de erro compreensíveis, zoom, redução de movimento e leitores de tela.
+NFR-1: Jornadas essenciais devem atender WCAG 2.2 AA, incluindo teclado, foco visível, nomes acessíveis, contraste, mensagens de erro compreensíveis, zoom, redução de movimento e leitores de tela.
 
 NFR-2: Em conexão móvel representativa do público europeu, páginas públicas e etapas de compra devem carregar e responder sem que fotografias, vídeos, fontes ou scripts bloqueiem a tarefa principal; aceite quantitativo deve seguir Core Web Vitals bons no 75º percentil por dispositivo.
 
@@ -138,7 +138,7 @@ NFR-6: Dados completos de cartão e códigos de segurança não devem transitar 
 
 NFR-7: Coleta, uso, compartilhamento, retenção e eliminação de dados devem seguir RGPD por design, com mapa de tratamentos, fluxo de direitos, fornecedores documentados, avaliação de impacto quando aplicável, processo de violação de dados e exclusão/revisão automática por prazo.
 
-NFR-8: Briefings, Miniaturas, fotografias de crianças, Prévias e fotos de qualidade devem permanecer privados, protegidos contra enumeração/acesso não autorizado e eliminados conforme política de retenção; autorização, finalidade, testes de acesso e exclusão ponta a ponta são obrigatórios.
+NFR-8: Briefings, Miniaturas, fotografias de crianças, Prévias e fotos de qualidade devem permanecer privados, protegidos contra enumeração/acesso não autorizado e eliminados conforme política de retenção.
 
 NFR-9: Dados críticos devem ter cópias protegidas, restauração testada, procedimento de resposta a incidentes e evidência de recuperação dos fluxos críticos.
 
@@ -150,63 +150,63 @@ NFR-12: O site deve ser responsivo e preservar jornadas essenciais em computador
 
 ### Requisitos adicionais de arquitetura e operação
 
-AR-1: Implementar a aplicação como monólito modular full-stack com módulos explícitos de domínio e portas para pagamentos, storage, e-mail, WhatsApp e envio.
+AR-1: Implementar Next.js como Frontend+BFF e Laravel como API/backend de domínio.
 
-AR-2: Next.js App Router + TypeScript será a base inicial da aplicação web; Server Actions/API routes devem chamar serviços de domínio, não provedores externos diretamente.
+AR-2: O navegador deve falar prioritariamente com Next.js; Next.js chama Laravel por contratos server-side/controlados.
 
-AR-3: Postgres deve ser a fonte canônica de dados transacionais, incluindo pedidos, clientes, catálogo, briefing, arquivos, aprovações, suporte e notificações.
+AR-3: BFF não pode conter regra de negócio principal; pode compor dados de tela, cuidar de SSR/SEO, sessão/cookies, cache de leitura e adaptação de payloads.
 
-AR-4: `order_id` deve conectar todo o histórico comercial, operacional e de atendimento.
+AR-4: Laravel é autoridade de domínio para carrinho, preço, pedido, pagamento, briefing, aprovação, produção, entrega, fatura, suporte, autorização e auditoria.
 
-AR-5: `payment_state` e `order_state` devem ser separados; webhooks ou conciliação manual confirmada são autoridade para confirmação financeira.
+AR-5: Backend Laravel deve seguir SOLID + Domain Pattern, organizado por módulos com camadas Domain, Application, Infrastructure e Interfaces/Http.
 
-AR-6: Transições de pedido/item devem ocorrer por máquina de estados explícita e comandos server-side idempotentes.
+AR-6: Eloquent está incluso como ORM do Laravel, mas restrito à camada Infrastructure/persistência, repositories, queries e migrations; Models Eloquent não devem virar entidades de domínio.
 
-AR-7: Configuração pré-carrinho é obrigatória para itens personalizados e deve ser server-owned para cálculo de preço/subtotal.
+AR-7: PostgreSQL é a fonte transacional de verdade para pedidos, clientes, catálogo, carrinhos, pagamentos, briefing, arquivos, aprovações, suporte, auditoria e métricas.
 
-AR-8: Miniatura/personagem é adicional compartilhado, cobrado uma única vez por pedido/personagem e reutilizável entre itens compatíveis.
+AR-8: Redis é seed para cache/fila; estado durável de negócio não deve depender de Redis.
 
-AR-9: Briefing pós-pagamento deve ser mestre por pedido/evento, com seções condicionais por modalidade.
+AR-9: `order_id` deve conectar cliente, itens, pagamento, briefing, arquivos, prévias, aprovação, produção, entrega digital, fatura, rastreio, suporte, notificações e auditoria.
 
-AR-10: Arquivos privados devem viver em storage privado, com metadados no Postgres e acesso por autorização/URLs temporárias.
+AR-10: `payment_state` e `order_state` devem ser separados; webhook confirmado ou confirmação manual auditada são autoridade de pagamento confirmado.
 
-AR-11: Notificações devem usar outbox transacional; e-mail e WhatsApp são efeitos assíncronos, e Área da Cliente é o registro principal.
+AR-11: Fluxo do pedido deve usar máquina de estados explícita com comandos/casos de uso idempotentes no Laravel.
 
-AR-12: Suporte automático deve usar base de respostas cadastradas e revisadas; escalonamento humano deve preservar contexto.
+AR-12: Laravel deve expor API REST JSON versionada inicialmente em `/api/v1`, com contratos testados por HTTP tests e documentáveis por OpenAPI.
 
-AR-13: Checkout deve permitir compra como visitante e acesso pós-compra por código seguro/magic link ou mecanismo equivalente sem expor pedidos por enumeração.
+AR-13: Laravel é autoridade de autenticação/autorização; Next.js BFF guarda sessão/cookies e não expõe segredo server-to-server ao navegador.
 
-AR-14: Internacionalização deve usar chaves de conteúdo e valores normalizados; troca de idioma não pode alterar carrinho, pedido, preço ou prazo.
+AR-14: Arquivos privados são controlados pelo Laravel com metadados no PostgreSQL, storage privado e acesso por autorização/URLs temporárias.
 
-AR-15: Admin deve usar a mesma aplicação, banco, agregado de pedido, comandos e autorização, sem planilha paralela como fonte de verdade.
+AR-15: Efeitos assíncronos como e-mail, WhatsApp, fatura, webhooks, antimalware, entrega digital, rastreio e lembretes devem rodar em jobs/filas Laravel, de forma idempotente.
 
-AR-16: Conta comercial, pagamentos e fatura devem considerar pessoa singular/trabalhadora independente em Portugal, CIRS 1336, titularidade bancária compatível, NIF/fatura e validação contabilística/fiscal.
+AR-16: Precificação, configuração, carrinho, descontos, miniatura e frete são server-owned no Laravel; Next.js apenas exibe e solicita ações.
 
-AR-17: Provedor de pagamento deve suportar checkout, cartões, wallets, MB WAY, reembolsos, disputas e conciliação; PayPal entra no MVP apenas se centralizado pelo provedor escolhido.
+AR-17: Miniatura/personagem é adicional compartilhado, cobrado uma única vez por pedido/personagem e reutilizável entre itens compatíveis.
 
-AR-18: Transferência bancária deve expirar em 48 horas, ser reprocessável e não liberar briefing/entrega sem confirmação.
+AR-18: Desconto progressivo por quantidade é automático; cupom de primeira compra gerado por cadastro de e-mail só aplica se a cliente inserir código válido no carrinho/checkout.
 
-AR-19: Frete físico automatizado no MVP deve cobrir os 27 países da União Europeia; outros países europeus devem seguir para suporte humano.
+AR-19: Carrinho pode ser salvo por até 90 dias quando a cliente cria/acessa conta; lembretes de carrinho exigem consentimento separado por canal.
 
-AR-20: Uploads devem validar tipo permitido, assinatura real, tamanho, quantidade, conteúdo malicioso, nomes não previsíveis, storage não público e retenção.
+AR-20: Transferência bancária deve reservar pedido por 48 horas, permitir prorrogação por mais 48 horas, aceitar envio de comprovante e exigir confirmação manual/bancária real antes de liberar fluxo.
 
-AR-21: Prévias devem ser versionadas de forma imutável; alteração deve ser solicitação consolidada; aprovação final deve registrar versão, autora, data e confirmações críticas.
+AR-21: Produto físico deve permitir envio normal ou rápido quando configurado; frete é calculado no checkout; rastreio só aparece quando modalidade/CTT/transportadora permitir.
 
-AR-22: Suporte humano deve operar com horário de segunda a sábado, 8h–20h de Portugal continental, com fila fora do horário e prazo máximo de 1 dia útil.
+AR-22: Produto Digital Pronto tem entrega imediata após pagamento confirmado; convite digital personalizado não é imediato e exige criação/edição, prévia e aprovação.
 
-AR-23: Capacidade inicial deve considerar 100 peças físicas por semana e 4 pontos diários para convites, sendo Convite Padrão 1 ponto e Complexo 2 pontos.
+AR-23: Briefing pós-pagamento deve ser mestre por pedido/evento, com seções condicionais por modalidade, autosave, progresso e upload protegido.
 
-AR-24: Urgência deve exigir avaliação humana, registrar decisão, impedir atraso confirmado em pedidos anteriores e aplicar adicional de 30% com mínimo de €10 quando aceita.
+AR-24: Prévias devem ser numeradas e imutáveis; aprovação final deve registrar versão, autora, data/hora e confirmações críticas.
 
-AR-25: Busca/SEO devem usar tema demonstrado, ocasião, grafias alternativas, URLs estáveis, metadados localizados, sitemap, canonical e marcação estruturada.
+AR-25: Publicação de trabalhos exige autorização opcional registrada. Convites só podem ser publicados com local, data, horário e dados sensíveis modificados/anônimos; lembrancinhas e miniaturas podem aparecer sem modificação quando autorizadas.
 
-AR-26: Catálogos atuais de convites/produtos digitais e papelaria personalizada devem ser inventariados separadamente e migrados para taxonomia unificada com revisão de licenças.
+AR-26: Suporte automático deve usar respostas cadastradas/revisadas; WhatsApp fica dentro do fluxo de suporte/projeto/entrega, não como botão flutuante permanente.
 
-AR-27: Idioma e moeda devem ser preferências explícitas; EUR é moeda-base, moedas adicionais dependem de prova do provedor, taxa deve ser bloqueada por 30 minutos no checkout.
+AR-27: Admin deve usar a mesma API/domínio Laravel, RBAC, auditoria e filas por próxima ação, sem planilha paralela como fonte de verdade.
 
-AR-28: Segurança e continuidade devem incluir TLS/HSTS, CSRF, proteção contra injeção/abuso, CSP, segredos seguros, MFA admin, RBAC, auditoria, backups, análise de dependências, testes e pentest.
+AR-28: CI/CD com GitHub Actions deve rodar lint/typecheck/build do frontend, testes Laravel, análise estática quando configurada e Playwright para fluxos críticos antes de merge/deploy.
 
-AR-29: Publicação de trabalhos feitos para clientes deve exigir autorização opcional registrada. Convites só podem ser publicados com dados sensíveis modificados/anônimos, como local, data e horário; lembrancinhas e miniaturas podem aparecer sem modificação quando autorizadas, respeitando privacidade, direitos de imagem e direitos de uso comercial de ativos protegidos.
+AR-29: Hospedagem, estratégia exata de auth BFF↔Laravel, storage, pagamento, fatura, e-mail, WhatsApp e transportadora permanecem deferidos atrás de portas/adaptadores.
 
 ### Requisitos de design UX
 
@@ -278,1642 +278,1257 @@ UX-DR33: Implementar responsividade contínua nas faixas 320–419 px, 420–759
 
 UX-DR34: Implementar privacidade UX: arquivos de briefing, fotos, referências, prévias, convites finais e fotos de QA privados; upload/prévia na Área da Cliente; licença digital clara; fatura por e-mail e Área da Cliente.
 
-UX-DR35: Implementar controle de autorização de portfólio/divulgação com escolha opcional e desmarcada por padrão; para convites, explicar que dados como local, data e horário serão modificados antes da publicação; para lembrancinhas e miniaturas, permitir publicação sem modificação quando autorizada.
+UX-DR35: Implementar controle de autorização de portfólio/divulgação com escolha opcional marcada por padrão e removível pela cliente; para convites, explicar que dados como local, data e horário serão modificados antes da publicação; para lembrancinhas e miniaturas, permitir publicação sem modificação quando autorizada.
 
 ### Mapa de cobertura de requisitos
 
-FR-1: Epic 1 — Loja pública, catálogo e descoberta mobile-first.
+FR-1: Epic 1 — Fundação da plataforma, BFF e experiência pública base.
 
-FR-2: Epic 1 — Loja pública, catálogo e descoberta mobile-first.
+FR-2: Epic 1 — Fundação da plataforma, BFF e experiência pública base.
 
-FR-3: Epic 1 — Loja pública, catálogo e descoberta mobile-first.
+FR-3: Epic 1 — Fundação da plataforma, BFF e experiência pública base.
 
-FR-4: Epic 1 — Loja pública, catálogo e descoberta mobile-first.
+FR-4: Epic 1 — Fundação da plataforma, BFF e experiência pública base.
 
-FR-5: Epic 1 — Loja pública, catálogo e descoberta mobile-first.
+FR-5: Epic 2 — Catálogo, descoberta e busca orientada por intenção.
 
-FR-6: Epic 1 — Loja pública, catálogo e descoberta mobile-first.
+FR-6: Epic 2 — Catálogo, descoberta e busca orientada por intenção.
 
-FR-7: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-7: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-8: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-8: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-9: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-9: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-10: Epic 6 — Suporte Online e Projeto Exclusivo.
+FR-10: Epic 7 — Suporte Online e Projeto Exclusivo.
 
-FR-11: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-11: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-12: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-12: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-13: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-13: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-14: Epic 2 — Produto, modalidade e configuração antes do carrinho.
+FR-14: Epic 3 — Produto, modalidade e configuração antes do carrinho.
 
-FR-15: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-15: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-16: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-16: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-17: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-17: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-18: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-18: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-19: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-19: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-20: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-20: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-21: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-21: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-22: Epic 3 — Carrinho, checkout, pagamento, frete e fatura.
+FR-22: Epic 4 — Carrinho, checkout, pagamento, frete e fatura.
 
-FR-23: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-23: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-24: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-24: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-25: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-25: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-26: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-26: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-27: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-27: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-28: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-28: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-29: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-29: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-30: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-30: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-31: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-31: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-32: Epic 5 — Entrega digital, produção física, QA e rastreio.
+FR-32: Epic 6 — Entrega digital, produção física, QA e rastreio.
 
-FR-33: Epic 5 — Entrega digital, produção física, QA e rastreio.
+FR-33: Epic 6 — Entrega digital, produção física, QA e rastreio.
 
-FR-34: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-34: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-35: Epic 5 — Entrega digital, produção física, QA e rastreio.
+FR-35: Epic 6 — Entrega digital, produção física, QA e rastreio.
 
-FR-36: Epic 4 — Área da Cliente, briefing e aprovação de arte.
+FR-36: Epic 5 — Área da Cliente, briefing e aprovação de arte.
 
-FR-37: Epic 6 — Suporte Online e Projeto Exclusivo.
+FR-37: Epic 7 — Suporte Online e Projeto Exclusivo.
 
-FR-38: Epic 6 — Suporte Online e Projeto Exclusivo.
+FR-38: Epic 7 — Suporte Online e Projeto Exclusivo.
 
-FR-39: Epic 6 — Suporte Online e Projeto Exclusivo.
+FR-39: Epic 7 — Suporte Online e Projeto Exclusivo.
 
-FR-40: Epic 6 — Suporte Online e Projeto Exclusivo.
+FR-40: Epic 7 — Suporte Online e Projeto Exclusivo.
 
-FR-41: Epic 7 — Administração, exceções, operação e métricas.
+FR-41: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-42: Epic 7 — Administração, exceções, operação e métricas.
+FR-42: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-43: Epic 5 — Entrega digital, produção física, QA e rastreio.
+FR-43: Epic 6 — Entrega digital, produção física, QA e rastreio.
 
-FR-44: Epic 5 — Entrega digital, produção física, QA e rastreio.
+FR-44: Epic 6 — Entrega digital, produção física, QA e rastreio.
 
-FR-45: Epic 7 — Administração, exceções, operação e métricas.
+FR-45: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-46: Epic 7 — Administração, exceções, operação e métricas.
+FR-46: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-47: Epic 7 — Administração, exceções, operação e métricas.
+FR-47: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-48: Epic 7 — Administração, exceções, operação e métricas.
+FR-48: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-49: Epic 7 — Administração, exceções, operação e métricas.
+FR-49: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
-FR-50: Epic 7 — Administração, exceções, operação e métricas.
+FR-50: Epic 8 — Administração, exceções, operação, auditoria e métricas.
 
 ## Lista de épicos
 
-### Epic 1: Loja pública, catálogo e descoberta mobile-first
+### Epic 1: Fundação da plataforma, BFF e experiência pública base
 
-A cliente consegue entrar no site, entender a JS Designs, buscar produtos/temas, navegar por categorias, ver “Mais procurados” e encontrar páginas públicas indexáveis.
+A cliente consegue abrir a loja com identidade JS Designs, navegação, idioma, busca inicial e páginas públicas base; o time ganha a fundação técnica mínima com Next.js BFF, Laravel API, PostgreSQL, Redis, Eloquent em Infrastructure e CI/CD.
 
-**FRs cobertos:** FR-1, FR-2, FR-3, FR-4, FR-5, FR-6
+**FRs cobertos:** FR-1, FR-2, FR-3, FR-4
 
-**Notas de implementação:** inclui setup inicial da aplicação greenfield, design system base, catálogo público, navegação, busca, home e SEO essencial. Deve preservar mobile-first, acessibilidade e internacionalização desde o início.
+**Notas de implementação:** inclui scaffold inicial, contratos BFF↔API, layout base, i18n, CI/CD mínimo e testes de smoke. Não cria todas as entidades de domínio antecipadamente.
 
-### Epic 2: Produto, modalidade e configuração antes do carrinho
+### Story 1.1: Inicializar a fundação técnica da plataforma
 
-A cliente entende cada tipo de produto e configura corretamente lembrancinhas, convites e digitais antes de avançar, com preço/subtotal coerente.
+**Requisitos cobertos:** AR-1, AR-2, AR-3, AR-4, AR-5, AR-6, AR-7, AR-8, AR-12, AR-28; NFR-3, NFR-4, NFR-5.
+
+As a equipe de desenvolvimento,
+I want uma base funcional com Next.js BFF, Laravel API, PostgreSQL, Redis e pipeline CI/CD inicial,
+So that as próximas funcionalidades da loja sejam implementadas sobre uma arquitetura consistente, testável e alinhada ao padrão definido.
+
+**Acceptance Criteria:**
+
+**Given** o repositório da JS Designs
+**When** a aplicação for iniciada em ambiente local
+**Then** devem existir aplicações separadas para Frontend/BFF em Next.js e Backend/API em Laravel
+**And** o Frontend/BFF deve conseguir chamar um endpoint saudável da Laravel API
+
+**Given** a Laravel API
+**When** o backend for configurado
+**Then** deve usar PostgreSQL como banco principal
+**And** deve usar Redis para cache/fila, sem tratar Redis como fonte durável de dados
+**And** Eloquent deve ficar restrito à camada de Infrastructure/persistência
+
+**Given** a arquitetura aprovada
+**When** o backend for organizado
+**Then** deve existir separação inicial por Domain, Application, Infrastructure e Interfaces
+**And** regras principais de negócio não devem ser colocadas no BFF
+
+**Given** o pipeline CI/CD
+**When** houver push ou pull request
+**Then** devem rodar checks mínimos de backend, frontend e testes automatizados iniciais
+**And** falhas nesses checks devem bloquear a aprovação técnica
+
+**Given** a base inicial
+**When** um dev executar os comandos documentados
+**Then** deve conseguir subir a stack local e validar a comunicação Frontend/BFF → Laravel API
+
+### Story 1.2: Criar o layout público base da loja
+
+**Requisitos cobertos:** FR-2; UX-DR1, UX-DR2, UX-DR4, UX-DR5, UX-DR6, UX-DR7, UX-DR9, UX-DR10, UX-DR32, UX-DR33.
+
+As a cliente da JS Designs,
+I want acessar uma loja com identidade visual clara, navegação simples e estrutura inicial confiável,
+So that eu consiga entender rapidamente que estou em uma loja de personalizados físicos e digitais.
+
+**Acceptance Criteria:**
+
+**Given** a página inicial da loja
+**When** a cliente acessar pelo navegador
+**Then** deve ver a identidade JS Designs aplicada com logo, cores, tipografia e estilo visual coerente com a UX aprovada
+**And** a interface deve priorizar experiência mobile, mantendo adaptação correta para desktop
+
+**Given** a navegação pública
+**When** a cliente visualizar o cabeçalho
+**Then** deve encontrar acesso para Home, Produtos, Categorias, Buscar, Carrinho, Entrar/Criar conta e Suporte
+**And** o botão principal deve conduzir para descoberta/compra de produtos
+
+**Given** o layout base
+**When** a cliente rolar a página
+**Then** deve existir rodapé com links essenciais, políticas, contato/suporte e informações da JS Designs
+**And** não deve existir botão flutuante permanente de WhatsApp fora dos fluxos definidos
+
+**Given** a arquitetura Frontend/BFF
+**When** a página pública carregar
+**Then** o Next.js deve renderizar a estrutura base
+**And** qualquer dado dinâmico necessário deve vir pelo BFF, sem expor segredos ou regras de negócio no navegador
+
+**Given** critérios básicos de qualidade
+**When** a página for validada
+**Then** deve passar em smoke test de renderização
+**And** deve manter estrutura semântica mínima para acessibilidade e SEO
+
+### Story 1.3: Implementar idioma, textos base e estrutura pública em português do Brasil
+
+**Requisitos cobertos:** FR-4; NFR-10; UX-DR3, UX-DR30, UX-DR33.
+
+As a cliente da JS Designs,
+I want navegar pela loja com textos claros em português do Brasil,
+So that eu entenda os produtos, etapas de compra e próximos passos sem confusão.
+
+**Acceptance Criteria:**
+
+**Given** a loja pública
+**When** a cliente acessar qualquer página base
+**Then** todos os textos visíveis devem estar em português do Brasil
+**And** os arquivos e documentos do projeto devem permanecer em UTF-8
+
+**Given** a estrutura de conteúdo da loja
+**When** o time precisar alterar textos de cabeçalho, rodapé, chamadas principais e mensagens informativas
+**Then** esses textos devem estar organizados de forma centralizada ou padronizada no frontend
+**And** não devem ficar espalhados de forma difícil de manter
+
+**Given** a cliente em fluxo público
+**When** encontrar informações sobre produtos físicos, produtos digitais, suporte ou compra
+**Then** os textos devem diferenciar claramente produto físico personalizado, produto digital pronto e produto digital personalizado
+**And** convites digitais personalizados devem informar que não são entregues imediatamente porque precisam de edição/criação e aprovação
+
+**Given** a experiência mobile-first
+**When** os textos forem exibidos em telas pequenas
+**Then** devem ser curtos, legíveis e sem quebrar o layout
+**And** mensagens mais longas devem aparecer apenas quando fizer sentido no contexto
+
+**Given** a validação técnica
+**When** o frontend for testado
+**Then** deve existir verificação mínima de renderização dos textos principais
+**And** caracteres acentuados devem aparecer corretamente
+
+### Story 1.4: Criar a home pública com entrada para os produtos mais procurados
+
+**Requisitos cobertos:** FR-1, FR-3; UX-DR4, UX-DR8, UX-DR11, UX-DR12.
+
+As a cliente da JS Designs,
+I want ver logo na entrada da loja os produtos mais procurados e caminhos claros de compra,
+So that eu encontre rapidamente lembrancinhas físicas personalizadas, convites digitais e outros itens relevantes.
+
+**Acceptance Criteria:**
+
+**Given** a cliente acessando a home
+**When** a página carregar
+**Then** deve existir uma seção inicial com chamada clara para a JS Designs
+**And** deve ficar evidente que a loja vende lembrancinhas físicas personalizadas e produtos digitais personalizados/prontos
+
+**Given** a preferência de descoberta definida
+**When** a cliente visualizar a primeira dobra da home
+**Then** os produtos ou categorias mais procurados devem aparecer logo de cara
+**And** devem ter cards com imagem, nome, tipo de produto e chamada para ver detalhes ou comprar
+
+**Given** a cliente procurando produtos específicos
+**When** ela usar a entrada de busca ou navegar pelos destaques
+**Then** deve conseguir seguir para resultados ou página do produto
+**And** a busca não deve depender de cadastro/login
+
+**Given** a arquitetura BFF/API
+**When** os produtos mais procurados forem exibidos
+**Then** o Next.js deve receber dados pelo BFF
+**And** a Laravel API deve ser a fonte dos dados de catálogo, sem regra de catálogo hardcoded no frontend
+
+### Story 1.5: Exibir captura de e-mail com cupom de primeira compra
+
+**Requisitos cobertos:** FR-14; AR-18; UX-DR19.
+
+As a visitante da loja,
+I want receber uma oferta de desconto ao cadastrar meu e-mail,
+So that eu tenha incentivo para fazer a primeira compra sem perder controle sobre o cupom.
+
+**Acceptance Criteria:**
+
+**Given** uma visitante acessando o site pela primeira vez
+**When** a janela de desconto for exibida
+**Then** deve haver campo para informar e-mail
+**And** deve ficar claro que o desconto depende do uso do cupom no checkout
+
+**Given** um e-mail válido informado
+**When** a visitante solicitar o desconto
+**Then** o sistema deve gerar ou associar um código de cupom de primeira compra
+**And** deve exibir ou enviar o código conforme a configuração definida
+
+**Given** a visitante fechando a janela
+**When** ela continuar navegando
+**Then** a navegação não deve ser bloqueada
+**And** a janela não deve reaparecer de forma agressiva na mesma sessão
+
+**Given** a regra de arquitetura
+**When** o cupom for criado ou validado
+**Then** a regra deve ficar na Laravel API
+**And** o BFF deve apenas intermediar a experiência pública
+
+### Epic 2: Catálogo, descoberta e busca orientada por intenção
+
+A cliente encontra produtos por categoria, tema, personagem, ocasião, tipo e grafias alternativas; Sharom consegue cadastrar catálogo estruturado com licenças/autorização de uso comercial.
+
+**FRs cobertos:** FR-5, FR-6
+
+**Notas de implementação:** Laravel é dono do catálogo/busca; Next.js BFF compõe páginas públicas e SEO.
+
+### Story 2.1: Cadastrar produtos com estrutura de catálogo comercial
+
+**Requisitos cobertos:** FR-5; AR-4, AR-6, AR-7.
+
+As a administradora da JS Designs,
+I want cadastrar produtos com dados estruturados de categoria, tipo, tema, ocasião e imagens,
+So that a loja consiga exibir e organizar os itens de forma pesquisável.
+
+**Acceptance Criteria:**
+
+**Given** a administradora autenticada
+**When** cadastrar um produto
+**Then** deve informar nome, descrição, tipo de produto, categoria, status de publicação e imagens
+**And** deve poder indicar se o produto é físico personalizado, digital pronto ou digital personalizado
+
+**Given** um produto com tema ou personagem
+**When** salvar o cadastro
+**Then** o sistema deve permitir registrar tema, personagem, ocasião e termos alternativos de busca
+**And** deve permitir registrar observações sobre licença/autorização de uso comercial quando aplicável
+
+**Given** a arquitetura aprovada
+**When** o produto for persistido
+**Then** a Laravel API deve controlar validação e persistência
+**And** Eloquent deve ser usado apenas na camada de Infrastructure
+
+### Story 2.2: Exibir listagens públicas por categoria, ocasião e tipo
+
+**Requisitos cobertos:** FR-3, FR-5; UX-DR11, UX-DR12, UX-DR33.
+
+As a cliente da JS Designs,
+I want navegar por categorias, ocasiões e tipos de produto,
+So that eu consiga encontrar produtos mesmo sem saber o nome exato.
+
+**Acceptance Criteria:**
+
+**Given** produtos publicados no catálogo
+**When** a cliente acessar uma página de categoria, ocasião ou tipo
+**Then** deve ver apenas produtos publicados
+**And** cada card deve mostrar imagem, nome, tipo e chamada para detalhes
+
+**Given** uma listagem com muitos produtos
+**When** a cliente navegar
+**Then** deve haver paginação, carregamento incremental ou outro padrão performático
+**And** a experiência deve funcionar bem em celular
+
+**Given** produtos digitais e físicos na mesma listagem
+**When** os cards forem exibidos
+**Then** cada produto digital deve aparecer explicitamente identificado como produto digital
+**And** produtos físicos personalizados devem aparecer como personalizados físicos
+
+### Story 2.3: Implementar busca pública por intenção
+
+**Requisitos cobertos:** FR-6, FR-10; UX-DR8, UX-DR31.
+
+As a cliente da JS Designs,
+I want buscar produtos por nome, tema, personagem, ocasião ou grafia aproximada,
+So that eu encontre produtos específicos rapidamente.
+
+**Acceptance Criteria:**
+
+**Given** a cliente usando a busca
+**When** informar um termo
+**Then** o sistema deve pesquisar nome, categoria, tema, personagem, ocasião e sinônimos cadastrados
+**And** deve retornar resultados relevantes sem exigir login
+
+**Given** uma busca sem resultado
+**When** a cliente pesquisar
+**Then** deve receber mensagem clara
+**And** deve ter caminho para suporte ou pedido de projeto exclusivo quando fizer sentido
+
+**Given** a arquitetura BFF/API
+**When** a busca for executada
+**Then** a consulta deve ser controlada pela Laravel API
+**And** o Next.js deve consumir os resultados via BFF
+
+### Story 2.4: Preparar páginas públicas de catálogo para SEO e compartilhamento
+
+**Requisitos cobertos:** FR-3; NFR-2, NFR-10.
+
+As a cliente que chega pelo Google ou link compartilhado,
+I want abrir páginas claras e indexáveis de catálogo,
+So that eu entenda rapidamente o produto ou categoria antes de comprar.
+
+**Acceptance Criteria:**
+
+**Given** uma página pública de produto, categoria ou busca
+**When** a página carregar
+**Then** deve ter título, descrição e metadados adequados
+**And** deve usar textos em português do Brasil
+
+**Given** uma página de produto ou categoria
+**When** for compartilhada
+**Then** deve apresentar prévia coerente com nome, imagem e descrição
+**And** não deve expor dados privados ou informações administrativas
+
+**Given** a validação técnica
+**When** os testes rodarem
+**Then** deve existir verificação mínima das páginas públicas principais
+**And** a renderização deve preservar caracteres acentuados
+
+### Epic 3: Produto, modalidade e configuração antes do carrinho
+
+A cliente entende e configura lembrancinhas, convites e produtos digitais antes do carrinho, com preço/subtotal correto, miniatura única e distinção clara entre digital pronto e convite personalizado.
 
 **FRs cobertos:** FR-7, FR-8, FR-9, FR-11, FR-12, FR-13, FR-14
 
-**Notas de implementação:** usa catálogo do Epic 1. Deve diferenciar produto físico personalizado, convite digital personalizado e Produto Digital Pronto, bloqueando carrinho quando configurações obrigatórias faltarem.
+**Notas de implementação:** Laravel controla precificação/configuração; Next.js exibe e coleta.
 
-### Epic 3: Carrinho, checkout, pagamento, frete e fatura
+### Story 3.1: Exibir página própria de produto com diferenças entre modelos
 
-A cliente compra como visitante, revisa itens, escolhe entrega quando aplicável, informa NIF opcional, paga por parceiro certificado e recebe confirmação correta por modalidade.
+**Requisitos cobertos:** FR-7, FR-8, FR-9; UX-DR11, UX-DR12, UX-DR13, UX-DR15.
+
+As a cliente da JS Designs,
+I want abrir uma página própria do produto e comparar os modelos disponíveis,
+So that eu escolha corretamente a versão desejada antes de comprar.
+
+**Acceptance Criteria:**
+
+**Given** um produto publicado
+**When** a cliente acessar a página do produto
+**Then** deve ver galeria, descrição, tipo de produto, informações de produção/entrega e CTA "Comprar agora"
+**And** deve ficar claro se o produto é físico, digital pronto ou digital personalizado
+
+**Given** um produto com modelos diferentes
+**When** a cliente visualizar as opções
+**Then** os modelos devem aparecer com diferenças escritas ou visualmente identificáveis
+**And** a cliente deve conseguir escolher o modelo desejado antes do carrinho
+
+**Given** um convite digital personalizado
+**When** a página do produto for exibida
+**Then** deve informar que não é entregue imediatamente
+**And** deve explicar que haverá edição/criação, prévia e aprovação
+
+### Story 3.2: Configurar quantidade e calcular preço antes do carrinho
+
+**Requisitos cobertos:** FR-11, FR-14; AR-16; UX-DR13, UX-DR14, UX-DR31.
+
+As a cliente comprando lembrancinhas ou itens personalizados,
+I want escolher a quantidade e ver o preço atualizado,
+So that eu entenda o valor antes de adicionar o produto ao carrinho.
+
+**Acceptance Criteria:**
+
+**Given** um produto com preço por quantidade
+**When** a cliente selecionar uma quantidade
+**Then** o preço/subtotal deve atualizar antes do produto ser adicionado ao carrinho
+**And** descontos progressivos por quantidade devem ser aplicados automaticamente quando existirem
+
+**Given** uma quantidade inválida ou abaixo do mínimo
+**When** a cliente tentar comprar
+**Then** o sistema deve bloquear a ação
+**And** deve mostrar mensagem objetiva sobre a quantidade permitida
+
+**Given** a regra de precificação
+**When** o preço for calculado
+**Then** a Laravel API deve ser a autoridade do cálculo
+**And** o frontend não deve conter regra final de preço hardcoded
+
+### Story 3.3: Coletar personalização essencial no adicionar ao carrinho
+
+**Requisitos cobertos:** FR-11, FR-12; UX-DR14, UX-DR15, UX-DR30.
+
+As a cliente comprando produto personalizado,
+I want informar tema, data, nome e observações no momento de adicionar ao carrinho,
+So that o pedido já tenha as informações mínimas para orientar a produção.
+
+**Acceptance Criteria:**
+
+**Given** um produto personalizado
+**When** a cliente clicar em adicionar ao carrinho ou comprar agora
+**Then** deve ser solicitado tema, data, nome da pessoa e outras observações quando aplicável
+**And** a cliente deve entender que detalhes completos virão no briefing após o pagamento
+
+**Given** a cliente preenchendo os campos
+**When** algum campo obrigatório estiver ausente
+**Then** o sistema deve indicar o campo pendente
+**And** não deve adicionar o item com configuração inválida
+
+**Given** a cliente optando por preencher detalhes depois
+**When** essa opção for permitida
+**Then** o sistema deve avisar que a primeira arte para aprovação só ficará pronta depois do briefing preenchido e entregue
+**And** deve avisar que a produção só começa depois da arte aprovada
+
+### Story 3.4: Oferecer miniatura do aniversariante como adicional pago uma única vez
+
+**Requisitos cobertos:** FR-11, FR-12, FR-14; AR-17; UX-DR16.
+
+As a cliente da JS Designs,
+I want escolher se quero miniatura do aniversariante,
+So that eu saiba quando esse adicional aumenta o valor do pedido.
+
+**Acceptance Criteria:**
+
+**Given** um produto compatível com miniatura
+**When** a cliente configurar o item
+**Then** deve haver opção para incluir ou não miniatura do aniversariante
+**And** deve ficar claro que a miniatura adiciona valor ao pedido
+
+**Given** a cliente usando a mesma miniatura em convite e lembrancinha no mesmo pedido
+**When** o carrinho for calculado
+**Then** a miniatura deve ser cobrada apenas uma vez por pedido/personagem
+**And** os itens devem referenciar a mesma miniatura quando aplicável
+
+**Given** a regra de cobrança
+**When** o subtotal for recalculado
+**Then** a Laravel API deve controlar a regra de cobrança única
+**And** o frontend deve apenas exibir o resultado retornado
+
+### Story 3.5: Diferenciar produtos digitais prontos e personalizados antes da compra
+
+**Requisitos cobertos:** FR-8, FR-9; AR-22; UX-DR12.
+
+As a cliente interessada em produto digital,
+I want saber se o arquivo é pronto ou se precisa ser personalizado,
+So that eu tenha expectativa correta sobre entrega e aprovação.
+
+**Acceptance Criteria:**
+
+**Given** um produto digital pronto
+**When** a página do produto for exibida
+**Then** deve informar que o envio ocorre por e-mail após pagamento confirmado
+**And** deve indicar que o arquivo é editável via Silhouette Studio quando aplicável
+
+**Given** um convite digital personalizado
+**When** a página do produto for exibida
+**Then** deve informar que ele precisa ser editado ou criado com tema e dados solicitados
+**And** deve informar que haverá prévia e aprovação antes da entrega final
+
+**Given** páginas de site ou listagem
+**When** um produto digital aparecer
+**Then** deve haver indicação visível de que é um produto digital
+**And** essa indicação deve aparecer sem misturar o público de digital com o público de lembrancinhas físicas quando a navegação estiver segmentada
+
+### Story 3.6: Sugerir produtos complementares por tema ou ocasião
+
+**Requisitos cobertos:** FR-13, FR-14; UX-DR17.
+
+As a cliente configurando ou revisando um produto,
+I want ver sugestões complementares relevantes do mesmo tema ou ocasião,
+So that eu possa montar um conjunto sem procurar manualmente item por item.
+
+**Acceptance Criteria:**
+
+**Given** um produto com tema, ocasião ou categoria compatível
+**When** a cliente visualizar a página do produto ou etapa compatível antes do carrinho
+**Then** o sistema pode sugerir dois ou três produtos complementares
+**And** as sugestões devem ser claramente opcionais
+
+**Given** produto complementar selecionado
+**When** a cliente adicionar o item
+**Then** o item deve preservar sua própria configuração no carrinho
+**And** descontos de conjunto ou quantidade devem ser recalculados pela Laravel API quando aplicáveis
+
+**Given** nenhuma sugestão relevante
+**When** a cliente visualizar a página
+**Then** o sistema não deve exibir bloco vazio ou genérico
+**And** a experiência principal de compra deve continuar sem interrupção
+
+### Epic 4: Carrinho, checkout, pagamento, frete e fatura
+
+A cliente compra como visitante, revisa itens, aplica cupom manual, escolhe frete normal/rápido quando físico, informa NIF opcional, paga por parceiro certificado ou transferência, e recebe confirmação por modalidade.
 
 **FRs cobertos:** FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21, FR-22
 
-**Notas de implementação:** usa configurações dos Epics 1 e 2. Deve separar estado financeiro de estado comercial e não liberar briefing, produção ou download por retorno de navegador.
+**Notas de implementação:** inclui carrinho salvo por 90 dias com conta, transferência com comprovante/prorrogação, frete rastreável ou não rastreável conforme modalidade.
 
-### Epic 4: Área da Cliente, briefing e aprovação de arte
+### Story 4.1: Gerenciar carrinho com itens configurados e persistência por conta
 
-A cliente acessa o pedido com segurança, preenche briefing protegido em passos curtos, acompanha prazos, recebe prévias, pede alterações e aprova a arte.
+**Requisitos cobertos:** FR-15; AR-19; UX-DR17.
+
+As a cliente da JS Designs,
+I want revisar produtos configurados no carrinho,
+So that eu confirme quantidades, adicionais e dados básicos antes do checkout.
+
+**Acceptance Criteria:**
+
+**Given** itens adicionados ao carrinho
+**When** a cliente abrir o carrinho
+**Then** deve ver produto, modelo, quantidade, personalização resumida, adicionais, subtotal e total
+**And** deve conseguir alterar quantidade ou remover item antes do checkout
+
+**Given** uma cliente com conta
+**When** ela deixar itens no carrinho
+**Then** o carrinho deve poder ficar salvo por até 90 dias
+**And** notificações de carrinho devem respeitar consentimento e regras de comunicação
+
+**Given** alterações de preço ou disponibilidade
+**When** a cliente retornar ao carrinho
+**Then** o sistema deve recalcular valores pela Laravel API
+**And** deve informar mudanças relevantes antes do pagamento
+
+### Story 4.2: Aplicar cupom manual e desconto progressivo automático
+
+**Requisitos cobertos:** FR-14; AR-18.
+
+As a cliente com cupom de primeira compra,
+I want inserir o código do cupom no checkout,
+So that o desconto seja aplicado somente quando eu informar o código.
+
+**Acceptance Criteria:**
+
+**Given** a cliente no carrinho ou checkout
+**When** houver campo de cupom
+**Then** ela deve poder inserir o código recebido pelo cadastro de e-mail
+**And** o desconto do cupom só deve ser aplicado se o código for informado e validado
+
+**Given** produtos com desconto progressivo por quantidade
+**When** a cliente selecionar quantidade elegível
+**Then** o desconto progressivo deve ser aplicado automaticamente
+**And** deve aparecer separado do cupom manual
+
+**Given** cupom inválido, expirado ou já usado
+**When** a cliente tentar aplicar
+**Then** o sistema deve recusar o cupom
+**And** deve manter o desconto progressivo normal quando aplicável
+
+### Story 4.3: Coletar dados de checkout, NIF opcional e consentimentos
+
+**Requisitos cobertos:** FR-16, FR-21; UX-DR18, UX-DR35.
+
+As a cliente finalizando a compra,
+I want informar dados essenciais, entrega e fatura opcional,
+So that o pedido possa ser confirmado corretamente.
+
+**Acceptance Criteria:**
+
+**Given** a cliente no checkout
+**When** preencher os dados
+**Then** deve informar dados de contato e dados necessários para entrega física quando houver produto físico
+**And** deve poder informar NIF opcional para fatura quando desejar
+
+**Given** autorizações e consentimentos no checkout
+**When** a cliente revisar as opções
+**Then** autorizações de publicação devem aparecer marcadas por padrão
+**And** a cliente deve poder desmarcar se não quiser autorizar
+
+**Given** um pedido com produto digital apenas
+**When** o checkout for exibido
+**Then** não deve exigir endereço físico desnecessário
+**And** deve confirmar o e-mail de entrega digital
+
+### Story 4.4: Calcular frete para produtos físicos com envio normal ou rápido
+
+**Requisitos cobertos:** FR-20; AR-21; UX-DR27, UX-DR31.
+
+As a cliente comprando produto físico,
+I want escolher envio normal ou rápido e ver o frete calculado,
+So that eu saiba o custo e a expectativa de entrega antes de pagar.
+
+**Acceptance Criteria:**
+
+**Given** o carrinho com produto físico
+**When** a cliente informar endereço de entrega
+**Then** o sistema deve calcular opções de frete disponíveis
+**And** deve permitir escolher envio normal ou rápido quando disponíveis
+
+**Given** uma modalidade sem rastreio
+**When** a opção for exibida
+**Then** deve informar que o rastreio pode não estar disponível
+**And** deve explicar que o rastreio depende dos CTT ou transportadora escolhida
+
+**Given** um carrinho somente digital
+**When** a cliente chegar ao checkout
+**Then** não deve cobrar frete
+**And** deve seguir para entrega digital conforme tipo de produto
+
+### Story 4.5: Confirmar pagamento por parceiro certificado ou transferência bancária
+
+**Requisitos cobertos:** FR-18, FR-19; AR-10, AR-20; NFR-4, NFR-6.
+
+As a cliente da JS Designs,
+I want escolher uma forma segura de pagamento,
+So that meu pedido avance somente depois da confirmação correta.
+
+**Acceptance Criteria:**
+
+**Given** checkout finalizado
+**When** a cliente escolher pagamento por parceiro certificado
+**Then** o sistema deve registrar a tentativa de pagamento
+**And** deve confirmar o pedido somente após retorno válido do parceiro
+
+**Given** a cliente escolhendo transferência bancária
+**When** o pedido for criado
+**Then** o sistema deve reservar o pedido por 48 horas
+**And** deve permitir prorrogar por mais 48 horas caso o pagamento ainda não tenha sido confirmado
+
+**Given** a cliente enviando comprovante
+**When** a administradora analisar o comprovante
+**Then** deve ser possível confirmar manualmente o pagamento
+**And** a produção ou entrega só deve avançar após confirmação real/manual registrada
+
+### Story 4.6: Enviar confirmação do pedido e próximos passos por modalidade
+
+**Requisitos cobertos:** FR-17, FR-22; AR-10, AR-11, AR-15; UX-DR25.
+
+As a cliente que pagou ou iniciou pagamento,
+I want receber confirmação clara do estado do meu pedido,
+So that eu saiba o que acontece depois.
+
+**Acceptance Criteria:**
+
+**Given** um pagamento confirmado
+**When** o pedido mudar de estado
+**Then** a cliente deve receber confirmação com número do pedido, resumo e próximos passos
+**And** produtos personalizados devem orientar sobre briefing e aprovação
+
+**Given** um pagamento pendente por transferência
+**When** o pedido for criado
+**Then** a cliente deve receber instruções de pagamento, prazo de 48 horas e opção de prorrogação
+**And** deve poder enviar comprovante quando disponível
+
+**Given** a arquitetura de estados
+**When** pedido, pagamento ou entrega mudarem
+**Then** a Laravel API deve registrar os estados separadamente
+**And** os efeitos assíncronos devem ser processados por filas/jobs
+
+### Epic 5: Área da Cliente, briefing e aprovação de arte
+
+A cliente acessa o pedido com segurança, preenche briefing protegido, recebe prévias, pede alterações, aprova a arte e escolhe autorização de publicação.
 
 **FRs cobertos:** FR-23, FR-24, FR-25, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-34, FR-36
 
-**Notas de implementação:** usa pedido confirmado do Epic 3. Deve implementar briefing mestre, autosave, uploads protegidos, prévias numeradas, aprovação explícita e notificações acionáveis.
+**Notas de implementação:** Laravel controla estados, arquivos, autorização e notificações; Next.js/BFF apresenta a experiência.
 
-### Epic 5: Entrega digital, produção física, QA e rastreio
+### Story 5.1: Criar acesso seguro à Área da Cliente
 
-A cliente recebe Produto Digital Pronto imediatamente, recebe convite final aprovado, acompanha produção física, foto privada de QA e rastreio quando disponível.
+**Requisitos cobertos:** FR-17, FR-30, FR-31; AR-13; NFR-5, NFR-8.
+
+As a cliente da JS Designs,
+I want acessar meus pedidos em uma área segura,
+So that eu acompanhe briefing, prévias, aprovações e entregas sem expor dados pessoais.
+
+**Acceptance Criteria:**
+
+**Given** uma cliente com pedido
+**When** acessar a Área da Cliente
+**Then** deve autenticar ou validar acesso seguro antes de ver dados do pedido
+**And** deve ver apenas pedidos associados a ela
+
+**Given** a arquitetura aprovada
+**When** a sessão estiver ativa
+**Then** a autorização deve ser controlada pela Laravel API
+**And** o BFF deve proteger cookies/sessão sem expor segredos ao navegador
+
+**Given** uma tentativa de acesso inválida
+**When** alguém tentar abrir pedido de outra cliente
+**Then** o sistema deve negar acesso
+**And** deve registrar evento relevante de segurança quando aplicável
+
+### Story 5.2: Preencher briefing pós-pagamento com referências e observações
+
+**Requisitos cobertos:** FR-23, FR-24, FR-25, FR-31; AR-23; UX-DR20, UX-DR21, UX-DR34.
+
+As a cliente com pedido personalizado,
+I want preencher o briefing e enviar referências depois do pagamento,
+So that a criação da arte tenha todas as informações necessárias.
+
+**Acceptance Criteria:**
+
+**Given** um pedido personalizado com pagamento confirmado
+**When** a cliente abrir o briefing
+**Then** deve poder informar tema, nome, data, preferências, textos, referências e outras observações
+**And** deve poder anexar arquivos de referência quando permitido
+
+**Given** a cliente optando por preencher depois
+**When** o briefing ainda não estiver entregue
+**Then** o sistema deve avisar que a primeira arte para aprovação só ficará pronta após briefing preenchido e entregue
+**And** deve avisar que a produção só começa depois da arte aprovada
+
+**Given** todas as informações obrigatórias do briefing preenchidas
+**When** a cliente entregar o briefing
+**Then** o sistema deve calcular ou comunicar o prazo de criação aplicável
+**And** o pedido deve sair de “Aguardando briefing” para o próximo estado permitido
+
+**Given** dados sensíveis no briefing
+**When** arquivos ou textos forem salvos
+**Then** devem ficar privados
+**And** o acesso deve depender da autorização do pedido
+
+### Story 5.3: Gerenciar prévias de arte e pedidos de alteração
+
+**Requisitos cobertos:** FR-26, FR-27, FR-31; UX-DR22, UX-DR23, UX-DR24, UX-DR31.
+
+As a cliente aguardando arte personalizada,
+I want receber prévias e pedir alterações dentro do site,
+So that eu aprove a arte com clareza antes da produção.
+
+**Acceptance Criteria:**
+
+**Given** uma primeira arte pronta
+**When** a administradora publicar a prévia
+**Then** a cliente deve ser notificada
+**And** deve conseguir visualizar a prévia na Área da Cliente
+
+**Given** a cliente analisando uma prévia
+**When** solicitar alteração
+**Then** deve poder escrever comentários objetivos
+**And** o pedido deve registrar histórico de versões e solicitações
+
+**Given** uma arte com rodadas gratuitas disponíveis
+**When** a cliente solicitar alteração
+**Then** o sistema deve permitir até três rodadas gratuitas por arte
+**And** deve mostrar contador visível de alterações gratuitas restantes
+
+**Given** uma prévia publicada
+**When** outra versão for enviada
+**Then** a versão anterior deve permanecer registrada para auditoria
+**And** arquivos privados não devem ficar acessíveis publicamente
+
+### Story 5.4: Aprovar arte e bloquear início de produção até aprovação
+
+**Requisitos cobertos:** FR-28, FR-29, FR-31, FR-34; AR-24; UX-DR22, UX-DR24.
+
+As a cliente da JS Designs,
+I want aprovar explicitamente a arte final,
+So that a produção ou entrega personalizada avance somente com minha confirmação.
+
+**Acceptance Criteria:**
+
+**Given** uma prévia pendente
+**When** a cliente clicar em aprovar
+**Then** o sistema deve registrar data, hora, versão aprovada e usuário responsável
+**And** o pedido deve mudar para estado compatível com produção ou finalização
+
+**Given** um pedido sem arte aprovada
+**When** houver tentativa de iniciar produção física ou entrega personalizada final
+**Then** o sistema deve bloquear o avanço
+**And** deve informar que a arte precisa ser aprovada
+
+**Given** a arquitetura de estados
+**When** a aprovação ocorrer
+**Then** a Laravel API deve controlar a transição de estado
+**And** o registro deve ser auditável
+
+**Given** um convite aprovado
+**When** a cliente confirmar a aprovação final
+**Then** deve poder escolher receber o convite por e-mail ou WhatsApp
+**And** a escolha deve ficar registrada no pedido
+
+### Story 5.5: Registrar autorização de publicação com opção marcada e removível
+
+**Requisitos cobertos:** AR-25; UX-DR35.
+
+As a cliente da JS Designs,
+I want decidir se autorizo a publicação do produto feito,
+So that eu tenha controle sobre uso de imagens do meu pedido no portfólio.
+
+**Acceptance Criteria:**
+
+**Given** o checkout ou Área da Cliente
+**When** a autorização de publicação aparecer
+**Then** ela deve vir marcada por padrão
+**And** a cliente deve conseguir desmarcar se não quiser autorizar
+
+**Given** autorização para convite exclusivo
+**When** o item for publicado no portfólio
+**Then** local, data, horário e dados sensíveis devem ser modificados ou anonimizados
+**And** o registro deve indicar que houve anonimização
+
+**Given** autorização para lembrancinhas ou miniaturas
+**When** o item for publicado
+**Then** pode aparecer sem modificação visual quando autorizado
+**And** a decisão da cliente deve ficar registrada no pedido
+
+### Story 5.6: Notificar a cliente sobre pendências e mudanças de estado
+
+**Requisitos cobertos:** FR-30, FR-36; AR-15; UX-DR24, UX-DR31.
+
+As a cliente acompanhando um pedido,
+I want receber avisos sobre briefing, prévias, aprovação e pendências,
+So that eu saiba quando preciso agir.
+
+**Acceptance Criteria:**
+
+**Given** uma pendência de briefing
+**When** o pedido estiver aguardando informações da cliente
+**Then** o sistema deve exibir pendência na Área da Cliente
+**And** pode enviar notificação conforme consentimentos aplicáveis
+
+**Given** uma nova prévia ou resposta da produção
+**When** o estado do pedido mudar
+**Then** a cliente deve receber aviso claro
+**And** o histórico do pedido deve ser atualizado
+
+**Given** a cliente precisando de ajuda
+**When** visualizar uma pendência
+**Then** deve haver caminho para suporte dentro do fluxo
+**And** a conversa deve ficar vinculada ao contexto do pedido quando aplicável
+
+### Epic 6: Entrega digital, produção física, QA e rastreio
+
+A cliente recebe Produto Digital Pronto imediatamente após pagamento confirmado, recebe convite personalizado só após criação/aprovação, acompanha produção física, foto privada de QA e rastreio quando disponível.
 
 **FRs cobertos:** FR-32, FR-33, FR-35, FR-43, FR-44
 
-**Notas de implementação:** usa pedido, arquivos privados e aprovação dos Epics 3 e 4. Deve tratar entrega digital imediata, produção física, checklist de QA, foto informativa e rastreamento integrado/manual.
+**Notas de implementação:** separa Produto Digital Pronto de convite digital personalizado.
 
-### Epic 6: Suporte Online e Projeto Exclusivo
+### Story 6.1: Entregar produto digital pronto após pagamento confirmado
 
-A cliente consegue pedir ajuda sem sair do site, receber respostas cadastradas, escalar para humano/chat/WhatsApp e solicitar Projeto Exclusivo sem pagamento imediato.
+**Requisitos cobertos:** FR-9, FR-35; AR-22; UX-DR12, UX-DR34.
+
+As a cliente que comprou produto digital pronto,
+I want receber o arquivo por e-mail após confirmação do pagamento,
+So that eu possa usar o produto sem aguardar personalização.
+
+**Acceptance Criteria:**
+
+**Given** um produto digital pronto pago e confirmado
+**When** o pagamento for validado
+**Then** o sistema deve liberar o arquivo digital
+**And** deve enviar instruções por e-mail
+
+**Given** um arquivo editável
+**When** a cliente receber a entrega
+**Then** deve ficar claro que é editável via Silhouette Studio quando aplicável
+**And** não deve mencionar Canva como editor suportado
+
+**Given** pagamento pendente ou recusado
+**When** a cliente tentar acessar o arquivo
+**Then** o sistema não deve liberar a entrega
+**And** deve indicar o estado do pagamento
+
+### Story 6.2: Entregar convite digital personalizado somente após criação e aprovação
+
+**Requisitos cobertos:** FR-8, FR-28, FR-34; AR-22, AR-24; UX-DR22, UX-DR34.
+
+As a cliente que comprou convite digital personalizado,
+I want receber o arquivo final somente depois da edição/criação e aprovação,
+So that o convite tenha tema e dados corretos.
+
+**Acceptance Criteria:**
+
+**Given** um convite digital personalizado
+**When** o pagamento for confirmado
+**Then** o pedido deve seguir para briefing/criação
+**And** não deve liberar entrega imediata
+
+**Given** a arte aprovada
+**When** a produção finalizar o arquivo
+**Then** a cliente deve receber a versão final por e-mail
+**And** deve ficar claro se o arquivo é editável via Silhouette Studio quando aplicável
+
+**Given** o pedido sem aprovação
+**When** houver tentativa de entrega final
+**Then** o sistema deve bloquear a entrega
+**And** deve informar que falta aprovação da arte
+
+### Story 6.3: Acompanhar produção física e foto privada de QA
+
+**Requisitos cobertos:** FR-29, FR-32, FR-43, FR-44; UX-DR24, UX-DR26, UX-DR31, UX-DR34.
+
+As a cliente de lembrancinha física personalizada,
+I want acompanhar a produção e ver uma foto informativa quando fizer sentido,
+So that eu saiba que o pedido está avançando.
+
+**Acceptance Criteria:**
+
+**Given** arte aprovada e produção iniciada
+**When** a administradora atualizar o estado
+**Then** a cliente deve ver o progresso na Área da Cliente
+**And** os estados devem refletir produção, QA, embalagem e envio quando aplicável
+
+**Given** uma arte aprovada para produto físico
+**When** a produção for preparada
+**Then** o sistema deve gerar Ficha de Produção com versão aprovada, itens, quantidades, materiais, acabamento, Miniatura, prazo, endereço e checklist
+**And** a ficha deve ficar vinculada ao pedido
+
+**Given** uma foto de QA disponível
+**When** a cliente visualizar a foto
+**Then** deve ficar claro que a foto é apenas informativa
+**And** a foto deve ser privada e vinculada ao pedido
+
+**Given** problema identificado na produção
+**When** o estado for atualizado
+**Then** a cliente deve poder chamar suporte para avaliar a situação
+**And** a equipe deve registrar a exceção no pedido
+
+### Story 6.4: Registrar envio e rastreio quando disponível
+
+**Requisitos cobertos:** FR-33; AR-21; UX-DR27, UX-DR31.
+
+As a cliente de produto físico,
+I want receber informação de envio e rastreio quando existir,
+So that eu acompanhe a entrega conforme a modalidade escolhida.
+
+**Acceptance Criteria:**
+
+**Given** um pedido físico pronto para envio
+**When** a administradora registrar postagem nos CTT ou transportadora
+**Then** deve informar modalidade, data de envio e transportador quando aplicável
+**And** deve registrar número de rastreio quando existir
+
+**Given** uma modalidade sem rastreio
+**When** a cliente visualizar o envio
+**Then** deve ficar claro que o rastreio não está disponível
+**And** deve explicar que o rastreio depende de quem faz a entrega
+
+**Given** rastreio disponível
+**When** a cliente acessar o pedido
+**Then** deve ver o código ou link de rastreio
+**And** o sistema pode consultar status automaticamente se o serviço permitir
+
+### Epic 7: Suporte Online e Projeto Exclusivo
+
+A cliente recebe suporte dentro do site, com respostas cadastradas, escalonamento humano/chat/WhatsApp e Projeto Exclusivo sem pagamento imediato.
 
 **FRs cobertos:** FR-10, FR-37, FR-38, FR-39, FR-40
 
-**Notas de implementação:** pode iniciar após Epic 1. Deve manter WhatsApp dentro do fluxo de suporte e Projeto Exclusivo, preservar contexto e evitar respostas automáticas fora da base curada.
+**Notas de implementação:** WhatsApp dentro do fluxo, não como botão flutuante permanente.
 
-### Epic 7: Administração, exceções, operação e métricas
+### Story 7.1: Oferecer suporte dentro do site com contexto da navegação
 
-Sharom administra catálogo, pedidos, exceções, pagamentos, faturas, fretes, papéis, auditoria e indicadores operacionais sem planilhas paralelas.
+**Requisitos cobertos:** FR-37, FR-39; AR-26; UX-DR28.
+
+As a cliente com dúvida,
+I want chamar suporte dentro do site,
+So that eu consiga resolver dúvidas sem sair do fluxo de compra ou pedido.
+
+**Acceptance Criteria:**
+
+**Given** a cliente em página pública, carrinho ou Área da Cliente
+**When** abrir o suporte
+**Then** o chat deve aparecer dentro do site
+**And** deve carregar contexto da página ou pedido quando aplicável
+
+**Given** a regra de UX definida
+**When** a cliente navegar no site
+**Then** não deve haver botão flutuante permanente de WhatsApp
+**And** o WhatsApp deve aparecer apenas como opção dentro do fluxo de suporte quando fizer sentido
+
+**Given** atendimento indisponível
+**When** a cliente enviar mensagem
+**Then** o sistema deve registrar a solicitação
+**And** deve informar expectativa de resposta
+
+### Story 7.2: Usar respostas cadastradas e escalonar para atendimento humano
+
+**Requisitos cobertos:** FR-38, FR-39, FR-40; AR-26; UX-DR28.
+
+As a administradora da JS Designs,
+I want cadastrar respostas de suporte e escalar conversas quando necessário,
+So that dúvidas comuns sejam respondidas rápido e casos específicos recebam atenção humana.
+
+**Acceptance Criteria:**
+
+**Given** perguntas frequentes cadastradas
+**When** a cliente iniciar atendimento
+**Then** o sistema deve sugerir respostas úteis dentro do chat
+**And** deve manter linguagem em português do Brasil
+
+**Given** uma dúvida não resolvida
+**When** a cliente solicitar ajuda humana ou o sistema identificar necessidade
+**Then** a conversa deve ser escalada
+**And** deve manter o histórico do chat
+
+**Given** opção de WhatsApp habilitada
+**When** o atendimento escalar para WhatsApp
+**Then** a transição deve ocorrer dentro do fluxo
+**And** deve preservar o contexto mínimo necessário
+
+### Story 7.3: Solicitar Projeto Exclusivo sem pagamento imediato
+
+**Requisitos cobertos:** FR-10; UX-DR29.
+
+As a cliente que não encontrou o produto ideal,
+I want solicitar um projeto exclusivo com detalhes e referências,
+So that a JS Designs possa avaliar antes de cobrar ou confirmar.
+
+**Acceptance Criteria:**
+
+**Given** a cliente em produto, busca sem resultado ou suporte
+**When** escolher Projeto Exclusivo
+**Then** deve preencher formulário com tema, tipo de produto, prazo, referências e outras observações
+**And** não deve haver pagamento imediato nessa etapa
+
+**Given** a solicitação enviada
+**When** a administradora analisar
+**Then** deve poder responder, pedir mais informações ou transformar em proposta/pedido
+**And** a cliente deve ser notificada da resposta
+
+**Given** arquivos de referência enviados
+**When** forem armazenados
+**Then** devem ficar privados
+**And** devem ser vinculados à solicitação
+
+### Epic 8: Administração, exceções, operação, auditoria e métricas
+
+Sharom administra pedidos, catálogo, exceções, pagamentos, faturas, fretes, papéis, auditoria e métricas sem planilhas paralelas.
 
 **FRs cobertos:** FR-41, FR-42, FR-45, FR-46, FR-47, FR-48, FR-49, FR-50
 
-**Notas de implementação:** consolida a operação sobre os fluxos criados nos épicos anteriores. Deve usar o mesmo agregado de Pedido, mesma máquina de estados, RBAC, auditoria e métricas.
+**Notas de implementação:** admin usa a mesma API Laravel/domínio; RBAC e auditoria no backend.
 
-## Epic 1: Loja pública, catálogo e descoberta mobile-first
+### Story 8.1: Criar painel administrativo de pedidos e estados operacionais
 
-A cliente consegue entrar no site, entender a JS Designs, buscar produtos/temas, navegar por categorias, ver “Mais procurados” e encontrar páginas públicas indexáveis.
+**Requisitos cobertos:** FR-41, FR-42; AR-9, AR-11, AR-27.
 
-### Story 1.1: Acessar a loja com base visual e navegação global
-
-Como cliente visitante,  
-quero acessar a loja com identidade JS Designs, navegação clara, busca, conta e carrinho,  
-para conseguir começar a compra pelo celular sem depender de atendimento.
+As a administradora da JS Designs,
+I want visualizar pedidos por estado, modalidade e prioridade,
+So that eu controle produção, briefing, pagamento, entrega e exceções sem planilhas paralelas.
 
 **Acceptance Criteria:**
 
-**Given** que a cliente abre a loja em celular a partir de 320 px  
-**When** a página inicial carrega  
-**Then** ela vê logo JS Designs, busca, acesso à Área da Cliente, carrinho e menu em um cabeçalho compacto  
-**And** todos os controles têm alvo mínimo de toque de 44 x 44 px.
+**Given** pedidos existentes
+**When** a administradora abrir o painel
+**Then** deve ver lista filtrável por estado, tipo de produto, pagamento, produção e entrega
+**And** deve conseguir abrir o detalhe operacional do pedido
 
-**Given** que a cliente navega por teclado ou leitor de tela  
-**When** passa pelo cabeçalho, menu, busca, conta e carrinho  
-**Then** a ordem de foco segue a leitura visual  
-**And** cada ícone tem nome acessível e foco visível.
+**Given** um pedido com pendência
+**When** ele aparecer no painel
+**Then** deve destacar briefing pendente, pagamento pendente, aprovação pendente ou envio pendente
+**And** deve permitir ação compatível com o papel da usuária
 
-**Given** que a aplicação é iniciada como greenfield  
-**When** a base técnica é criada  
-**Then** ela usa Next.js App Router com TypeScript, estrutura mobile-first e módulos iniciais coerentes com a arquitetura  
-**And** regras de negócio não ficam presas em componentes visuais.
+**Given** a arquitetura aprovada
+**When** o admin consumir dados
+**Then** deve usar a mesma Laravel API/domínio da loja
+**And** não deve manter regra operacional em planilhas paralelas
 
-**Given** que a cliente acessa a loja em português, inglês ou espanhol  
-**When** muda o idioma  
-**Then** a página atual permanece no mesmo contexto  
-**And** carrinho, pedido, preço e prazo não são alterados pela troca de idioma.
+### Story 8.2: Administrar catálogo, preços, descontos e adicionais
 
-**Given** que a cliente usa navegador desktop, tablet ou celular suportado  
-**When** acessa a home  
-**Then** a navegação permanece funcional em toque, mouse e teclado  
-**And** a experiência não exige app nativo nem site separado.
+**Requisitos cobertos:** FR-46; AR-16, AR-17, AR-18.
 
-### Story 1.2: Ver produtos mais procurados logo na entrada
-
-Como cliente visitante,  
-quero ver produtos específicos e mais procurados logo no início da home,  
-para encontrar rapidamente uma lembrancinha ou item relevante sem precisar navegar muito.
+As a administradora da JS Designs,
+I want configurar catálogo, preços, descontos progressivos e adicionais,
+So that a loja calcule valores corretamente sem edição manual por pedido.
 
 **Acceptance Criteria:**
 
-**Given** que a cliente acessa a home pelo celular  
-**When** a primeira dobra ou início da rolagem é exibido  
-**Then** a seção “Mais procurados” aparece cedo com produtos específicos  
-**And** a seção não fica escondida depois de um hero longo.
+**Given** acesso administrativo
+**When** cadastrar ou editar produto
+**Then** deve poder configurar preço base, faixas de quantidade, descontos progressivos e adicionais como miniatura
+**And** deve poder publicar, ocultar ou arquivar produtos
 
-**Given** que um produto mais procurado é personalizado  
-**When** a cliente toca no card  
-**Then** ela é levada para a página própria do produto  
-**And** o produto não é adicionado direto ao carrinho.
+**Given** regra de miniatura
+**When** configurar adicional
+**Then** deve existir suporte para cobrança única por pedido/personagem
+**And** a regra deve ser aplicada pela Laravel API
 
-**Given** que um produto mais procurado é Produto Digital Pronto  
-**When** o card é exibido  
-**Then** ele mostra selo claro de produto digital, download imediato e compatibilidade Silhouette Studio quando aplicável  
-**And** o CTA usa “Comprar agora”.
+**Given** alteração de preço
+**When** a administradora salvar
+**Then** novas compras devem usar a nova regra
+**And** pedidos já pagos não devem ser alterados sem exceção administrativa registrada
 
-**Given** que a cliente usa leitor de tela  
-**When** navega pelos cards de produtos  
-**Then** cada card informa nome, modalidade, preço ou faixa de preço, prazo/entrega e ação disponível.
+### Story 8.3: Confirmar manualmente pagamentos e controlar exceções financeiras
 
-**Given** que a cliente acessa a home em desktop  
-**When** visualiza “Mais procurados”  
-**Then** a grade pode usar mais colunas  
-**And** nenhuma informação essencial disponível no celular é removida.
+**Requisitos cobertos:** FR-19, FR-47; AR-10, AR-20.
 
-### Story 1.3: Buscar por produto, tema, ocasião, tipo e personagem
-
-Como cliente visitante,  
-quero pesquisar usando palavras do meu jeito,  
-para encontrar produtos por tema, ocasião, personagem, estilo ou tipo sem depender do WhatsApp.
+As a administradora da JS Designs,
+I want confirmar pagamentos manuais e tratar exceções financeiras,
+So that pedidos por transferência ou casos especiais avancem com rastreabilidade.
 
 **Acceptance Criteria:**
 
-**Given** que a cliente abre a busca  
-**When** digita produto, tema, personagem, ocasião, tipo ou grafia alternativa  
-**Then** o sistema retorna produtos relevantes quando existirem  
-**And** diferencia resultados exatos de semelhantes.
+**Given** um pedido por transferência com comprovante
+**When** a administradora revisar
+**Then** deve poder aprovar ou rejeitar o comprovante
+**And** aprovação manual deve confirmar o pagamento e registrar responsável, data e observação
 
-**Given** que não há resultado exato  
-**When** a busca retorna vazia  
-**Then** o termo pesquisado é preservado  
-**And** a tela mostra sugestões semelhantes, categorias principais e CTA para Projeto Exclusivo.
+**Given** prazo de 48 horas expirando
+**When** a cliente solicitar prorrogação
+**Then** a administradora ou regra do sistema deve permitir mais 48 horas conforme política definida
+**And** o histórico deve registrar a prorrogação
 
-**Given** que a cliente pesquisa um tema de convite que ainda não tem exemplar publicado  
-**When** há tipos/modelos de convite disponíveis  
-**Then** o sistema orienta a escolher o tipo/modelo e informar o tema no pré-formulário  
-**And** não força Projeto Exclusivo apenas pela ausência do tema publicado.
+**Given** uma exceção financeira
+**When** houver ajuste, cancelamento ou correção
+**Then** o sistema deve exigir motivo
+**And** deve preservar trilha de auditoria
 
-**Given** que a busca atualiza resultados dinamicamente  
-**When** a lista muda, fica vazia ou carrega  
-**Then** a mudança é comunicada de forma acessível sem excesso de anúncio para leitor de tela.
+### Story 8.4: Administrar produção, QA, envio e rastreio
 
-**Given** que filtros/chips são usados em celular  
-**When** a cliente aplica ou remove filtros  
-**Then** os controles funcionam por toque e teclado  
-**And** não dependem de hover.
+**Requisitos cobertos:** FR-32, FR-33, FR-43, FR-44, FR-47; AR-21.
 
-### Story 1.4: Navegar por categorias e catálogo estruturado
-
-Como cliente visitante,  
-quero navegar por categorias claras e produtos bem organizados,  
-para comparar opções de lembrancinhas, kits, convites e digitais sem confusão.
+As a administradora da JS Designs,
+I want atualizar produção, QA, envio e rastreio,
+So that a cliente receba informações corretas durante a execução do pedido.
 
 **Acceptance Criteria:**
 
-**Given** que Sharom cadastra um produto no catálogo  
-**When** informa os dados do produto  
-**Then** o sistema exige natureza/modalidade, categoria, fotos, preço, quantidade ou variante, tema demonstrado, ocasião, personalização, prazo, materiais, composição, disponibilidade e tipo de entrega.
+**Given** um pedido físico aprovado para produção
+**When** a administradora atualizar etapas
+**Then** deve poder marcar produção iniciada, QA, embalagem, enviado e entregue quando aplicável
+**And** cada transição deve respeitar a máquina de estados
 
-**Given** que o produto usa personagem ou ativo protegido  
-**When** Sharom tenta publicar o produto  
-**Then** o sistema exige registro de licença, autorização ou verificação de direito de uso comercial  
-**And** impede publicação quando o status de direito de uso estiver pendente ou rejeitado.
+**Given** foto de QA
+**When** a administradora anexar imagem
+**Then** a imagem deve ficar privada
+**And** deve aparecer para a cliente apenas como informativa
 
-**Given** que a cliente navega pela loja  
-**When** abre categorias como Lembrancinhas, Kits, Convites ou Produtos Digitais Prontos  
-**Then** vê listagens consistentes com filtros relevantes  
-**And** cada item mostra modalidade de forma clara.
+**Given** envio registrado
+**When** houver código de rastreio
+**Then** deve salvar transportador, modalidade e código
+**And** deve indicar se o rastreio é consultável automaticamente ou apenas informativo
 
-**Given** que a cliente alterna idioma na listagem  
-**When** os produtos são renderizados  
-**Then** nomes, descrições, metadados e SEO aparecem no idioma escolhido quando disponíveis  
-**And** fallback editorial controlado evita mistura silenciosa de idiomas.
+### Story 8.5: Gerenciar papéis, permissões e auditoria
 
-**Given** que a cliente usa celular  
-**When** navega por listagens e categorias  
-**Then** os cards permanecem legíveis, tocáveis e comparáveis  
-**And** a página não usa anúncios de terceiros nem ruído promocional externo.
+**Requisitos cobertos:** FR-48; AR-13, AR-14, AR-27; NFR-5, NFR-8.
 
-### Story 1.5: Publicar páginas com SEO essencial e conteúdo localizado
-
-Como cliente que chega pelo Google ou link externo,  
-quero abrir páginas públicas claras e no idioma correto,  
-para entender rapidamente se a JS Designs tem o produto ou tema que procuro.
+As a responsável pela operação,
+I want controlar permissões e auditar ações sensíveis,
+So that dados de clientes, pagamentos e arquivos fiquem protegidos.
 
 **Acceptance Criteria:**
 
-**Given** que uma página pública de produto, categoria ou tema existe  
-**When** ela é publicada  
-**Then** ela possui título, descrição, URL estável, canonical quando aplicável e metadados localizados  
-**And** o conteúdo principal é compreensível sem depender de imagem.
+**Given** usuários administrativos
+**When** configurar acesso
+**Then** deve haver papéis/permissões para funções administrativas relevantes
+**And** ações sensíveis devem exigir usuário autorizado
 
-**Given** que a cliente chega por busca externa em uma página de produto  
-**When** a página abre  
-**Then** ela vê diretamente o contexto relevante do produto  
-**And** consegue seguir para configuração, compra ou Projeto Exclusivo conforme a modalidade.
+**Given** alteração de pedido, pagamento, briefing, arquivo, autorização ou preço
+**When** a ação ocorrer
+**Then** o sistema deve registrar quem fez, quando fez e o que mudou
+**And** o registro deve ser consultável por usuário autorizado
 
-**Given** que a página está em português, inglês ou espanhol  
-**When** o conteúdo localizado não existe para algum campo  
-**Then** o sistema usa fallback editorial controlado  
-**And** não mistura idiomas de forma silenciosa em informações críticas de preço, prazo, entrega ou política.
+**Given** tentativa não autorizada
+**When** alguém acessar recurso protegido
+**Then** o sistema deve negar acesso
+**And** deve registrar evento quando aplicável
 
-**Given** que filtros, busca ou estados transacionais existem  
-**When** mecanismos de busca acessam o site  
-**Then** páginas privadas, estados de checkout, briefing, Área da Cliente e filtros infinitos não são indexados.
+### Story 8.6: Exibir métricas operacionais e comerciais essenciais
 
-**Given** que a página usa fotos reais de produtos  
-**When** imagens carregam lentamente ou falham  
-**Then** a página mantém texto alternativo adequado, layout estável e caminho de compra utilizável.
+**Requisitos cobertos:** FR-49, FR-50; NFR-11.
 
-## Epic 2: Produto, modalidade e configuração antes do carrinho
-
-A cliente entende cada tipo de produto e configura corretamente lembrancinhas, convites e digitais antes de avançar, com preço/subtotal coerente.
-
-### Story 2.1: Entender uma página de produto físico personalizado
-
-Como cliente interessada em lembrancinhas físicas,  
-quero ver uma página própria do produto com informações claras antes de configurar,  
-para decidir se aquele item serve para minha festa.
+As a administradora da JS Designs,
+I want acompanhar métricas de vendas, pedidos e produção,
+So that eu tome decisões operacionais sem depender de controles manuais.
 
 **Acceptance Criteria:**
 
-**Given** que a cliente abre uma página de produto físico personalizado  
-**When** a página carrega  
-**Then** ela vê fotos reais, nome do produto, preço ou faixa de preço, quantidade mínima, material, acabamento, conteúdo, prazo, entrega e personalização disponível  
-**And** existe um resumo compacto próximo ao CTA.
+**Given** pedidos e eventos registrados
+**When** abrir a área de métricas
+**Then** deve ver indicadores de pedidos, receita, conversão, produtos mais procurados e estados pendentes
+**And** filtros por período e modalidade devem estar disponíveis
 
-**Given** que a cliente ainda não configurou o produto  
-**When** toca no CTA principal  
-**Then** o CTA diz “Personalizar e comprar”  
-**And** leva para a página própria de personalização, não direto ao carrinho.
+**Given** produtos físicos e digitais
+**When** consultar métricas
+**Then** deve ser possível separar desempenho por tipo de produto
+**And** deve evidenciar produtos mais procurados para alimentar a home e catálogo
 
-**Given** que o produto possui personalização opcional ou obrigatória  
-**When** a página explica o processo  
-**Then** a cliente entende quais dados serão pedidos antes do carrinho e quais fotos/referências serão enviadas depois no briefing protegido.
+**Given** dados sensíveis
+**When** métricas forem exibidas
+**Then** não devem expor informações privadas desnecessárias
+**And** devem respeitar permissões administrativas
 
-**Given** que a página é vista em celular  
-**When** a cliente rola o conteúdo  
-**Then** preço, prazo e próxima ação continuam fáceis de encontrar  
-**And** textos e botões cabem a partir de 320 px.
+### Story 8.7: Tratar exceções operacionais explicitamente
 
-**Given** que a cliente usa teclado ou leitor de tela  
-**When** percorre galeria, resumo e CTA  
-**Then** a ordem de foco é lógica  
-**And** imagens têm texto alternativo útil quando transmitirem informação do produto.
+**Requisitos cobertos:** FR-45, FR-47; AR-11, AR-15, AR-27; NFR-3, NFR-11.
 
-### Story 2.2: Configurar lembrancinha física com quantidade, dados e miniatura
-
-Como cliente comprando lembrancinhas personalizadas,  
-quero escolher quantidade, tema, data, nome/texto e miniatura antes do carrinho,  
-para ver o preço correto e enviar um pedido completo.
+As a administradora da JS Designs,
+I want registrar e tratar exceções operacionais de forma explícita,
+So that quarta alteração, urgência, pagamento pendente, erro, retrabalho, falha de integração e pedido pausado não fiquem perdidos em mensagens soltas.
 
 **Acceptance Criteria:**
 
-**Given** que a cliente abre a página de personalização de uma lembrancinha  
-**When** a tela carrega  
-**Then** a quantidade aparece cedo na jornada  
-**And** o preço unitário/subtotal é atualizado quando a quantidade muda.
-
-**Given** que a cliente tenta adicionar ao carrinho  
-**When** quantidade, tema, nome/texto ou data obrigatória não foram preenchidos  
-**Then** o sistema bloqueia a ação  
-**And** mostra erros textuais próximos aos campos correspondentes.
-
-**Given** que a cliente escolhe miniatura/personagem criada pela JS Designs  
-**When** o subtotal é recalculado  
-**Then** o valor adicional aparece claramente  
-**And** a interface informa que a miniatura será cobrada uma única vez por pedido/personagem.
-
-**Given** que a cliente já tem miniatura incluída no mesmo pedido  
-**When** configura outro item compatível  
-**Then** o sistema mostra “Miniatura incluída neste pedido”  
-**And** não duplica a cobrança.
-
-**Given** que a cliente possui referências ou fotos para a miniatura  
-**When** está na configuração pré-carrinho  
-**Then** a tela informa que fotos e referências serão enviadas depois no briefing protegido  
-**And** não exige upload sensível antes do pagamento.
-
-**Given** que a cliente quer acrescentar instrução breve  
-**When** preenche “outras observações”  
-**Then** a observação é salva no resumo do item  
-**And** permanece editável no carrinho.
-
-### Story 2.3: Comparar e configurar convite digital personalizado
-
-Como cliente procurando convite digital personalizado,  
-quero escolher o tipo/modelo e informar o tema antes do carrinho,  
-para comprar o convite correto com prazo e preço claros.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente abre a área de convites digitais personalizados  
-**When** os modelos/tipos são exibidos  
-**Then** cada opção mostra diferenças visuais e escritas  
-**And** informa recursos, prazo, preço, dados necessários e se é Convite Padrão ou Convite Complexo.
-
-**Given** que a cliente escolhe um tipo/modelo  
-**When** inicia a configuração  
-**Then** o formulário coleta tema em texto livre, cores, data, horário, endereço quando aplicável e dados principais do convite  
-**And** a ausência de exemplar publicado do tema não bloqueia a compra.
-
-**Given** que o convite permite miniatura/personagem  
-**When** a cliente escolhe contratar criação da miniatura  
-**Then** o adicional aparece no preço  
-**And** a cobrança é única por pedido/personagem e reutilizável em lembrancinhas compatíveis.
-
-**Given** que a cliente tenta avançar sem dados obrigatórios  
-**When** toca em adicionar ao carrinho  
-**Then** o sistema bloqueia a ação  
-**And** mostra mensagens próximas aos campos incompletos.
-
-**Given** que o convite escolhido é Padrão  
-**When** o resumo é exibido  
-**Then** a cliente vê prazo de até 24 horas após pagamento e dados completos.
-
-**Given** que o convite escolhido é Complexo  
-**When** o resumo é exibido  
-**Then** a cliente vê que precisará concluir briefing protegido  
-**And** o prazo é de até 48 horas após briefing completo.
-
-### Story 2.4: Comprar Produto Digital Pronto sem confundir com personalização
-
-Como cliente que compra arquivo digital pronto,  
-quero entender que o produto é digital, imediato e compatível com Silhouette Studio,  
-para comprar sem esperar briefing, aprovação ou atendimento.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente abre uma página de Produto Digital Pronto  
-**When** a página carrega  
-**Then** ela vê selo claro de “Produto digital”, “Download imediato” e compatibilidade com Silhouette Studio  
-**And** a página não promete edição no Canva.
-
-**Given** que a cliente lê a página  
-**When** consulta os detalhes do produto  
-**Then** vê quais arquivos serão entregues, condições de uso, licença, ausência de personalização e ausência de aprovação de arte.
-
-**Given** que a cliente decide comprar  
-**When** toca no CTA principal  
-**Then** o botão diz “Comprar agora”  
-**And** leva para carrinho/checkout sem pedir briefing ou dados de personalização.
-
-**Given** que Produto Digital Pronto aparece em área mista da loja  
-**When** é exibido em card, busca ou “Mais procurados”  
-**Then** mantém rótulo forte de produto digital  
-**And** não usa linguagem visual ou CTA de convite personalizado.
-
-**Given** que a cliente usa leitor de tela  
-**When** navega pela página  
-**Then** modalidade, entrega imediata, compatibilidade e ausência de personalização são anunciadas em texto acessível.
-
-### Story 2.5: Aplicar desconto progressivo, complementos e cupom manual
-
-Como cliente montando um pedido,  
-quero ver desconto por quantidade, complementos relevantes e campo para cupom,  
-para saber o total correto antes de pagar.
-
-**Acceptance Criteria:**
-
-**Given** que um produto possui desconto progressivo por quantidade  
-**When** a cliente altera a quantidade  
-**Then** o sistema recalcula automaticamente preço unitário, subtotal e desconto progressivo aplicável  
-**And** a mudança de subtotal é anunciada de forma acessível.
-
-**Given** que a cliente recebeu um cupom por cadastrar o e-mail  
-**When** está no carrinho ou checkout  
-**Then** existe um campo para inserir o código do cupom  
-**And** o desconto de primeira compra só é aplicado se o código válido for informado.
-
-**Given** que a cliente não informa o cupom recebido  
-**When** finaliza a compra  
-**Then** o desconto do cupom não é aplicado  
-**And** o desconto progressivo por quantidade continua funcionando normalmente quando aplicável.
-
-**Given** que desconto progressivo e cupom manual são aplicáveis ao mesmo pedido  
-**When** o total é calculado  
-**Then** o sistema aplica a regra comercial configurada para combinação ou não combinação dos descontos  
-**And** informa claramente qual desconto foi aplicado.
-
-**Given** que existem complementos relevantes do mesmo tema ou ocasião  
-**When** a cliente visualiza produto ou carrinho  
-**Then** o sistema pode sugerir dois ou três complementos  
-**And** as sugestões não bloqueiam a compra nem parecem obrigatórias.
-
-**Given** que a cliente adiciona complemento compatível com miniatura já paga  
-**When** o subtotal é atualizado  
-**Then** a miniatura não é cobrada novamente  
-**And** o resumo informa quais itens reutilizam a miniatura.
-
-## Epic 3: Carrinho, checkout, pagamento, frete e fatura
-
-A cliente compra como visitante, revisa itens, escolhe entrega quando aplicável, informa NIF opcional, paga por parceiro certificado e recebe confirmação correta por modalidade.
-
-### Story 3.1: Revisar carrinho editável por modalidade
-
-Como cliente com itens no carrinho,  
-quero revisar e editar produtos físicos, convites e digitais em um único pedido,  
-para confirmar quantidade, personalização, miniatura e subtotal antes do checkout.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente adicionou produtos físicos personalizados, convites ou digitais prontos  
-**When** abre o carrinho  
-**Then** cada item aparece com modalidade, nome, quantidade, configuração relevante, subtotal e ação de editar/remover  
-**And** o carrinho aceita vários produtos no mesmo pedido.
-
-**Given** que um item possui miniatura/personagem compartilhada  
-**When** o carrinho exibe o resumo  
-**Then** a miniatura aparece como adicional único do pedido  
-**And** os itens que reutilizam a miniatura são indicados.
-
-**Given** que a cliente altera quantidade ou configuração de item editável  
-**When** volta ao carrinho  
-**Then** subtotal, descontos progressivos e resumo do pedido são recalculados pelo servidor  
-**And** nenhum dado já preenchido é perdido sem confirmação.
-
-**Given** que a cliente possui cupom de primeira compra recebido por e-mail  
-**When** informa o código no campo de cupom  
-**Then** o carrinho valida o código  
-**And** mostra se foi aplicado, recusado, expirado ou incompatível.
-
-**Given** que a cliente não informa cupom  
-**When** avança para checkout  
-**Then** nenhum desconto de cupom é aplicado  
-**And** descontos progressivos válidos continuam aplicados automaticamente.
-
-**Given** que a cliente remove item do carrinho  
-**When** a remoção afeta miniatura compartilhada, complemento ou desconto  
-**Then** o sistema recalcula o total  
-**And** informa claramente o que mudou.
-
-### Story 3.2: Calcular frete para produtos físicos no checkout
-
-Como cliente comprando produto físico,  
-quero informar o endereço e ver frete, prazo estimado e disponibilidade antes de pagar,  
-para saber o total real da compra.
-
-**Acceptance Criteria:**
-
-**Given** que o carrinho contém pelo menos um produto físico  
-**When** a cliente chega ao checkout  
-**Then** o sistema solicita endereço de entrega antes de finalizar o pagamento  
-**And** calcula disponibilidade, custo de frete e previsão de envio para os 27 países da União Europeia, com opções de envio normal e envio rápido quando configuradas.
-
-**Given** que o carrinho contém apenas produto digital pronto ou convite digital sem entrega física  
-**When** a cliente chega ao checkout  
-**Then** o sistema não exige endereço de entrega física  
-**And** não adiciona frete ao total.
-
-**Given** que o endereço informado está fora da cobertura automática de frete  
-**When** o sistema valida o país/região  
-**Then** a cliente é orientada a abrir Suporte Online para avaliação manual  
-**And** o checkout não promete preço ou prazo automático.
-
-**Given** que o frete é calculado  
-**When** o resumo do pedido é exibido  
-**Then** o total separa subtotal dos produtos, descontos, miniatura, frete e total final  
-**And** separa prazo de produção do prazo estimado da transportadora, indicando se a modalidade escolhida permite rastreio.
-
-**Given** que a cliente altera endereço, país ou itens físicos  
-**When** o checkout recalcula o pedido  
-**Then** frete e previsão são atualizados  
-**And** a mudança é comunicada antes do pagamento.
-
-**Given** que há falha temporária no cálculo de frete  
-**When** a cliente tenta prosseguir  
-**Then** o sistema mostra estado seguro e recuperável  
-**And** não permite pagamento com frete desconhecido para produto físico.
-
-**Given** que envio normal e envio rápido estão disponíveis para o endereço informado  
-**When** a cliente escolhe uma modalidade  
-**Then** o checkout atualiza preço, prazo estimado e expectativa de rastreio  
-**And** preserva a escolha no pedido.
-
-### Story 3.3: Finalizar checkout como visitante com fatura e consentimentos
-
-Como cliente pronta para comprar,  
-quero concluir contato, entrega, fatura, consentimentos e revisão em uma página,  
-para pagar sem criar conta antes.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente chega ao checkout  
-**When** informa seus dados  
-**Then** o checkout aceita compra como visitante  
-**And** não exige senha ou cadastro prévio.
-
-**Given** que a cliente deseja incluir NIF na fatura  
-**When** marca “Desejo incluir NIF na fatura”  
-**Then** o campo de NIF é exibido e validado conforme regra configurada  
-**And** o dado aparece no resumo fiscal antes do pagamento.
-
-**Given** que a cliente não deseja incluir NIF  
-**When** deixa a opção desmarcada  
-**Then** o checkout continua normalmente  
-**And** a venda ainda fica marcada para geração de fatura.
-
-**Given** que o pedido contém Produto Digital Pronto com entrega imediata  
-**When** a cliente revisa os aceites obrigatórios antes de pagar  
-**Then** o sistema apresenta ciência clara sobre download/acesso imediato e regras de desistência quando aplicável  
-**And** registra a aceitação ativa exigida antes de liberar a compra.
-
-**Given** que a cliente informa e-mail para compra  
-**When** existem autorizações opcionais como newsletter/desconto, portfólio/divulgação ou reutilização de arquivos  
-**Then** cada autorização aparece separada e desmarcada por padrão  
-**And** a compra não depende de aceitar marketing, divulgação ou reutilização opcional.
-
-**Given** que a autorização de portfólio/divulgação é exibida  
-**When** a cliente decide autorizar  
-**Then** o sistema registra data/hora, versão do texto aceito, canais permitidos e nível de anonimização  
-**And** explica que convites serão publicados apenas com local, data, horário e dados sensíveis modificados/anônimos, enquanto lembrancinhas e miniaturas podem aparecer sem modificação quando autorizado.
-
-**Given** que a cliente revisa o pedido  
-**When** o checkout mostra o total final  
-**Then** aparecem itens, descontos, cupom manual se aplicado, miniatura, frete quando houver, NIF/fatura e canal de contato  
-**And** dados editáveis podem ser corrigidos antes do pagamento.
-
-### Story 3.4: Pagar por parceiro certificado com confirmação segura
-
-Como cliente no checkout,  
-quero pagar por um parceiro certificado,  
-para concluir a compra com segurança sem expor dados sensíveis de cartão à JS Designs.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente escolhe método de pagamento disponível  
-**When** inicia o pagamento  
-**Then** o pagamento é processado por parceiro certificado  
-**And** dados completos de cartão e códigos de segurança não transitam nem ficam armazenados na aplicação JS Designs.
-
-**Given** que o parceiro retorna a cliente ao site após o pagamento  
-**When** a página de retorno carrega  
-**Then** o sistema mostra estado de pagamento aguardando confirmação quando necessário  
-**And** não libera briefing, produção ou download apenas pelo retorno do navegador.
-
-**Given** que o webhook de pagamento confirma pagamento aprovado  
-**When** o evento é processado  
-**Then** `payment_state` muda para confirmado por comando idempotente  
-**And** o pedido avança para a próxima etapa correta conforme a modalidade dos itens.
-
-**Given** que o webhook é repetido ou chega fora de ordem  
-**When** o sistema processa o evento  
-**Then** não duplica pedido, cobrança, fatura, miniatura, notificação ou entrega  
-**And** registra o evento com correlação ao pedido.
-
-**Given** que há falha, disputa, cancelamento ou reembolso  
-**When** o provedor envia evento ou Sharom registra conciliação  
-**Then** o pedido entra em estado seguro ou fila de exceção  
-**And** a cliente não recebe promessa incompatível com o estado financeiro.
-
-### Story 3.5: Reservar pedido por transferência bancária com comprovante e prorrogação
-
-Como cliente que prefere transferência bancária,  
-quero receber instruções claras, enviar comprovante e poder pedir mais prazo se necessário,  
-para pagar sem perder o pedido configurado imediatamente.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente escolhe transferência bancária  
-**When** finaliza o checkout  
-**Then** o pedido fica em “Aguardando pagamento”  
-**And** a reserva inicial expira em 48 horas se não houver confirmação.
-
-**Given** que o pedido está aguardando transferência  
-**When** a cliente vê a confirmação  
-**Then** a tela mostra instruções de pagamento, prazo de 48 horas, referência do pedido e próxima ação  
-**And** deixa claro que briefing, produção e downloads só liberam após confirmação real do pagamento.
-
-**Given** que a cliente possui comprovante de transferência  
-**When** envia o comprovante pela Área da Cliente ou suporte autorizado  
-**Then** o pedido muda para “Comprovante recebido”  
-**And** o sistema registra arquivo, data/hora, origem do envio e vínculo com o pedido.
-
-**Given** que o pedido está em “Comprovante recebido”  
-**When** Sharom confere o banco e confirma recebimento real  
-**Then** o sistema permite confirmação manual do pagamento  
-**And** registra quem confirmou, data/hora, observação opcional e evidência/auditoria.
-
-**Given** que o comprovante foi enviado mas o dinheiro não entrou ou está divergente  
-**When** Sharom analisa o pedido  
-**Then** o pagamento não é confirmado  
-**And** o pedido permanece aguardando pagamento ou entra em exceção com motivo visível.
-
-**Given** que o pagamento ainda não foi confirmado e a reserva está próxima do fim  
-**When** a cliente acessa a Área da Cliente ou link seguro do pedido  
-**Then** ela pode solicitar prorrogação por mais 48 horas  
-**And** o sistema registra data/hora da prorrogação.
-
-**Given** que a cliente já usou a prorrogação disponível  
-**When** tenta prorrogar novamente  
-**Then** o sistema não prorroga automaticamente  
-**And** oferece contato com Suporte Online para avaliação manual.
-
-**Given** que o pagamento por transferência é confirmado manualmente ou por integração  
-**When** a confirmação é registrada  
-**Then** o sistema muda `payment_state` para confirmado por comando idempotente  
-**And** o pedido avança conforme a modalidade dos itens.
-
-**Given** que a reserva expira sem confirmação após o prazo disponível  
-**When** a rotina de expiração roda  
-**Then** o pedido é marcado como expirado/cancelado conforme regra configurada  
-**And** estoque, capacidade ou janela reservada são liberados quando aplicável.
-
-**Given** que a confirmação é registrada duas vezes  
-**When** o sistema processa a repetição  
-**Then** não duplica fatura, pedido, notificação ou liberação de briefing/download.
-
-### Story 3.6: Salvar carrinho por 90 dias para cliente com conta
-
-Como cliente que cria ou acessa uma conta,  
-quero manter meu carrinho salvo por até 90 dias e receber lembretes se eu autorizar,  
-para poder voltar depois sem perder os itens escolhidos.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente está navegando sem conta  
-**When** adiciona itens ao carrinho  
-**Then** o carrinho é preservado durante a sessão conforme regra técnica disponível  
-**And** a cliente pode continuar para checkout sem criar conta.
-
-**Given** que a cliente cria conta ou acessa a Área da Cliente  
-**When** possui itens no carrinho  
-**Then** o sistema associa o carrinho à conta  
-**And** mantém os itens salvos por até 90 dias.
-
-**Given** que o carrinho salvo contém produto, preço, disponibilidade ou prazo que mudou  
-**When** a cliente retorna ao carrinho  
-**Then** o sistema recalcula os valores atuais pelo servidor  
-**And** mostra claramente quais itens mudaram antes do checkout.
-
-**Given** que a cliente autoriza lembretes de carrinho por e-mail ou WhatsApp  
-**When** o carrinho permanece abandonado  
-**Then** o sistema pode enviar notificações sobre os itens salvos  
-**And** respeita consentimento separado, canal autorizado e opção de cancelar lembretes.
-
-**Given** que a cliente não autoriza lembretes  
-**When** abandona o carrinho  
-**Then** o carrinho pode permanecer salvo por 90 dias se houver conta  
-**And** nenhuma notificação promocional é enviada.
-
-**Given** que o prazo de 90 dias expira  
-**When** a rotina de limpeza executa  
-**Then** o carrinho salvo é removido ou anonimizado conforme política de retenção  
-**And** o sistema registra a execução sem conservar conteúdo eliminado.
-
-### Story 3.7: Confirmar compra e criar acesso seguro à Área da Cliente
-
-Como cliente que acabou de pagar,  
-quero receber uma confirmação clara e acesso seguro ao meu pedido,  
-para saber exatamente o próximo passo e como isso afeta os prazos.
-
-**Acceptance Criteria:**
-
-**Given** que o pagamento foi confirmado para pedido com item personalizado  
-**When** a tela de confirmação é exibida  
-**Then** a cliente vê “Pedido confirmado” e a próxima ação  
-**And** o CTA principal é “Preencher briefing agora”.
-
-**Given** que a cliente prefere preencher depois  
-**When** escolhe “Preencher depois”  
-**Then** o sistema informa onde retomar o briefing  
-**And** avisa claramente que a primeira arte para aprovação só ficará pronta depois do briefing preenchido e entregue.
-
-**Given** que o pedido contém produto físico personalizado  
-**When** a cliente lê os próximos passos  
-**Then** o sistema informa que a produção física só começa depois da arte aprovada  
-**And** explica que o prazo de produção conta após a Aprovação Final.
-
-**Given** que o pedido contém apenas Produto Digital Pronto  
-**When** o pagamento é confirmado  
-**Then** a confirmação informa entrega imediata por e-mail  
-**And** oferece acesso à Área da Cliente para re-download.
-
-**Given** que o pedido está aguardando confirmação financeira  
-**When** a cliente chega à página de confirmação  
-**Then** a tela mostra estado “Aguardando pagamento” ou equivalente  
-**And** não exibe CTA de briefing, produção ou download ainda.
-
-**Given** que o sistema cria ou associa acesso pós-compra  
-**When** envia código seguro ou magic link  
-**Then** o link/código permite acessar apenas pedidos autorizados  
-**And** impede enumeração por número de pedido e e-mail.
-
-**Given** que a confirmação dispara notificações  
-**When** e-mail ou WhatsApp falha  
-**Then** a Área da Cliente continua sendo o registro principal  
-**And** a falha fica detectável para operação.
-
-## Epic 4: Área da Cliente, briefing e aprovação de arte
-
-A cliente acessa o pedido com segurança, preenche briefing protegido em passos curtos, acompanha prazos, recebe prévias, pede alterações e aprova a arte.
-
-### Story 4.1: Acessar Área da Cliente com linha do tempo do pedido
-
-Como cliente com pedido confirmado,  
-quero acessar uma área protegida com estado, próxima ação e prazo,  
-para acompanhar o pedido sem depender de mensagem manual.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente recebeu código seguro ou magic link  
-**When** acessa a Área da Cliente  
-**Then** vê apenas pedidos autorizados para aquele acesso  
-**And** o sistema impede enumeração por número de pedido ou e-mail.
-
-**Given** que a cliente abre um pedido  
-**When** a linha do tempo é exibida  
-**Then** ela vê Estado do Pedido, motivo, Próxima Ação, responsável e data prevista  
-**And** etapas concluídas, atuais e futuras são visualmente distintas.
-
-**Given** que o pedido está aguardando pagamento, briefing, aprovação, produção, QA, envio, concluído, pausado ou em exceção  
-**When** a cliente consulta a linha do tempo  
-**Then** o texto explica o estado em linguagem clara  
-**And** mostra o que precisa acontecer para avançar.
-
-**Given** que a cliente usa celular  
-**When** consulta a Área da Cliente  
-**Then** a linha do tempo é legível e operável a partir de 320 px  
-**And** ações principais ficam fáceis de tocar.
-
-**Given** que e-mail ou WhatsApp falha  
-**When** a cliente acessa a Área da Cliente  
-**Then** a informação atual do pedido continua disponível  
-**And** a Área da Cliente permanece como registro principal.
-
-### Story 4.2: Preencher briefing mestre em passos curtos
-
-Como cliente com item personalizado pago,  
-quero preencher um briefing protegido em etapas curtas,  
-para enviar todas as informações necessárias sem repetir dados.
-
-**Acceptance Criteria:**
-
-**Given** que o pedido possui lembrancinha, convite complexo ou outro item personalizado que exige briefing  
-**When** a cliente abre o briefing  
-**Then** existe um único briefing mestre por pedido/evento  
-**And** ele mostra seções condicionais conforme os itens comprados.
-
-**Given** que a cliente informa dados compartilhados do evento  
-**When** preenche nome, tema, data, textos, preferências e observações  
-**Then** esses dados podem ser reaproveitados pelos itens compatíveis do mesmo pedido  
-**And** o sistema evita pedir a mesma informação duas vezes sem necessidade.
-
-**Given** que a cliente avança entre etapas  
-**When** preenche parcialmente o briefing  
-**Then** o sistema salva rascunho automaticamente  
-**And** mostra progresso, etapas pendentes e confirmação de salvamento.
-
-**Given** que a cliente tenta enviar briefing incompleto  
-**When** existem campos obrigatórios pendentes  
-**Then** o envio é bloqueado  
-**And** os erros aparecem próximos aos campos, com orientação clara.
-
-**Given** que a cliente precisa enviar referências  
-**When** adiciona arquivos ou links  
-**Then** pode enviar múltiplos anexos e múltiplos links  
-**And** vê progresso, sucesso, falha, remover e tentar novamente.
-
-**Given** que a cliente envia fotos/referências de criança ou miniatura  
-**When** conclui o upload  
-**Then** os arquivos ficam privados na Área da Cliente  
-**And** o sistema registra finalidade, vínculo com pedido/item e autorização necessária.
-
-### Story 4.3: Pausar prazos e lembrar briefing pendente
-
-Como cliente que ainda não terminou o briefing,  
-quero receber avisos claros de que o pedido depende da minha ação,  
-para entender que os prazos só começam depois do briefing completo.
-
-**Acceptance Criteria:**
-
-**Given** que o pagamento foi confirmado e o briefing é obrigatório  
-**When** a cliente ainda não enviou o briefing completo  
-**Then** o pedido permanece em “Aguardando briefing”  
-**And** criação de arte, produção e entrega não começam.
-
-**Given** que o briefing está incompleto  
-**When** a Área da Cliente mostra o pedido  
-**Then** a próxima ação é atribuída à cliente  
-**And** o sistema informa que o prazo da primeira arte começa apenas após o briefing completo e entregue.
-
-**Given** que o briefing permanece pendente  
-**When** chega o momento configurado de lembrete  
-**Then** o sistema envia lembrete acionável por canal consentido  
-**And** o lembrete aponta para o briefing protegido.
-
-**Given** que a cliente conclui o briefing  
-**When** envia todas as etapas obrigatórias  
-**Then** o pedido sai de “Aguardando briefing”  
-**And** o prazo da primeira arte é calculado conforme a modalidade.
-
-**Given** que a cliente atrasou o briefing  
-**When** o pedido calcula prazos  
-**Then** o tempo aguardando a cliente fica registrado como pausa  
-**And** a operação consegue ver início, fim, motivo e responsável pela pausa.
-
-### Story 4.4: Receber prévia numerada da arte
-
-Como cliente aguardando personalização,  
-quero receber uma prévia numerada quando a arte estiver pronta,  
-para revisar a versão correta antes de aprovar ou pedir alteração.
-
-**Acceptance Criteria:**
-
-**Given** que o briefing está completo ou os dados necessários do convite padrão foram entregues  
-**When** Sharom envia a primeira arte  
-**Then** o sistema cria uma prévia numerada e imutável  
-**And** vincula a prévia ao pedido, item, autora e data/hora.
-
-**Given** que a prévia fica disponível  
-**When** o sistema envia notificações  
-**Then** a cliente recebe aviso por e-mail e WhatsApp quando consentido/aplicável  
-**And** o aviso leva para a Área da Cliente protegida.
-
-**Given** que a cliente abre a prévia  
-**When** consulta a tela de aprovação  
-**Then** vê a imagem/arquivo em bom tamanho, número da versão, item relacionado e prazo/impacto da decisão  
-**And** a interface mostra as ações “Aprovar arte” e “Pedir alteração”.
-
-**Given** que existem prévias anteriores  
-**When** a cliente consulta o histórico  
-**Then** consegue ver versões numeradas anteriores  
-**And** nenhuma versão antiga pode ser confundida com a versão atualmente pendente.
-
-**Given** que a prévia contém arquivo privado  
-**When** a cliente acessa o arquivo  
-**Then** o acesso ocorre por autorização e link temporário/controlado  
-**And** outra cliente não consegue acessar o arquivo por URL previsível.
-
-### Story 4.5: Pedir alteração com texto, imagem ou ambos
-
-Como cliente revisando uma prévia,  
-quero pedir alteração usando texto, marcação na imagem ou ambos,  
-para explicar claramente o que precisa mudar antes da aprovação.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente está na tela de uma prévia pendente  
-**When** escolhe “Pedir alteração”  
-**Then** o sistema abre formulário com campo de texto livre  
-**And** oferece marcação em imagem como opção adicional, não obrigatória.
-
-**Given** que a cliente envia uma alteração  
-**When** confirma o pedido de alteração  
-**Then** o sistema registra uma Rodada de Alteração consolidada  
-**And** vincula texto, marcações, anexos opcionais, autora, data/hora e versão da prévia.
-
-**Given** que a cliente ainda possui rodadas gratuitas  
-**When** registra alteração  
-**Then** o contador de até três Rodadas de Alteração gratuitas é atualizado  
-**And** a tela informa quantas restam.
-
-**Given** que a cliente tenta enviar quarta alteração gratuita  
-**When** o limite já foi usado  
-**Then** o sistema bloqueia alteração gratuita automática  
-**And** encaminha para exceção/avaliação humana com explicação de possível custo ou prazo.
-
-**Given** que a cliente revisa a alteração antes de enviar  
-**When** há texto, marcações ou arquivos  
-**Then** ela consegue confirmar ou voltar para editar  
-**And** o sistema não perde os dados preenchidos.
-
-**Given** que a alteração é enviada  
-**When** o pedido muda de estado  
-**Then** ele entra em “Alteração solicitada”  
-**And** a próxima ação passa para Sharom.
-
-### Story 4.6: Aprovar arte final e registrar autorização de publicação
-
-Como cliente revisando a arte final,  
-quero aprovar deliberadamente a versão correta e escolher se autorizo divulgação,  
-para liberar produção/entrega com segurança e controlar o uso público do meu pedido.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente está vendo a prévia pendente  
-**When** toca em “Aprovar arte”  
-**Then** o sistema mostra confirmação deliberada antes de finalizar  
-**And** lista dados críticos para revisão, como nome/texto, tema, data e item relacionado.
-
-**Given** que a cliente confirma a aprovação  
-**When** a ação é registrada  
-**Then** o sistema salva Aprovação Final com versão, autora, data/hora e confirmações críticas  
-**And** mostra mensagem forte: “Arte aprovada para produção.”
-
-**Given** que o item aprovado é produto físico  
-**When** a Aprovação Final é registrada  
-**Then** o pedido pode avançar para “Aprovado para produção”  
-**And** o prazo de produção física passa a contar após essa aprovação.
-
-**Given** que o item aprovado é convite digital personalizado  
-**When** a Aprovação Final é registrada  
-**Then** o pedido pode avançar para entrega digital do convite final  
-**And** a cliente escolhe receber por e-mail ou WhatsApp, mantendo acesso na Área da Cliente.
-
-**Given** que a cliente ainda não decidiu sobre divulgação/portfólio  
-**When** confirma a arte ou conclui o briefing  
-**Then** o sistema oferece autorização opcional e separada para publicação  
-**And** a opção aparece desmarcada por padrão.
-
-**Given** que a cliente autoriza divulgação  
-**When** o sistema registra a autorização  
-**Then** salva canais permitidos, data/hora, versão do texto aceito e nível de anonimização  
-**And** informa que convites só serão publicados com local, data, horário e dados sensíveis modificados/anônimos.
-
-**Given** que a autorização envolve lembrancinhas ou miniaturas  
-**When** a cliente autoriza publicação  
-**Then** o sistema permite registrar que esses itens podem aparecer sem modificação  
-**And** mantém possibilidade de restringir ou retirar autorização futura.
-
-**Given** que a cliente não autoriza divulgação  
-**When** a aprovação da arte é concluída  
-**Then** a compra, produção e entrega continuam normalmente  
-**And** o pedido fica marcado como não autorizado para portfólio/divulgação.
-
-### Story 4.7: Enviar notificações acionáveis e entregar convite aprovado
-
-Como cliente acompanhando um pedido personalizado,  
-quero receber avisos úteis e escolher o canal de entrega do convite,  
-para agir no momento certo e receber o arquivo final no canal preferido.
-
-**Acceptance Criteria:**
-
-**Given** que ocorre mudança relevante no pedido  
-**When** o sistema envia notificação  
-**Then** a mensagem informa Estado do Pedido, Próxima Ação e impacto no prazo  
-**And** usa apenas canais consentidos ou necessários ao serviço.
-
-**Given** que a primeira arte fica pronta  
-**When** a notificação é enviada  
-**Then** a cliente recebe aviso por e-mail e WhatsApp quando aplicável  
-**And** o link leva para a prévia protegida na Área da Cliente.
-
-**Given** que a cliente aprova um convite digital personalizado  
-**When** escolhe canal de entrega  
-**Then** pode selecionar e-mail, WhatsApp ou ambos conforme opção disponível  
-**And** o arquivo final também fica associado ao pedido na Área da Cliente.
-
-**Given** que a entrega por WhatsApp foi escolhida  
-**When** o sistema envia ou registra o envio  
-**Then** o histórico do pedido preserva canal, data/hora e status  
-**And** dados sensíveis só são enviados conforme regra/consentimento aplicável.
-
-**Given** que uma notificação falha  
-**When** e-mail ou WhatsApp não é entregue  
-**Then** o pedido não muda incorretamente de estado  
-**And** a falha fica visível para operação com possibilidade de nova tentativa.
-
-**Given** que a cliente acessa a Área da Cliente sem receber notificação  
-**When** abre o pedido  
-**Then** encontra a mesma próxima ação e os mesmos arquivos disponíveis  
-**And** não depende do canal externo para concluir a jornada.
-
-## Epic 5: Entrega digital, produção física, QA e rastreio
-
-A cliente recebe Produto Digital Pronto imediatamente, recebe convite final aprovado, acompanha produção física, foto privada de QA e rastreio quando disponível.
-
-### Story 5.1: Entregar Produto Digital Pronto imediatamente após pagamento confirmado
-
-Como cliente que comprou Produto Digital Pronto,  
-quero receber o arquivo automaticamente após o pagamento confirmado,  
-para usar o produto sem esperar atendimento ou briefing.
-
-**Acceptance Criteria:**
-
-**Given** que o pedido contém Produto Digital Pronto e pagamento confirmado  
-**When** o sistema processa a confirmação  
-**Then** envia automaticamente e-mail com acesso ao arquivo adquirido  
-**And** libera o arquivo na Área da Cliente.
-
-**Given** que o pagamento ainda está pendente ou aguardando confirmação  
-**When** a cliente acessa a confirmação ou Área da Cliente  
-**Then** o arquivo não é liberado  
-**And** a tela mostra o estado financeiro correto.
-
-**Given** que o arquivo é entregue  
-**When** a cliente acessa o link  
-**Then** o acesso usa link temporário/protegido  
-**And** outra cliente não consegue acessar o arquivo por URL previsível.
-
-**Given** que o e-mail não chega  
-**When** a cliente entra na Área da Cliente por código/link seguro  
-**Then** pode gerar novo link temporário para re-download  
-**And** o sistema registra a tentativa.
-
-**Given** que a cliente visualiza o produto adquirido  
-**When** consulta os detalhes  
-**Then** vê licença, compatibilidade com Silhouette Studio e ausência de personalização  
-**And** não há etapa de briefing, prévia ou aprovação para Produto Digital Pronto.
-
-**Given** que o pedido contém convite digital personalizado  
-**When** o pagamento é confirmado  
-**Then** o sistema não trata o convite como entrega imediata  
-**And** mantém o fluxo de edição/criação por tema, dados do cliente, prévia e aprovação antes da entrega final.
-
-### Story 5.2: Gerar ficha de produção a partir da arte aprovada
-
-Como Sharom preparando um produto físico,  
-quero uma ficha de produção vinculada à arte aprovada,  
-para produzir a encomenda correta sem depender de conversa ou planilha.
-
-**Acceptance Criteria:**
-
-**Given** que um produto físico recebeu Aprovação Final  
-**When** o pedido avança para “Aprovado para produção”  
-**Then** o sistema gera ou disponibiliza Ficha de Produção  
-**And** a ficha aponta para a versão exata da arte aprovada.
-
-**Given** que Sharom abre a Ficha de Produção  
-**When** consulta os detalhes  
-**Then** vê itens, quantidades, materiais, acabamento, miniatura, tema, nome/texto, endereço, prazo e observações relevantes  
-**And** tudo está ligado ao mesmo `order_id`.
-
-**Given** que existe tentativa de produzir usando versão diferente da aprovada  
-**When** a ficha é carregada  
-**Then** o sistema impede ou sinaliza divergência crítica  
-**And** não permite marcar produção como iniciada com versão incorreta.
-
-**Given** que a produção começa  
-**When** Sharom executa a ação de iniciar produção  
-**Then** o pedido muda para “Em produção”  
-**And** o prazo de sete dias corridos passa a ser exibido na Área da Cliente.
-
-**Given** que o pedido possui múltiplos itens físicos  
-**When** a ficha é exibida  
-**Then** cada item aparece separado com quantidade e instruções próprias  
-**And** dados compartilhados do briefing são reaproveitados sem duplicação confusa.
-
-### Story 5.3: Registrar QA com foto privada informativa
-
-Como Sharom finalizando uma encomenda física,  
-quero concluir uma verificação de qualidade e anexar foto privada,  
-para registrar que o produto está pronto antes do envio.
-
-**Acceptance Criteria:**
-
-**Given** que um pedido físico está em produção  
-**When** Sharom conclui a produção  
-**Then** o pedido pode avançar para “Verificação de qualidade”  
-**And** a próxima ação passa para checklist de QA.
-
-**Given** que Sharom abre o checklist de QA  
-**When** verifica a encomenda  
-**Then** consegue marcar itens de conferência configurados, como quantidade, acabamento, arte aprovada, embalagem e dados de envio  
-**And** pode registrar observação interna quando necessário.
-
-**Given** que a encomenda passa na verificação  
-**When** Sharom anexa a foto final privada  
-**Then** o sistema salva a foto vinculada ao pedido  
-**And** a Área da Cliente exibe a foto como informativa, sem pedir nova aprovação.
-
-**Given** que a cliente vê a foto de QA  
-**When** abre a Área da Cliente  
-**Then** entende que a foto é apenas informativa  
-**And** não vê botão de aprovar/reprovar nessa etapa.
-
-**Given** que a foto de QA contém produto personalizado, miniatura ou dado sensível  
-**When** o arquivo é armazenado  
-**Then** ele permanece privado e protegido por autorização  
-**And** segue a política de retenção definida.
-
-**Given** que a verificação identifica erro ou retrabalho  
-**When** Sharom registra falha  
-**Then** o pedido entra em exceção ou retrabalho  
-**And** a cliente recebe informação clara quando houver impacto no prazo.
-
-### Story 5.4: Registrar modalidade de envio e rastreio quando disponível
-
-Como cliente aguardando uma encomenda física,  
-quero escolher/entender a modalidade de envio e receber rastreio quando ela permitir,  
-para acompanhar a entrega com expectativas corretas.
-
-**Acceptance Criteria:**
-
-**Given** que o pedido físico passou pelo QA  
-**When** Sharom prepara o envio  
-**Then** o pedido muda para “Preparando para envio”  
-**And** a Área da Cliente mostra a modalidade escolhida no checkout: envio normal ou envio rápido.
-
-**Given** que Sharom posta nos CTT ou em transportadora  
-**When** registra os dados de envio  
-**Then** salva modalidade, transportadora, data de postagem e código/link quando existir  
-**And** o pedido muda para “Enviado”.
-
-**Given** que a modalidade/transportadora permite rastreio  
-**When** a cliente abre o painel de rastreio  
-**Then** vê transportadora, código/link e instrução clara de acompanhamento  
-**And** recebe notificação acionável por canal consentido.
-
-**Given** que a modalidade escolhida não permite rastreio, como pode ocorrer no envio normal  
-**When** a cliente consulta o pedido  
-**Then** o sistema mostra que aquela entrega não possui rastreio disponível  
-**And** não apresenta isso como erro.
-
-**Given** que o rastreio ainda não foi gerado  
-**When** a cliente consulta o pedido antes do registro  
-**Then** o sistema mostra “Rastreio ainda não disponível”  
-**And** explica que o código aparecerá ali se a modalidade/transportadora permitir.
-
-**Given** que o endereço ou envio entra em exceção  
-**When** Sharom registra problema de logística  
-**Then** o pedido entra na fila de exceções  
-**And** a cliente recebe explicação e próxima ação quando necessário.
-
-**Given** que o pedido é entregue ou finalizado  
-**When** Sharom ou integração registra conclusão  
-**Then** o pedido muda para “Concluído”  
-**And** o histórico preserva eventos de envio, modalidade e rastreio quando houver.
-
-## Epic 6: Suporte Online e Projeto Exclusivo
-
-A cliente consegue pedir ajuda sem sair do site, receber respostas cadastradas, escalar para humano/chat/WhatsApp e solicitar Projeto Exclusivo sem pagamento imediato.
-
-### Story 6.1: Abrir suporte online contextual sem tornar WhatsApp obrigatório
-
-Como cliente navegando na loja ou Área da Cliente,  
-quero abrir suporte online contextual dentro do site,  
-para tirar dúvidas sem abandonar a jornada de compra ou acompanhamento.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente está navegando na loja, produto, carrinho, checkout ou Área da Cliente  
-**When** abre o Suporte Online  
-**Then** o chat aparece de forma compacta e contextual  
-**And** não há botão flutuante permanente de WhatsApp competindo com carrinho, compra ou aprovação.
-
-**Given** que a cliente abre o suporte em uma página de pedido  
-**When** inicia a conversa  
-**Then** o sistema pode anexar contexto consentido, como pedido, página atual, item ou estado  
-**And** não envia dados sensíveis ao WhatsApp sem regra e consentimento adequados.
-
-**Given** que a cliente usa celular  
-**When** conversa pelo chat  
-**Then** o widget não cobre ações críticas da página  
-**And** pode ser fechado e reaberto sem perder a conversa.
-
-**Given** que a cliente usa teclado ou leitor de tela  
-**When** abre, navega e fecha o suporte  
-**Then** foco, nomes acessíveis e ordem de navegação funcionam corretamente  
-**And** o foco retorna ao ponto anterior ao fechar.
-
-**Given** que o suporte está indisponível tecnicamente  
-**When** a cliente navega pela loja  
-**Then** busca, carrinho, checkout, briefing, aprovação e Área da Cliente continuam funcionando  
-**And** a falha fica detectável para operação.
-
-### Story 6.2: Responder automaticamente apenas com conteúdo cadastrado
-
-Como cliente com uma dúvida comum,  
-quero receber uma resposta confiável no chat,  
-para continuar a compra ou acompanhamento sem esperar atendimento humano quando a resposta já existir.
-
-**Acceptance Criteria:**
-
-**Given** que existe resposta cadastrada, ativa e aplicável à dúvida  
-**When** a cliente pergunta no suporte  
-**Then** o Atendimento Automático retorna apenas o conteúdo aprovado  
-**And** não inventa resposta sobre preço, prazo, política ou pedido privado.
-
-**Given** que não há resposta cadastrada aplicável  
-**When** a cliente pergunta no suporte  
-**Then** o sistema informa que não encontrou resposta confiável  
-**And** oferece atendimento humano por chat ou WhatsApp dentro do fluxo.
-
-**Given** que Sharom administra a base de suporte  
-**When** cadastra ou edita uma resposta  
-**Then** informa pergunta/intenção, resposta, idioma, status, data de revisão e responsável  
-**And** pode ativar ou desativar a resposta.
-
-**Given** que a loja tem português, inglês e espanhol  
-**When** a cliente usa suporte no idioma escolhido  
-**Then** o sistema usa resposta cadastrada no mesmo idioma quando existir  
-**And** não mistura idiomas silenciosamente.
-
-**Given** que uma resposta envolve etapa de pedido  
-**When** é exibida no chat  
-**Then** ela usa termos consistentes como briefing, aprovação, produção, QA, rastreio e fatura  
-**And** aponta para a próxima ação correta quando houver contexto.
-
-### Story 6.3: Escalar atendimento humano por chat ou WhatsApp
-
-Como cliente que não resolveu a dúvida automaticamente,  
-quero continuar com atendimento humano pelo canal que eu escolher,  
-para receber ajuda sem repetir todo o contexto.
-
-**Acceptance Criteria:**
-
-**Given** que o Atendimento Automático não encontrou resposta confiável  
-**When** oferece atendimento humano  
-**Then** a cliente pode escolher continuar no chat ou ir para WhatsApp  
-**And** WhatsApp aparece apenas dentro desse fluxo, não como botão flutuante permanente.
-
-**Given** que a cliente escolhe atendimento humano no chat  
-**When** a conversa é encaminhada  
-**Then** Sharom recebe histórico, página/pedido relacionado quando autorizado e estado da conversa  
-**And** pode responder pelo painel.
-
-**Given** que a cliente escolhe WhatsApp  
-**When** o encaminhamento é iniciado  
-**Then** o sistema preserva contexto consentido de forma apropriada  
-**And** não envia briefing, prévias, fotos ou dados sensíveis sem regra e consentimento.
-
-**Given** que a solicitação ocorre fora do horário humano  
-**When** a cliente pede atendimento  
-**Then** o sistema informa horário de atendimento humano de segunda a sábado, 8h às 20h no horário de Portugal continental  
-**And** informa retorno em até 1 dia útil.
-
-**Given** que a conversa é respondida  
-**When** Sharom finaliza ou marca como resolvida  
-**Then** o histórico fica vinculado ao cliente/pedido quando aplicável  
-**And** a cliente consegue retomar compra ou acompanhamento.
-
-**Given** que a cliente indica que a resposta não resolveu  
-**When** o sistema registra feedback  
-**Then** a conversa pode voltar para fila humana  
-**And** a base automática não é alterada sem revisão de Sharom.
-
-### Story 6.4: Solicitar Projeto Exclusivo sem pagamento imediato
-
-Como cliente que não encontrou exatamente o que precisa,  
-quero enviar uma solicitação de Projeto Exclusivo,  
-para receber avaliação humana antes de qualquer pagamento.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente acessa Projeto Exclusivo pela home, busca sem resultado, produto ou suporte  
-**When** abre o formulário  
-**Then** vê que a solicitação não exige pagamento imediato  
-**And** entende que o aceite depende de avaliação humana.
-
-**Given** que a cliente preenche o formulário  
-**When** informa os dados principais  
-**Then** o sistema coleta nome, WhatsApp ou e-mail, tipo de produto desejado, data do evento, tema/ideia e outras observações  
-**And** permite referências/anexos e orçamento aproximado como opcionais.
-
-**Given** que a cliente adiciona referências  
-**When** envia arquivos ou links  
-**Then** o sistema aceita múltiplos anexos/links conforme limites configurados  
-**And** mostra sucesso, falha, remover e tentar novamente.
-
-**Given** que a cliente tenta enviar sem contato ou dados mínimos  
-**When** clica em enviar  
-**Then** o sistema bloqueia envio  
-**And** mostra erros próximos aos campos obrigatórios.
-
-**Given** que a solicitação é enviada  
-**When** a confirmação aparece  
-**Then** informa recebimento, canal de retorno e resposta humana em até 1 dia útil  
-**And** não promete aceite automático.
-
-**Given** que Sharom recebe a solicitação  
-**When** abre no painel  
-**Then** vê dados, referências, origem da solicitação e histórico de suporte relacionado quando existir  
-**And** pode marcar como aceita, recusada, precisa de mais informações ou convertida em proposta/pedido.
-
-## Epic 7: Administração, exceções, operação e métricas
-
-Sharom administra catálogo, pedidos, exceções, pagamentos, faturas, fretes, papéis, auditoria e indicadores operacionais sem planilhas paralelas.
-
-### Story 7.1: Visualizar fila administrativa por próxima ação
-
-Como Sharom administrando a loja,  
-quero ver pedidos organizados por próxima ação, responsável, prazo e prioridade,  
-para saber o que precisa ser feito sem usar planilha paralela.
-
-**Acceptance Criteria:**
-
-**Given** que Sharom acessa o painel administrativo  
-**When** abre a fila de pedidos  
-**Then** vê pedidos agrupados por próxima ação, como aguardando pagamento, aguardando briefing, criar arte, aguardando aprovação, alteração solicitada, aprovado para produção, QA, envio e exceções  
-**And** cada item mostra responsável, prazo restante, prioridade e estado.
-
-**Given** que há pedidos pausados por ação da cliente  
-**When** a fila é exibida  
-**Then** o sistema mostra motivo da pausa, início da pausa e responsável  
-**And** não mistura atraso da cliente com atraso operacional.
-
-**Given** que há pedidos próximos do prazo  
-**When** Sharom consulta a fila  
-**Then** o sistema destaca prioridade conforme regra configurada  
-**And** permite filtrar por modalidade, data, estado e responsável.
-
-**Given** que Sharom abre um item da fila  
-**When** seleciona o pedido  
-**Then** vai para a visão consolidada do pedido  
-**And** todas as ações continuam ligadas ao mesmo `order_id`.
-
-**Given** que um usuário sem permissão administrativa tenta acessar a fila  
-**When** solicita a página  
-**Then** o acesso é negado  
-**And** a tentativa é registrada para auditoria quando aplicável.
-
-### Story 7.2: Consultar visão consolidada do pedido
-
-Como Sharom analisando um pedido,  
-quero ver todo o histórico comercial, financeiro, criativo e operacional em uma tela,  
-para decidir a próxima ação sem reconstruir contexto em mensagens externas.
-
-**Acceptance Criteria:**
-
-**Given** que Sharom abre um pedido no admin  
-**When** a visão consolidada carrega  
-**Then** ela vê cliente, itens, pagamento, briefing, arquivos, miniatura, prévias, aprovação, produção ou entrega digital, fatura, envio, notificações e suporte  
-**And** tudo está vinculado ao mesmo `order_id`.
-
-**Given** que o pedido possui miniatura/personagem compartilhada  
-**When** Sharom consulta os itens  
-**Then** vê quais itens usam a miniatura  
-**And** confirma que a cobrança ocorreu uma única vez por pedido/personagem.
-
-**Given** que o pedido possui briefing mestre  
-**When** Sharom consulta respostas e uploads  
-**Then** vê dados compartilhados e seções por item  
-**And** consegue identificar quais respostas/arquivos alimentam cada arte ou produto.
-
-**Given** que há prévias e alterações  
-**When** Sharom consulta o histórico criativo  
-**Then** vê versões numeradas, pedidos de alteração, contador de rodadas e versão aprovada  
-**And** a versão aprovada aparece como referência oficial.
-
-**Given** que existem fatura, frete, rastreio ou exceções  
-**When** Sharom consulta a visão consolidada  
-**Then** vê estado atual, histórico e próximos passos  
-**And** não precisa usar planilha paralela como fonte de verdade.
-
-**Given** que Sharom executa uma ação sensível no pedido  
-**When** salva a ação  
-**Then** o sistema registra autoria, data/hora, mudança feita e motivo quando aplicável.
-
-### Story 7.3: Administrar catálogo, preços, temas e conteúdo comercial
-
-Como Sharom gerenciando a loja,  
-quero cadastrar e manter produtos, categorias, preços, disponibilidade e traduções,  
-para publicar a loja sem depender de alterações manuais no código.
-
-**Acceptance Criteria:**
-
-**Given** que Sharom cria ou edita um produto  
-**When** salva o cadastro  
-**Then** pode administrar categoria, modalidade, nome, descrição, fotos, preço, variantes, quantidades, materiais, acabamento, prazo, disponibilidade, tipo de entrega e status de publicação  
-**And** o sistema valida campos obrigatórios conforme modalidade.
-
-**Given** que o produto é convite  
-**When** Sharom define o cadastro  
-**Then** pode informar família/tipo/modelo, formato, recursos, classificação Padrão/Complexo, prazo, preço e dados necessários  
-**And** pode indicar que temas demonstrados são exemplos e não limitam tema livre.
-
-**Given** que o produto é Produto Digital Pronto  
-**When** Sharom define o cadastro  
-**Then** pode informar compatibilidade Silhouette Studio, arquivos entregues, licença, ausência de personalização e entrega imediata  
-**And** o produto não usa campos de briefing/aprovação.
-
-**Given** que o produto usa tema, personagem ou ativo protegido  
-**When** Sharom tenta publicar  
-**Then** o sistema exige status de licença/autorização de uso comercial  
-**And** impede publicação quando a autorização estiver ausente, pendente ou rejeitada.
-
-**Given** que Sharom cadastra preços por quantidade ou descontos  
-**When** salva regras comerciais  
-**Then** o sistema permite configurar descontos progressivos, complementos, cupons e disponibilidade  
-**And** deixa claro quais descontos são automáticos e quais exigem código manual.
-
-**Given** que a loja opera em três idiomas  
-**When** Sharom edita conteúdo comercial  
-**Then** pode cadastrar traduções em pt-BR, inglês e espanhol  
-**And** o sistema mostra pendências de tradução antes de publicar.
-
-### Story 7.4: Tratar exceções operacionais com decisão explícita
-
-Como Sharom operando pedidos com situações fora do fluxo normal,  
-quero uma fila de exceções com motivos e ações controladas,  
-para resolver casos especiais sem alterar silenciosamente o pedido.
-
-**Acceptance Criteria:**
-
-**Given** que ocorre quarta alteração, urgência, pagamento pendente, erro de produção, retrabalho, falha de integração, pedido pausado, endereço fora da UE ou problema de mídia  
-**When** o sistema detecta ou Sharom registra o caso  
-**Then** o pedido entra na fila de exceções  
-**And** o motivo fica visível e vinculado ao `order_id`.
-
-**Given** que Sharom abre uma exceção  
-**When** analisa o caso  
-**Then** vê tipo, impacto em preço, prazo, produção, pagamento ou comunicação  
-**And** pode escolher uma ação permitida conforme papel e estado do pedido.
-
-**Given** que a exceção é urgência  
-**When** Sharom avalia a possibilidade  
-**Then** o sistema permite registrar decisão humana, adicional de 30% com mínimo de €10 quando aceita e impacto no prazo  
-**And** impede reordenar fila se isso causar atraso confirmado em pedidos anteriores.
-
-**Given** que a exceção envolve quarta alteração  
-**When** Sharom decide cobrar ou aceitar manualmente  
-**Then** o sistema registra decisão, valor/prazo quando aplicável e comunicação para cliente  
-**And** não reinicia o contador de alterações gratuitas.
-
-**Given** que a exceção envolve falha de pagamento, fatura, frete, e-mail, WhatsApp, upload ou antimalware  
-**When** o sistema registra a falha  
-**Then** ela fica correlacionada ao pedido  
-**And** aparece como acionável para operação.
-
-**Given** que a exceção é resolvida  
-**When** Sharom finaliza a ação  
-**Then** o pedido volta ao estado correto da máquina de estados  
-**And** o histórico preserva motivo, decisão, autora e data/hora.
-
-### Story 7.5: Administrar pagamentos, faturas, fretes e conciliação
-
-Como Sharom controlando a operação financeira e logística,  
-quero consultar pagamentos, faturas, fretes, rastreamentos e divergências,  
-para manter cada pedido correto e auditável.
-
-**Acceptance Criteria:**
-
-**Given** que Sharom abre a área financeira/logística  
-**When** consulta pedidos  
-**Then** vê estado financeiro, método de pagamento, tentativas, confirmação, fatura, NIF quando informado, frete, transportadora e rastreio quando houver  
-**And** cada registro está vinculado ao `order_id`.
-
-**Given** que um pagamento por transferência aguarda confirmação  
-**When** Sharom abre o pedido  
-**Then** vê prazo restante, comprovante quando enviado, estado “Comprovante recebido” quando aplicável e opção de confirmar manualmente após conferir entrada real no banco  
-**And** a ação de confirmar exige registro de autoria e data/hora.
-
-**Given** que existe divergência de pagamento, valor, fatura ou reembolso  
-**When** o sistema detecta ou Sharom registra  
-**Then** cria item acionável de conciliação  
-**And** impede liberação indevida de briefing, produção ou download.
-
-**Given** que uma venda exige fatura  
-**When** o pagamento é confirmado  
-**Then** o sistema gera ou enfileira emissão de fatura de forma idempotente  
-**And** mantém a fatura disponível por e-mail e Área da Cliente.
-
-**Given** que o pedido físico possui envio normal ou rápido  
-**When** Sharom consulta logística  
-**Then** vê modalidade escolhida, preço cobrado, prazo estimado, transportadora e expectativa de rastreio  
-**And** pode registrar postagem, código/link quando existir ou ausência de rastreio conforme modalidade.
-
-**Given** que há falha em fatura, frete, rastreio ou notificação logística  
-**When** a falha é registrada  
-**Then** aparece como exceção ou pendência acionável  
-**And** o pedido não muda para estado incompatível.
-
-**Given** que a cliente vê problema, dúvida ou exceção no pedido  
-**When** consulta Área da Cliente, pagamento, fatura, frete ou rastreio  
-**Then** sempre existe opção clara de chamar Suporte Online para avaliação  
-**And** o suporte recebe contexto do pedido quando a cliente autoriza.
-
-### Story 7.6: Controlar papéis administrativos e auditoria
-
-Como dona da operação,  
-quero limitar permissões por papel e auditar ações sensíveis,  
-para proteger pedidos, arquivos, pagamentos e dados das clientes.
-
-**Acceptance Criteria:**
-
-**Given** que Sharom acessa o admin  
-**When** executa ações administrativas  
-**Then** possui papel com permissões completas configuradas  
-**And** ações sensíveis exigem sessão autenticada e autorizada.
-
-**Given** que existe Assistente de Produção ou outro papel operacional  
-**When** esse usuário acessa o painel  
-**Then** vê apenas informações necessárias para sua função  
-**And** não acessa pagamento, NIF, fatura, dados sensíveis ou arquivos privados sem necessidade.
-
-**Given** que uma ação sensível é realizada  
-**When** altera pedido, pagamento, fatura, aprovação, arquivo, frete, autorização de publicação, catálogo ou permissões  
-**Then** o sistema registra autoria, data/hora, antes/depois quando aplicável, motivo e `order_id` ou entidade relacionada.
-
-**Given** que alguém tenta acessar arquivo ou pedido sem autorização  
-**When** a solicitação é feita  
-**Then** o acesso é negado  
-**And** a tentativa relevante fica registrada.
-
-**Given** que Sharom precisa revisar histórico  
-**When** consulta auditoria de um pedido ou entidade  
-**Then** consegue ver linha do tempo de ações sensíveis  
-**And** filtrar por tipo, usuário, data e resultado.
-
-**Given** que MFA administrativo está configurado  
-**When** um usuário admin inicia sessão  
-**Then** o sistema exige o segundo fator conforme política definida  
-**And** bloqueia ou alerta tentativas suspeitas.
-
-### Story 7.7: Medir jornadas, operação e qualidade do serviço
-
-Como Sharom acompanhando o lançamento,  
-quero ver métricas de jornada e operação desde o primeiro dia,  
-para entender conversão, prazos, gargalos e dependência de suporte.
-
-**Acceptance Criteria:**
-
-**Given** que a cliente usa a loja com consentimento adequado  
-**When** navega pelas jornadas principais  
-**Then** o sistema registra eventos de descoberta, busca, visualização de produto, configuração, carrinho, início/conclusão de checkout, briefing, aprovação, entrega e suporte  
-**And** respeita preferências de privacidade e consentimento.
-
-**Given** que Sharom abre o painel de indicadores  
-**When** consulta o período de baseline inicial  
-**Then** vê visitas qualificadas, buscas, visualizações, configurações, carrinhos, checkouts concluídos e abandono  
-**And** consegue filtrar por idioma, modalidade, origem e dispositivo quando disponível.
-
-**Given** que existem pedidos personalizados  
-**When** o painel calcula operação  
-**Then** mostra tempo por estado, pedidos pausados, cumprimento de prazo, alterações, retrabalho, falhas e dependência de suporte  
-**And** separa tempo da cliente de tempo operacional.
-
-**Given** que há falhas em pagamento, fatura, frete, e-mail, WhatsApp, upload, antimalware, entrega digital ou mudança de estado  
-**When** a falha ocorre  
-**Then** ela é detectável, correlacionada ao pedido e acionável  
-**And** pode gerar exceção quando bloquear a jornada.
-
-**Given** que métricas são exibidas  
-**When** Sharom consulta dados agregados  
-**Then** não expõem dados pessoais desnecessários  
-**And** respeitam retenção e controle de acesso.
-
-**Given** que as metas de 90 dias ainda não foram definidas  
-**When** o baseline de 30 dias termina  
-**Then** o sistema permite exportar ou consultar dados necessários para definir metas futuras  
-**And** preserva contramétricas como acessibilidade, clareza, retrabalho e dependência de suporte.
+**Given** um pedido com quarta alteração, urgência, pagamento pendente, erro, retrabalho, falha de integração ou pausa
+**When** a exceção for identificada
+**Then** a administradora deve conseguir registrar o tipo da exceção, motivo, responsável e próxima ação
+**And** a exceção deve ficar vinculada ao pedido
+
+**Given** uma exceção aberta
+**When** a cliente consultar o pedido
+**Then** deve ver estado, motivo e próxima ação quando a informação puder ser exibida
+**And** deve ter opção de chamar suporte para avaliar a situação
+
+**Given** uma exceção resolvida
+**When** a administradora encerrar o caso
+**Then** o sistema deve registrar solução, data, responsável e impacto no prazo
+**And** a máquina de estados deve avançar apenas para estados permitidos
