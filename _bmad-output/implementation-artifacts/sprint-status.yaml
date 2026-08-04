@@ -50,7 +50,7 @@ story_location: "J:/JSDESIGN/_bmad-output/implementation-artifacts"
 development_status:
   epic-1: in-progress
   1-1-inicializar-a-fundacao-tecnica-da-plataforma: done
-  1-2-criar-o-layout-publico-base-da-loja: backlog
+  1-2-criar-o-layout-publico-base-da-loja: done
   1-3-implementar-idioma-textos-base-e-estrutura-publica-em-portugues-do-brasil: backlog
   1-4-criar-a-home-publica-com-entrada-para-os-produtos-mais-procurados: backlog
   1-5-exibir-captura-de-e-mail-com-cupom-de-primeira-compra: backlog
