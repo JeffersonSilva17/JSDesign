@@ -1,0 +1,107 @@
+name: smoke
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  bff-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: jsdesign
+          POSTGRES_USER: jsdesign
+          POSTGRES_PASSWORD: jsdesign
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jsdesign -d jsdesign"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_pgsql, pgsql, mbstring, intl, zip
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare API environment
+        working-directory: apps/api
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi
+
+      - name: Run API migrations
+        working-directory: apps/api
+        run: php artisan migrate:fresh --force --ansi
+
+      - name: Start Laravel API
+        working-directory: apps/api
+        run: php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/ci-server.log 2>&1 &
+
+      - name: Wait for Laravel API
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8000/api/v1/health > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Build web app
+        working-directory: apps/web
+        env:
+          API_INTERNAL_URL: http://127.0.0.1:8000
+        run: npm run build
+
+      - name: Run BFF smoke tests
+        working-directory: apps/web
+        env:
+          API_INTERNAL_URL: http://127.0.0.1:8000
+        run: npm run test:e2e
+
+      - name: Upload Laravel smoke server log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: laravel-smoke-server-log
+          path: apps/api/storage/logs/ci-server.log
