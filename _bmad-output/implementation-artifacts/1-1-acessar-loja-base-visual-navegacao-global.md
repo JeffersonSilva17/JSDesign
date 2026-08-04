@@ -1,6 +1,8 @@
 # Story 1.1: Acessar a loja com base visual e navegação global
 
-Status: ready-for-dev
+Status: superseded
+
+> Artefato histórico superado pela nova quebra de épicos/stories baseada na arquitetura Laravel API + Next.js BFF. Não usar esta story para execução atual.
 
 ## Story
 

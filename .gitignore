@@ -1,0 +1,29 @@
+# Sistema/editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Node/Next
+node_modules/
+.next/
+*.tsbuildinfo
+out/
+playwright-report/
+test-results/
+
+# PHP/Laravel
+vendor/
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*.log
+
+# Builds
+dist/
+coverage/

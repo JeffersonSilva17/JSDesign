@@ -1,0 +1,7 @@
+[workflow]
+
+persistent_facts = [
+  "Após qualquer story ser implementada pelo workflow bmad-dev-story, a metodologia do projeto exige executar revisão adversarial com bmad-review-adversarial-general antes de considerar a story concluída."
+]
+
+on_complete = "Executar bmad-review-adversarial-general contra a story implementada e os arquivos alterados. A story só pode avançar para conclusão após a revisão adversarial ser registrada e os achados críticos/altos serem tratados ou explicitamente aceitos por Sharom."
