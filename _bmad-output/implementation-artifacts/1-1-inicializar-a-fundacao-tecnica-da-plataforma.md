@@ -455,6 +455,7 @@ GPT-5 Codex.
 - `apps/api/routes/api.php`
 - `apps/api/tests/Feature/FoundationConfigurationTest.php`
 - `apps/api/tests/Feature/HealthTest.php`
+- `apps/api/tests/Unit/.gitkeep`
 - `apps/web/.env.example`
 - `apps/web/AGENTS.md`
 - `apps/web/CLAUDE.md`
@@ -488,3 +489,4 @@ GPT-5 Codex.
 - 2026-08-04 — Code review Backend/API: 11 patches aplicados e validados; 2 itens de hardening operacional deferidos.
 - 2026-08-04 — Code review Frontend/BFF: 10 patches aplicados e validados; 1 item de hardening de teste deferido.
 - 2026-08-04 — Code review Docker/CI/CD/documentação/artefatos: 16 patches aplicados e validados; story e sprint atualizados para `done`.
+- 2026-08-04 — Correção pós-CI: versionado `apps/api/tests/Unit/.gitkeep` para garantir que o diretório referenciado por `phpunit.xml` exista no runner Linux.
