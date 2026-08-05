@@ -1,12 +1,9 @@
 import type { Metadata } from 'next';
 
 import { PlaceholderPage } from '@/components/layout/PlaceholderPage';
+import { placeholderPages } from '@/features/public-store/publicLayoutContent';
 
-export const metadata: Metadata = {
-  title: 'Produtos em preparação',
-  description:
-    'Entrada pública do catálogo JS Designs em preparação, sem simular preço ou disponibilidade.',
-};
+export const metadata: Metadata = placeholderPages.produtos.metadata;
 
 export default function ProdutosPage() {
   return <PlaceholderPage pageKey="produtos" />;

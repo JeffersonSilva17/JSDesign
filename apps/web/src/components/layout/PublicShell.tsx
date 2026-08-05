@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
+import { publicContent } from '@/features/public-store/publicLayoutContent';
 
 type PublicShellProps = Readonly<{
   children: ReactNode;
@@ -12,7 +13,7 @@ export function PublicShell({ children, globalSurface }: PublicShellProps) {
   return (
     <div className="public-shell">
       <a className="skip-link" href="#conteudo">
-        Pular para o conteúdo principal
+        {publicContent.navigation.skipToMainContent}
       </a>
       <SiteHeader />
       <div className="global-surface">{globalSurface}</div>
