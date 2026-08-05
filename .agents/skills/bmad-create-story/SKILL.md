@@ -77,6 +77,7 @@ Activation is complete. If `activation_steps_prepend` or `activation_steps_appen
 - `ux_file` = `{planning_artifacts}/*ux*.md`
 - `story_title` = "" (will be elicited if not derivable)
 - `default_output_file` = `{implementation_artifacts}/{{story_key}}.md`
+- `story_review_file` = `{implementation_artifacts}/reviews/review-{{story_key}}-adversarial.md`
 
 ## Input Files
 
@@ -86,6 +87,24 @@ Activation is complete. If `activation_steps_prepend` or `activation_steps_appen
 | architecture | Architecture (fallback - epics file should have relevant sections) | whole: `{planning_artifacts}/*architecture*.md`, sharded: `{planning_artifacts}/*architecture*/*.md` | SELECTIVE_LOAD |
 | ux | UX design (fallback - epics file should have relevant sections) | whole: `{planning_artifacts}/*ux*.md`, sharded: `{planning_artifacts}/*ux*/*.md` | SELECTIVE_LOAD |
 | epics | Enhanced epics+stories file with BDD and source hints | whole: `{planning_artifacts}/*epic*.md`, sharded: `{planning_artifacts}/*epic*/*.md` | SELECTIVE_LOAD |
+
+## Story Reviewer Gate
+
+Used after the story file is drafted and checklist-clean, before sprint status moves to `ready-for-dev`.
+
+The workflow must ask whether to run an adversarial story review every time a new story is created. Default/recommended answer is yes, and the user may explicitly skip it.
+
+If accepted, run `bmad-review-adversarial-general` against `{default_output_file}` and the already loaded source context. Save the full findings to `{story_review_file}` and keep only a compact verdict/summary in the main handoff. The adversarial review must look for:
+
+- ambiguous or weak acceptance criteria
+- missing PRD/UX/Architecture constraints
+- contradictions with previous stories or existing code
+- wrong file paths, wrong stack assumptions, or implementation traps
+- scope creep hidden inside tasks
+- missing test expectations or CI/CD implications
+- handoff gaps that could make `bmad-dev-story` implement the wrong thing
+
+Apply clear fixes to the story before sprint status is updated. If findings need user judgment, surface only those findings and wait for direction. If the user skips the gate, continue and mention the skipped review in the completion report.
 
 ## Execution
 
@@ -397,6 +416,20 @@ Activation is complete. If `activation_steps_prepend` or `activation_steps_appen
 <step n="6" goal="Update sprint status and finalize">
   <action>Validate the newly created story file {default_output_file} against `./checklist.md` and apply any required fixes before finalizing</action>
   <action>Save story document unconditionally</action>
+
+  <!-- Story adversarial review gate -->
+  <action>Run `## Story Reviewer Gate`: ask whether to run `bmad-review-adversarial-general` before final handoff. Default/recommended answer is yes.</action>
+  <check if="user accepts adversarial story review">
+    <action>Run `bmad-review-adversarial-general` against {default_output_file} plus the loaded PRD, UX, Architecture, Epics, previous-story, git, and latest-technical context already used to create the story</action>
+    <action>Create {implementation_artifacts}/reviews if needed and save the full adversarial review findings to {story_review_file}</action>
+    <action>Apply clear, non-controversial fixes directly to {default_output_file}</action>
+    <action>For findings requiring product or technical judgment, present them concisely and wait for user direction before proceeding</action>
+    <action>Re-validate {default_output_file} against `./checklist.md` if the story changed during review</action>
+    <action>Save story document unconditionally after review resolution</action>
+  </check>
+  <check if="user skips adversarial story review">
+    <action>Continue without running the review and include "Adversarial story review: skipped by user" in the completion report</action>
+  </check>
 
   <!-- Update sprint status -->
   <check if="sprint status file exists">

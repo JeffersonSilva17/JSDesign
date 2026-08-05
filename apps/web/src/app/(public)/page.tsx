@@ -1,60 +1,56 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { publicCta } from '@/features/public-store/publicLayoutContent';
+import { publicContent, publicCta, secondaryPublicCta } from '@/features/public-store/publicLayoutContent';
 
-export const metadata: Metadata = {
-  title: 'Loja online de personalizados físicos e digitais',
-  description:
-    'Loja online JS Designs para lembrancinhas físicas personalizadas, convites digitais e produtos digitais com experiência mobile-first.',
-};
+export const metadata: Metadata = publicContent.metadata.home;
 
 export default function Home() {
+  const { hero, modalityCards, nextPaths } = publicContent.home;
+
   return (
     <>
       <section className="hero" aria-labelledby="home-title">
         <div className="hero__copy">
-          <p className="eyebrow">Loja JS Designs</p>
-          <h1 id="home-title">Detalhes personalizados para celebrar com cuidado.</h1>
-          <p className="hero__lead">
-            Uma experiência clara para descobrir lembrancinhas físicas personalizadas, convites
-            digitais e arquivos digitais sem depender de atendimento para começar.
-          </p>
+          <p className="eyebrow">{hero.eyebrow}</p>
+          <h1 id="home-title">{hero.title}</h1>
+          <p className="hero__lead">{hero.lead}</p>
           <div className="hero__actions">
             <Link className="button button--primary" href={publicCta.href}>
               {publicCta.label}
             </Link>
-            <Link className="button button--secondary" href="/buscar">
-              Buscar por tema
+            <Link className="button button--secondary" href={secondaryPublicCta.href}>
+              {secondaryPublicCta.label}
             </Link>
           </div>
         </div>
 
-        <aside className="hero__visual" aria-label="Resumo visual da loja JS Designs">
-          <div className="product-preview product-preview--large">
-            <span>Lembrancinhas físicas</span>
-            <strong>Personalização antes do carrinho</strong>
-          </div>
-          <div className="product-preview">
-            <span>Convites digitais</span>
-            <strong>Prévia e aprovação</strong>
-          </div>
-          <div className="product-preview product-preview--accent">
-            <span>Produto digital</span>
-            <strong>Identificado com clareza</strong>
-          </div>
+        <aside className="hero__visual" aria-label={hero.visualAriaLabel}>
+          {modalityCards.map((card, index) => (
+            <div
+              className={[
+                'product-preview',
+                index === 0 ? 'product-preview--large' : '',
+                'tone' in card && card.tone === 'accent' ? 'product-preview--accent' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              key={card.label}
+            >
+              <span>{card.label}</span>
+              <strong>{card.title}</strong>
+              <p>{card.description}</p>
+            </div>
+          ))}
         </aside>
       </section>
 
       <section className="entry-section" aria-labelledby="entry-title">
         <div>
-          <p className="eyebrow">Próximos caminhos</p>
-          <h2 id="entry-title">Base pronta para descoberta de produtos.</h2>
+          <p className="eyebrow">{nextPaths.eyebrow}</p>
+          <h2 id="entry-title">{nextPaths.title}</h2>
         </div>
-        <p>
-          A listagem de “Mais procurados” entra na Story 1.4. Nesta etapa, a loja já apresenta
-          identidade, navegação e estrutura pública para receber catálogo, busca e compra.
-        </p>
+        <p>{nextPaths.description}</p>
       </section>
     </>
   );

@@ -326,6 +326,14 @@ code {
   line-height: 1.12;
 }
 
+.product-preview p {
+  color: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.86;
+}
+
 .entry-section,
 .placeholder-page {
   background: rgb(255 255 255 / 76%);

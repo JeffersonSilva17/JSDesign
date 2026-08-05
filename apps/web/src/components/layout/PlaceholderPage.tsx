@@ -1,6 +1,10 @@
 import Link from 'next/link';
 
-import { placeholderPages, publicCta, type PlaceholderPageKey } from '@/features/public-store/publicLayoutContent';
+import {
+  placeholderFallbackCtas,
+  placeholderPages,
+  type PlaceholderPageKey,
+} from '@/features/public-store/publicLayoutContent';
 
 type PlaceholderPageProps = Readonly<{
   pageKey: PlaceholderPageKey;
@@ -8,10 +12,7 @@ type PlaceholderPageProps = Readonly<{
 
 export function PlaceholderPage({ pageKey }: PlaceholderPageProps) {
   const page = placeholderPages[pageKey];
-  const fallbackCta =
-    pageKey === 'produtos'
-      ? { href: '/', label: 'Voltar para a home' }
-      : { href: publicCta.href, label: 'Voltar para produtos' };
+  const fallbackCta = pageKey === 'produtos' ? placeholderFallbackCtas.produtos : placeholderFallbackCtas.default;
 
   return (
     <section className="placeholder-page" aria-labelledby="placeholder-title">
