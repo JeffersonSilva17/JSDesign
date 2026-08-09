@@ -15,6 +15,15 @@ type MetadataContent = Readonly<{
   }>;
 }>;
 
+type EditorialMostWantedItem = Readonly<{
+  title: string;
+  modality: string;
+  description: string;
+  visualLabel: string;
+  tone: 'soft' | 'champagne' | 'calm';
+  cta: LinkContent;
+}>;
+
 export type PlaceholderContent = Readonly<{
   title: string;
   eyebrow: string;
@@ -48,14 +57,13 @@ export type PublicContent = Readonly<{
       eyebrow: string;
       title: string;
       lead: string;
-      visualAriaLabel: string;
     }>;
-    modalityCards: readonly Readonly<{
-      label: string;
+    mostWanted: Readonly<{
+      eyebrow: string;
       title: string;
       description: string;
-      tone?: 'accent';
-    }>[];
+      items: readonly EditorialMostWantedItem[];
+    }>;
     nextPaths: Readonly<{
       eyebrow: string;
       title: string;
