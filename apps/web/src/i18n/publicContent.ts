@@ -52,34 +52,56 @@ export const publicContent = {
       title: 'Detalhes personalizados para celebrar com cuidado.',
       lead:
         'Uma experiência clara para descobrir lembrancinhas físicas personalizadas, convites digitais personalizados e Produto Digital Pronto sem depender de atendimento para começar.',
-      visualAriaLabel: 'Resumo visual da loja JS Designs',
     },
-    modalityCards: [
-      {
-        label: 'Lembrancinhas físicas personalizadas',
-        title: 'Personalização antes do carrinho',
-        description:
-          'Produtos físicos exigirão escolha de modelo, quantidade e detalhes personalizados antes do carrinho, em stories futuras.',
-      },
-      {
-        label: 'Convites digitais personalizados',
-        title: 'Prévia e aprovação',
-        description:
-          'Convites digitais personalizados não são entrega imediata: precisam de edição/criação, prévia e aprovação antes da entrega final.',
-      },
-      {
-        label: 'Produto Digital Pronto',
-        title: 'Digital, sem personalização',
-        description:
-          'Produto Digital Pronto é digital, sem personalização e pode incluir arquivos para Silhouette Studio; download imediato só será liberado após pagamento confirmado, em story futura.',
-        tone: 'accent',
-      },
-    ],
+    mostWanted: {
+      eyebrow: 'Logo de cara',
+      title: 'Mais procurados',
+      description:
+        'Esta seleção editorial apresenta as principais modalidades da JS Designs; não é um ranking de vendas ou buscas.',
+      items: [
+        {
+          title: 'Kit Festa Fazendinha',
+          modality: 'Produto físico personalizado',
+          description:
+            'Lembrancinhas físicas personalizadas que terão quantidade, tema, nome, data e outros detalhes definidos antes do carrinho.',
+          visualLabel: 'Festa em papel',
+          tone: 'soft',
+          cta: {
+            label: 'Ver opções',
+            href: '/produtos',
+          },
+        },
+        {
+          title: 'Convite Jardim Dourado',
+          modality: 'Convite digital personalizado',
+          description:
+            'Convites digitais personalizados não são entrega imediata: precisam de edição/criação, prévia e aprovação antes da entrega final.',
+          visualLabel: 'Convite autoral',
+          tone: 'champagne',
+          cta: {
+            label: 'Ver modelos',
+            href: '/buscar',
+          },
+        },
+        {
+          title: 'Topo Céu Encantado',
+          modality: 'Produto digital',
+          description:
+            'Produto Digital Pronto, sem personalização e compatível com Silhouette Studio. Quando a compra estiver disponível, o download imediato será liberado após o pagamento confirmado.',
+          visualLabel: 'Arquivo de corte',
+          tone: 'calm',
+          cta: {
+            label: 'Ver arquivo',
+            href: '/produtos',
+          },
+        },
+      ],
+    },
     nextPaths: {
       eyebrow: 'Próximos caminhos',
-      title: 'Base pronta para descoberta de produtos.',
+      title: 'Continue explorando',
       description:
-        'A listagem de “Mais procurados” entra na Story 1.4. Nesta etapa, a loja já apresenta identidade, navegação e estrutura pública para receber catálogo, busca e compra sem simular fluxo transacional.',
+        'Use Produtos, Categorias ou Buscar para continuar a descoberta. Essas rotas permanecem honestamente em preparação até receberem catálogo e busca reais.',
     },
   },
   footer: {
@@ -271,6 +293,10 @@ export const publicContent = {
     'convites digitais personalizados',
     'Produto Digital Pronto',
     'Silhouette Studio',
+    'Mais procurados',
+    'Kit Festa Fazendinha',
+    'Convite Jardim Dourado',
+    'Topo Céu Encantado',
   ],
 } as const satisfies PublicContent;
 

@@ -6,7 +6,7 @@ import { publicContent, publicCta, secondaryPublicCta } from '@/features/public-
 export const metadata: Metadata = publicContent.metadata.home;
 
 export default function Home() {
-  const { hero, modalityCards, nextPaths } = publicContent.home;
+  const { hero, mostWanted, nextPaths } = publicContent.home;
 
   return (
     <>
@@ -24,25 +24,43 @@ export default function Home() {
             </Link>
           </div>
         </div>
+      </section>
 
-        <aside className="hero__visual" aria-label={hero.visualAriaLabel}>
-          {modalityCards.map((card, index) => (
-            <div
-              className={[
-                'product-preview',
-                index === 0 ? 'product-preview--large' : '',
-                'tone' in card && card.tone === 'accent' ? 'product-preview--accent' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              key={card.label}
+      <section className="most-wanted" aria-labelledby="most-wanted-title">
+        <div className="most-wanted__header">
+          <p className="eyebrow">{mostWanted.eyebrow}</p>
+          <h2 id="most-wanted-title">{mostWanted.title}</h2>
+          <p>{mostWanted.description}</p>
+        </div>
+
+        <div className="most-wanted__grid">
+          {mostWanted.items.map((item, index) => (
+            <article
+              className="most-wanted-card"
+              aria-labelledby={`most-wanted-item-${index}`}
+              key={item.title}
             >
-              <span>{card.label}</span>
-              <strong>{card.title}</strong>
-              <p>{card.description}</p>
-            </div>
+              <div
+                className={`most-wanted-card__visual most-wanted-card__visual--${item.tone}`}
+                aria-hidden="true"
+              >
+                <span>{item.visualLabel}</span>
+              </div>
+              <div className="most-wanted-card__body">
+                <p className="most-wanted-card__modality">{item.modality}</p>
+                <h3 id={`most-wanted-item-${index}`}>{item.title}</h3>
+                <p>{item.description}</p>
+                <Link
+                  className="button button--secondary most-wanted-card__cta"
+                  href={item.cta.href}
+                  aria-label={`${item.cta.label}: ${item.title}`}
+                >
+                  {item.cta.label}
+                </Link>
+              </div>
+            </article>
           ))}
-        </aside>
+        </div>
       </section>
 
       <section className="entry-section" aria-labelledby="entry-title">
