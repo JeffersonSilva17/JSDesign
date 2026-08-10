@@ -89,5 +89,25 @@ export type PublicContent = Readonly<{
     produtos: LinkContent;
     default: LinkContent;
   }>;
+  firstPurchaseDiscount: Readonly<{
+    fieldLabel: string;
+    fieldHelp: string;
+    manualUse: string;
+    submit: string;
+    submitting: string;
+    close: string;
+    decline: string;
+    copy: string;
+    copied: string;
+    confirm: string;
+    statusLabel: string;
+    errors: Readonly<{
+      emailRequired: string;
+      emailInvalid: string;
+      authorizationRequired: string;
+      unavailable: string;
+      retry: string;
+    }>;
+  }>;
   qualityCopy: readonly string[];
 }>;
