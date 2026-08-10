@@ -267,6 +267,162 @@ code {
   min-height: 0;
 }
 
+.discount-dialog {
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 20px 70px rgb(45 45 45 / 18%);
+  color: var(--ink-primary);
+  margin: auto;
+  max-height: min(92svh, 720px);
+  max-width: min(calc(100vw - 32px), 520px);
+  overflow: auto;
+  padding: clamp(18px, 4vw, 28px);
+  width: 100%;
+}
+
+.discount-dialog::backdrop {
+  background: rgb(45 45 45 / 24%);
+}
+
+.discount-dialog__header {
+  align-items: start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.discount-dialog h2,
+.discount-inline h2 {
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.discount-dialog__close {
+  align-items: center;
+  background: var(--surface-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--ink-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1.5rem;
+  height: 44px;
+  justify-content: center;
+  line-height: 1;
+  width: 44px;
+}
+
+.discount-dialog__form,
+.discount-dialog__field,
+.discount-dialog__actions {
+  display: grid;
+  gap: 12px;
+}
+
+.discount-dialog__form {
+  margin-top: 16px;
+}
+
+.discount-dialog__benefit,
+.discount-dialog__manual,
+.discount-dialog__help,
+.discount-dialog__status {
+  margin: 0;
+}
+
+.discount-dialog__benefit {
+  color: var(--accent-primary);
+  font-weight: 800;
+}
+
+.discount-dialog__manual,
+.discount-dialog__help {
+  font-size: 0.9375rem;
+}
+
+.discount-dialog__field label,
+.discount-dialog__authorization label {
+  color: var(--ink-primary);
+  font-weight: 800;
+}
+
+.discount-dialog__field input[type="email"] {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--ink-primary);
+  font: inherit;
+  min-height: 44px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.discount-dialog__field input[aria-invalid="true"] {
+  border-color: #9f2d20;
+}
+
+.discount-dialog__authorization {
+  align-items: start;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 44px minmax(0, 1fr);
+}
+
+.discount-dialog__authorization input {
+  height: 44px;
+  margin: 0;
+  width: 44px;
+}
+
+.discount-dialog__error {
+  color: #9f2d20;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.discount-dialog__privacy {
+  align-items: center;
+  display: inline-flex;
+  justify-self: start;
+  min-height: 44px;
+}
+
+.discount-dialog__status:empty {
+  display: none;
+}
+
+.discount-dialog__coupon {
+  align-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.discount-dialog__coupon code {
+  font-size: 1rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.discount-dialog__actions {
+  grid-template-columns: 1fr;
+}
+
+.discount-inline {
+  background: var(--surface-base);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.discount-inline__inner {
+  margin: 0 auto;
+  max-width: var(--content-max);
+  padding: 18px var(--gutter);
+}
+
 .site-main {
   margin: 0 auto;
   max-width: var(--content-max);
@@ -519,6 +675,10 @@ code {
     grid-column: auto;
     grid-row: auto;
     justify-self: end;
+  }
+
+  .discount-dialog__actions {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .hero__copy {

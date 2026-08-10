@@ -283,6 +283,28 @@ export const publicContent = {
       label: 'Voltar para produtos',
     },
   },
+  firstPurchaseDiscount: {
+    fieldLabel: 'E-mail',
+    fieldHelp:
+      'Usaremos este e-mail somente para emitir e entregar o cupom solicitado. Isso não cria conta nem newsletter.',
+    manualUse:
+      'O código deverá ser inserido manualmente no carrinho ou checkout quando esse fluxo estiver disponível.',
+    submit: 'Solicitar cupom',
+    submitting: 'Solicitando...',
+    close: 'Fechar oferta de desconto',
+    decline: 'Agora não',
+    copy: 'Copiar código',
+    copied: 'Código copiado',
+    confirm: 'Entendi',
+    statusLabel: 'Status da solicitação do cupom',
+    errors: {
+      emailRequired: 'Informe seu e-mail para solicitar o cupom.',
+      emailInvalid: 'Informe um e-mail válido.',
+      authorizationRequired: 'Confirme a autorização específica para solicitar o cupom.',
+      unavailable: 'A solicitação de cupom está temporariamente indisponível.',
+      retry: 'Não foi possível concluir agora. Tente novamente em instantes.',
+    },
+  },
   qualityCopy: [
     'Área da Cliente',
     'Políticas',
