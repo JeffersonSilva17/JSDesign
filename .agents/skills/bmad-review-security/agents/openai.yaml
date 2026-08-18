@@ -1,0 +1,6 @@
+interface:
+  display_name: "BMAD Security Review"
+  short_description: "Revisao adversarial de seguranca BMAD"
+  default_prompt: "Use $bmad-review-security para auditar esta story, spec ou diff sob STRIDE, OWASP API/LLM, SAST, SCA e politicas de segredos."
+policy:
+  allow_implicit_invocation: true

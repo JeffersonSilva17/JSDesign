@@ -8,4 +8,8 @@ Uso previsto:
 - Tipos derivados de contratos, não regras de negócio.
 - Versionamento explícito quando houver mudanças incompatíveis.
 
-Nesta story, nenhum contrato de domínio é criado. O healthcheck inicial usa payload estável documentado nos testes.
+Contratos atuais:
+
+- `catalog-admin-v1.openapi.yaml`: escritas administrativas do catálogo, concorrência por `version` e erros estáveis.
+
+Os contratos descrevem transporte e projeções. Invariantes comerciais continuam sendo autoridade do domínio Laravel.

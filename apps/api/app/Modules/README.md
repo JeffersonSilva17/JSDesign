@@ -9,4 +9,9 @@ Cada módulo deve manter as camadas:
 - `Infrastructure`: Eloquent, repositories, queries, migrations técnicas e adapters.
 - `Interfaces/Http`: controllers, requests/resources e rotas HTTP.
 
-Nesta story, os módulos existem apenas como estrutura. Não criar tabelas, models ou regras de e-commerce antes das stories correspondentes.
+Módulos implementados:
+
+- `Promotions`: captura e emissão do cupom de primeira compra.
+- `Catalog`: cadastro administrativo, persistência e publicação de produtos; consulte `Catalog/README.md`.
+
+Novas regras de e-commerce continuam restritas às stories correspondentes.

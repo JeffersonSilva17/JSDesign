@@ -1,8 +1,8 @@
 # Story {{epic_num}}.{{story_num}}: {{story_title}}
 
-Status: ready-for-dev
+Status: draft
 
-<!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
+<!-- Note: Security review is mandatory before ready-for-dev. Run validate-create-story as an additional quality check before dev-story. -->
 
 ## Story
 

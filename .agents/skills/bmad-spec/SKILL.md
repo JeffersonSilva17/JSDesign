@@ -46,6 +46,7 @@ Inside the spec folder:
   SPEC.md                  ← uppercase, the kernel — DERIVED from .memlog.md, never hand-edited
   <companion-1>.md         ← optional, content-typed (e.g. glossary.md); spec-authored ones are derived too
   <companion-2>.md
+  review-security.md       ← mandatory bmad-review-security report before final handoff
   .memlog.md               ← canonical, append-only memory; what SPEC.md is distilled from
 ```
 
@@ -87,6 +88,8 @@ When load-bearing content does not fit the five-field kernel, it lives in a comp
 
 **Spawn a companion when the content needs more than one kernel-shape line:** multi-item catalogs (per-entity matrices like archetypes, drinks, modes, routes), tables, diagrams (always), editorial voice rules, long-form reference material the kernel cites by name (glossary, brownfield notes, project conventions). Single-line decision-benders stay in Constraints; intent+success pairs stay in Capabilities. If a kernel field is starting to bullet into sub-bullets, the content has outgrown the kernel and wants a companion.
 
+**Spawn `threat-model.md` when the spec touches authentication, authorization, admin surfaces, PII/LGPD data, payments, uploads/downloads, webhooks, browser automation, LLM/tool calls, multi-tenant data, external APIs, or privileged infrastructure.** This companion contains STRIDE analysis and is listed in `companions:` so downstream story and implementation workflows must read it.
+
 Companions are either:
 
 - **Spec-authored** companions are written by bmad-spec and live as **siblings of SPEC.md** (e.g., `glossary.md`, `patron-archetypes.md`). bmad-spec owns them and may edit them on update operations.
@@ -121,6 +124,16 @@ After every create or update, sweep the resulting artifact in **two passes** bef
 **Pass 2 — Preservation.** Walk the source claim by claim. Confirm each load-bearing claim landed in SPEC.md or a companion. Wrapper-ceremony drops are logged under "Wrapper-only content" so the drop is on the record, not silent.
 
 Record the verdict for each pass to `.memlog.md` (`append --type event`). In interactive mode, review it with the user. In headless mode, `.memlog.md` is one of the files returned, so the caller (or its downstream LLM) reads the verdict there.
+
+## Security Gate
+
+Before Output, run `bmad-review-security` against `SPEC.md`, every file listed in `companions:`, and any source artifacts still needed to understand security context. Save the full report to `{spec-folder}/review-security.md`.
+
+If the review identifies clear fixes that can be made without inventing product intent, append those decisions/constraints/questions to `.memlog.md`, re-derive `SPEC.md` and relevant companions, then rerun the focused security review on the changed security surface.
+
+If any high-risk security finding remains open, do not present the spec as final or ready for downstream story creation. Return the spec folder plus the blocking security findings and wait for user direction. Medium-risk findings require owner, mitigation, and explicit acceptance note before downstream handoff. Low-risk findings may remain recommendations.
+
+Record the security gate verdict to `.memlog.md` with `append --type event`.
 
 ## Spec with no change signal
 

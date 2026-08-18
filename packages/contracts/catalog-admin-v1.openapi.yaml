@@ -1,0 +1,221 @@
+openapi: 3.1.0
+info:
+  title: JS Designs Catalog Admin API
+  version: 1.0.0
+  description: Contrato administrativo fail-closed; exige identidade com catalog.manage.
+servers:
+  - url: /api/v1
+paths:
+  /admin/catalog/products:
+    post:
+      operationId: createCatalogProductDraft
+      security: [{ adminIdentity: [catalog.manage] }]
+      requestBody: { $ref: '#/components/requestBodies/CreateProduct' }
+      responses:
+        '201': { $ref: '#/components/responses/Product' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Validation' }
+  /admin/catalog/products/{product}:
+    patch:
+      operationId: updateCatalogProduct
+      security: [{ adminIdentity: [catalog.manage] }]
+      parameters: [{ $ref: '#/components/parameters/ProductId' }]
+      requestBody: { $ref: '#/components/requestBodies/UpdateProduct' }
+      responses:
+        '200': { $ref: '#/components/responses/Product' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Validation' }
+  /admin/catalog/products/{product}/publish:
+    post:
+      operationId: publishCatalogProduct
+      security: [{ adminIdentity: [catalog.manage] }]
+      parameters: [{ $ref: '#/components/parameters/ProductId' }]
+      requestBody: { $ref: '#/components/requestBodies/Version' }
+      responses:
+        '200': { $ref: '#/components/responses/Product' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Validation' }
+  /admin/catalog/products/{product}/unpublish:
+    post:
+      operationId: unpublishCatalogProduct
+      security: [{ adminIdentity: [catalog.manage] }]
+      parameters: [{ $ref: '#/components/parameters/ProductId' }]
+      requestBody: { $ref: '#/components/requestBodies/Version' }
+      responses:
+        '200': { $ref: '#/components/responses/Product' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Validation' }
+components:
+  securitySchemes:
+    adminIdentity:
+      type: oauth2
+      description: Placeholder; o mecanismo definitivo de autenticação está fora desta story.
+      flows:
+        clientCredentials:
+          tokenUrl: /not-configured
+          scopes: { catalog.manage: Manter catálogo }
+  parameters:
+    ProductId: { name: product, in: path, required: true, schema: { type: string, format: uuid } }
+  requestBodies:
+    Version:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [version]
+            properties: { version: { type: integer, minimum: 1 } }
+    CreateProduct:
+      required: true
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProductCreate' } } }
+    UpdateProduct:
+      required: true
+      content: { application/json: { schema: { $ref: '#/components/schemas/ProductUpdate' } } }
+  schemas:
+    ProductCreate:
+      allOf:
+        - { $ref: '#/components/schemas/ProductWrite' }
+        - type: object
+          required: [slug, modality]
+    ProductUpdate:
+      allOf:
+        - { $ref: '#/components/schemas/ProductWrite' }
+        - type: object
+          required: [version]
+          not: { required: [slug] }
+          description: Atualizacao nao aceita `slug`; mudanca de slug exige operacao explicita fora desta story.
+    ProductWrite:
+      type: object
+      properties:
+        version: { type: integer, minimum: 1, description: Obrigatório em atualização }
+        slug: { type: string, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$', maxLength: 180 }
+        name: { type: [string, 'null'], maxLength: 180 }
+        description: { type: [string, 'null'], maxLength: 10000 }
+        modality: { enum: [physical_personalized, digital_ready, digital_personalized] }
+        category_id: { type: [string, 'null'], format: uuid }
+        price_minor: { type: [integer, 'null'], minimum: 0 }
+        currency: { enum: [EUR, null], description: Moeda-base ISO 4217; multimoeda foi deferida }
+        availability: { enum: [available, unavailable, made_to_order, null] }
+        delivery_type: { enum: [physical, digital, null] }
+        minimum_quantity: { type: [integer, 'null'], minimum: 1 }
+        variants_reference: { type: [string, 'null'] }
+        is_personalized: { type: [boolean, 'null'] }
+        is_immediate_delivery: { type: [boolean, 'null'] }
+        requires_briefing: { type: [boolean, 'null'] }
+        requires_approval: { type: [boolean, 'null'] }
+        production_lead_time_days: { type: [integer, 'null'], minimum: 1 }
+        materials: { type: [string, 'null'] }
+        composition: { type: [string, 'null'] }
+        file_description: { type: [string, 'null'] }
+        compatibility: { type: [string, 'null'] }
+        usage_terms: { type: [string, 'null'] }
+        taxonomy:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            required: [type, label]
+            properties:
+              type: { enum: [theme, occasion, search_alias] }
+              label: { type: string, maxLength: 160 }
+        images:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            required: [storage_reference, sort_order, is_primary]
+            properties:
+              storage_reference: { type: string, pattern: '^file_[A-Za-z0-9]{20,170}$' }
+              alt_text: { type: [string, 'null'], maxLength: 300 }
+              sort_order: { type: integer, minimum: 0, maximum: 1000 }
+              is_primary: { type: boolean }
+        protected_assets:
+          type: array
+          maxItems: 30
+          items:
+            type: object
+            required: [label, status]
+            properties:
+              label: { type: string, maxLength: 160 }
+              status: { enum: [pending, verified, rejected] }
+              notes: { type: [string, 'null'], maxLength: 5000 }
+              evidence_reference: { type: [string, 'null'], pattern: '^evidence_[A-Za-z0-9]{12,170}$' }
+    AdminProductEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          allOf:
+            - { $ref: '#/components/schemas/ProductWrite' }
+            - type: object
+              required: [id, slug, status, version, created_at, updated_at]
+              properties:
+                id: { type: string, format: uuid }
+                status: { enum: [draft, published, unpublished] }
+                version: { type: integer, minimum: 1 }
+                created_at: { type: string, format: date-time }
+                updated_at: { type: string, format: date-time }
+                protected_assets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      label: { type: string }
+                      status: { enum: [pending, verified, rejected] }
+                      notes: { type: [string, 'null'], description: Somente administrativo }
+                      evidence_reference: { type: [string, 'null'], description: Somente administrativo }
+                      verified_by: { type: [string, 'null'], description: Somente administrativo }
+                      verified_at: { type: [string, 'null'], format: date-time, description: Somente administrativo }
+    TypedError:
+      type: object
+      required: [code, message_key, field_path, recoverable]
+      properties:
+        code: { type: string }
+        message_key: { type: string }
+        field_path: { type: string }
+        recoverable: { type: boolean }
+        next_action: { type: string }
+    SimpleErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message_key]
+          properties:
+            code: { type: string }
+            message_key: { type: string }
+  responses:
+    Product:
+      description: Produto administrativo
+      content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductEnvelope' } } }
+    Unauthenticated:
+      description: Identidade ausente ou inválida
+      content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } }
+    Forbidden:
+      description: Identidade sem catalog.manage
+      content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } }
+    Conflict:
+      description: Slug ou versão em conflito
+      content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } }
+    NotFound:
+      description: Produto não encontrado após autenticação e autorização
+      content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } }
+    Validation:
+      description: Erros tipados por campo
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: { errors: { type: array, items: { $ref: '#/components/schemas/TypedError' } } }
