@@ -4,3 +4,7 @@
 - Pin de GitHub Actions por SHA em vez de tags versionadas — deferred porque os workflows já usam versões maiores explícitas e a política de pin por SHA deve ser definida como hardening operacional.
 - Tornar criação de `jsdesign_test` idempotente quando volume Docker já existe — deferred porque afeta apenas ambientes com volume antigo; tratar junto da documentação/troubleshooting Docker.
 - Criar testes negativos dedicados para BFF degradado/API indisponível — deferred porque exige estrutura adicional de teste/servidor com ambiente alternativo; tratar em hardening de testes do BFF.
+
+## Deferred from: code review of 2-1-cadastrar-produtos-com-estrutura-de-catalogo-comercial (2026-08-13)
+
+- Politicas de IDE/sandbox (`Artifact Review Policy`, bloqueio de comandos destrutivos e allowlist de browser) nao foram encontradas em arquivo auditavel no repo; tratar como hardening de governanca do ambiente.

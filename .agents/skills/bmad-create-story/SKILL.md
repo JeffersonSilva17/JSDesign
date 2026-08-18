@@ -78,6 +78,7 @@ Activation is complete. If `activation_steps_prepend` or `activation_steps_appen
 - `story_title` = "" (will be elicited if not derivable)
 - `default_output_file` = `{implementation_artifacts}/{{story_key}}.md`
 - `story_review_file` = `{implementation_artifacts}/reviews/review-{{story_key}}-adversarial.md`
+- `story_security_review_file` = `{implementation_artifacts}/reviews/review-{{story_key}}-security.md`
 
 ## Input Files
 
@@ -105,6 +106,24 @@ If accepted, run `bmad-review-adversarial-general` against `{default_output_file
 - handoff gaps that could make `bmad-dev-story` implement the wrong thing
 
 Apply clear fixes to the story before sprint status is updated. If findings need user judgment, surface only those findings and wait for direction. If the user skips the gate, continue and mention the skipped review in the completion report.
+
+## Security Reviewer Gate
+
+Used after the story file is drafted and checklist-clean, before the story Status or sprint status moves to `ready-for-dev`.
+
+This gate is mandatory. Run `bmad-review-security` against `{default_output_file}` plus the loaded PRD, UX, Architecture, Epics, previous-story, git, and latest-technical context already used to create the story. Save the full security findings to `{story_security_review_file}`.
+
+The security review must verify:
+
+- STRIDE coverage for authentication, authorization, payload limits, data flows, and trust boundaries
+- absence of hardcoded secrets or requirements that encourage secrets outside `.env`
+- strict input validation expectations for API/CLI/Web surfaces
+- injection, path traversal, XSS, unsafe shell execution, and unsafe query risks
+- LGPD/PII handling, log minimization, public/admin data separation, and sanitized errors
+- SAST/SCA/secret-scan expectations appropriate to the detected stack
+- IDE/sandbox governance gaps relevant to the story plan
+
+Apply clear, non-controversial fixes directly to the story. If any high-risk security finding remains open, HALT before `ready-for-dev` and wait for explicit user direction. Medium risks require an owner, mitigation plan, and acceptance note before continuing. Low risks may remain as recommendations.
 
 ## Execution
 
@@ -407,15 +426,28 @@ Apply clear fixes to the story before sprint status is updated. If findings need
   <template-output file="{default_output_file}">
   story_completion_status</template-output>
 
-  <!-- CRITICAL: Set status to ready-for-dev -->
-  <action>Set story Status to: "ready-for-dev"</action>
-  <action>Add completion note: "Ultimate
-  context engine analysis completed - comprehensive developer guide created"</action>
+  <!-- CRITICAL: Keep status below ready-for-dev until mandatory security gate passes -->
+  <action>Set story Status to: "draft"</action>
+  <action>Add completion note: "Context engine analysis completed - pending mandatory security gate before ready-for-dev"</action>
 </step>
 
 <step n="6" goal="Update sprint status and finalize">
   <action>Validate the newly created story file {default_output_file} against `./checklist.md` and apply any required fixes before finalizing</action>
   <action>Save story document unconditionally</action>
+
+  <!-- Mandatory security review gate -->
+  <action>Run `## Security Reviewer Gate`: invoke `bmad-review-security` before any `ready-for-dev` status change.</action>
+  <action>Create {implementation_artifacts}/reviews if needed and save the full security review findings to {story_security_review_file}</action>
+  <action>Apply clear, non-controversial security fixes directly to {default_output_file}</action>
+  <check if="security review has any high-risk finding still open">
+    <action>HALT before ready-for-dev; present only the open high-risk findings and wait for explicit user direction</action>
+  </check>
+  <check if="security review has medium-risk findings">
+    <action>Verify each medium-risk finding has owner, mitigation plan, and explicit acceptance note before continuing</action>
+  </check>
+  <action>Add or update a `Security Gate - bmad-review-security` section in {default_output_file} with report path, verdict, and remaining conditions</action>
+  <action>Re-validate {default_output_file} against `./checklist.md` if the story changed during security review</action>
+  <action>Save story document unconditionally after security review resolution</action>
 
   <!-- Story adversarial review gate -->
   <action>Run `## Story Reviewer Gate`: ask whether to run `bmad-review-adversarial-general` before final handoff. Default/recommended answer is yes.</action>
@@ -430,6 +462,9 @@ Apply clear fixes to the story before sprint status is updated. If findings need
   <check if="user skips adversarial story review">
     <action>Continue without running the review and include "Adversarial story review: skipped by user" in the completion report</action>
   </check>
+
+  <action>Set story Status to: "ready-for-dev" only after the mandatory security gate passes and any required adversarial story review fixes are resolved</action>
+  <action>Add completion note: "Story security gate passed - ready for development"</action>
 
   <!-- Update sprint status -->
   <check if="sprint status file exists">

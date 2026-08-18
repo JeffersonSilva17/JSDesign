@@ -115,8 +115,8 @@ Para o smoke/e2e, mantenha a Laravel API ativa em `127.0.0.1:8000` e garanta que
 API_INTERNAL_URL=http://127.0.0.1:8000
 ```
 
-## Limites explícitos da Story 1.1
+## Limites atuais
 
-Esta fundação não implementa catálogo real, carrinho, checkout, autenticação completa, briefing, aprovação de arte, pagamento, entrega, suporte funcional ou painel administrativo.
+O backend implementa o cadastro administrativo e a publicação do catálogo. As escritas permanecem fail-closed até a integração de uma identidade administrativa e de um mecanismo aprovado de arquivos.
 
-Os módulos Laravel existem apenas como estrutura arquitetural inicial. Tabelas, models e regras de domínio só devem ser criadas nas stories correspondentes.
+Ainda não existem listagem/busca pública, carrinho, checkout, autenticação completa, briefing, aprovação de arte, pagamento, entrega, suporte funcional ou painel administrativo visual.
