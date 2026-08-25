@@ -13,13 +13,13 @@ jobs:
       postgres:
         image: postgres:18
         env:
-          POSTGRES_DB: jsdesign
+          POSTGRES_DB: jsdesign_test
           POSTGRES_USER: jsdesign
           POSTGRES_PASSWORD: jsdesign
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U jsdesign -d jsdesign"
+          --health-cmd "pg_isready -U jsdesign -d jsdesign_test"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 20
@@ -60,24 +60,6 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate --ansi
-
-      - name: Run API migrations
-        working-directory: apps/api
-        run: php artisan migrate:fresh --force --ansi
-
-      - name: Start Laravel API
-        working-directory: apps/api
-        run: php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/ci-server.log 2>&1 &
-
-      - name: Wait for Laravel API
-        run: |
-          for i in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:8000/api/v1/health > /dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-          exit 1
 
       - name: Install web dependencies
         working-directory: apps/web
