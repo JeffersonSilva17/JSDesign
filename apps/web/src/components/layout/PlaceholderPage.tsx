@@ -12,7 +12,7 @@ type PlaceholderPageProps = Readonly<{
 
 export function PlaceholderPage({ pageKey }: PlaceholderPageProps) {
   const page = placeholderPages[pageKey];
-  const fallbackCta = pageKey === 'produtos' ? placeholderFallbackCtas.produtos : placeholderFallbackCtas.default;
+  const fallbackCta = placeholderFallbackCtas.default;
 
   return (
     <section className="placeholder-page" aria-labelledby="placeholder-title">

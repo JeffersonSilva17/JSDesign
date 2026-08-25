@@ -1,0 +1,139 @@
+openapi: 3.1.0
+info: { title: JS Designs Public Catalog API, version: 1.0.0 }
+servers: [{ url: /api/v1 }]
+paths:
+  /catalog/products:
+    get:
+      operationId: listPublicCatalogProducts
+      parameters:
+        - { name: category, in: query, schema: { type: string, maxLength: 160, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' } }
+        - { name: occasion, in: query, schema: { type: string, minLength: 1, maxLength: 180 } }
+        - { name: modality, in: query, schema: { $ref: '#/components/schemas/Modality' } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, maximum: 10000, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 48, default: 12 } }
+      responses:
+        '200': { description: Página de produtos publicados, content: { application/json: { schema: { $ref: '#/components/schemas/ProductPage' } } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /catalog/products/{slug}:
+    get:
+      operationId: getPublishedCatalogProduct
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string, maxLength: 180, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' } }]
+      responses:
+        '200': { description: Resumo de produto publicado, content: { application/json: { schema: { type: object, required: [data], additionalProperties: false, properties: { data: { $ref: '#/components/schemas/ProductDetail' } } } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /catalog/facets:
+    get:
+      operationId: getPublicCatalogFacets
+      responses:
+        '200': { description: Facetas publicadas sem contagens, content: { application/json: { schema: { $ref: '#/components/schemas/FacetsEnvelope' } } } }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+components:
+  schemas:
+    Modality: { type: string, enum: [physical_personalized, digital_personalized, digital_ready] }
+    Category: { type: object, required: [slug, label], additionalProperties: false, properties: { slug: { type: string, maxLength: 160, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }, label: { type: string } } }
+    Image: { type: object, required: [url, alt_text], additionalProperties: false, properties: { url: { type: string, pattern: '^/(?!/)(?!.*(?:\\.\\.|%2[eE]%2[eE]))[^\\\\#?\\x00-\\x1F\\x7F]+$' }, alt_text: { type: string } } }
+    Taxonomy: { type: object, required: [type, key, label], additionalProperties: false, properties: { type: { type: string, enum: [theme, occasion] }, key: { type: string }, label: { type: string } } }
+    ProductBase:
+      type: object
+      required: [id, slug, name, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy]
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, maxLength: 180, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        name: { type: string }
+        category: { $ref: '#/components/schemas/Category' }
+        modality: { $ref: '#/components/schemas/Modality' }
+        price_minor: { type: integer, minimum: 0 }
+        currency: { type: string, const: EUR }
+        availability: { type: string, enum: [available, unavailable, made_to_order] }
+        delivery_type: { type: string, enum: [physical, digital] }
+        production_lead_time_days: { type: [integer, 'null'], minimum: 0 }
+        is_immediate_delivery: { type: boolean }
+        primary_image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        taxonomy: { type: array, items: { $ref: '#/components/schemas/Taxonomy' } }
+    ProductCard:
+      type: object
+      required: [id, slug, name, description_excerpt, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy, compatibility_excerpt]
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, maxLength: 180, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        name: { type: string }
+        description_excerpt: { type: string, maxLength: 240 }
+        category: { $ref: '#/components/schemas/Category' }
+        modality: { $ref: '#/components/schemas/Modality' }
+        price_minor: { type: integer, minimum: 0 }
+        currency: { type: string, const: EUR }
+        availability: { type: string, enum: [available, unavailable, made_to_order] }
+        delivery_type: { type: string, enum: [physical, digital] }
+        production_lead_time_days: { type: [integer, 'null'], minimum: 0 }
+        is_immediate_delivery: { type: boolean }
+        primary_image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        taxonomy: { type: array, items: { $ref: '#/components/schemas/Taxonomy' } }
+        compatibility_excerpt: { type: [string, 'null'], maxLength: 120 }
+    ProductDetail:
+      type: object
+      required: [id, slug, name, description, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy, compatibility]
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, maxLength: 180, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        name: { type: string }
+        description: { type: string }
+        category: { $ref: '#/components/schemas/Category' }
+        modality: { $ref: '#/components/schemas/Modality' }
+        price_minor: { type: integer, minimum: 0 }
+        currency: { type: string, const: EUR }
+        availability: { type: string, enum: [available, unavailable, made_to_order] }
+        delivery_type: { type: string, enum: [physical, digital] }
+        production_lead_time_days: { type: [integer, 'null'], minimum: 0 }
+        is_immediate_delivery: { type: boolean }
+        primary_image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        taxonomy: { type: array, items: { $ref: '#/components/schemas/Taxonomy' } }
+        compatibility: { type: [string, 'null'] }
+    ProductPage:
+      type: object
+      required: [data, meta]
+      additionalProperties: false
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/ProductCard' } }
+        meta:
+          type: object
+          required: [current_page, per_page, last_page, total, applied_filters, filter_labels]
+          additionalProperties: false
+          properties:
+            current_page: { type: integer, minimum: 1, maximum: 10000 }
+            per_page: { type: integer, minimum: 1, maximum: 48 }
+            last_page: { type: integer, minimum: 1 }
+            total: { type: integer, minimum: 0 }
+            applied_filters:
+              type: object
+              additionalProperties: false
+              properties: { category: { type: string }, occasion: { type: string }, modality: { type: string } }
+            filter_labels:
+              type: object
+              additionalProperties: false
+              properties: { category: { type: string }, occasion: { type: string }, modality: { type: string } }
+    FacetsEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          type: object
+          required: [categories, occasions, modalities]
+          additionalProperties: false
+          properties:
+            categories: { type: array, items: { $ref: '#/components/schemas/Category' } }
+            occasions: { type: array, items: { type: object, required: [key, label], additionalProperties: false, properties: { key: { type: string }, label: { type: string } } } }
+            modalities: { type: array, items: { type: object, required: [value, label], additionalProperties: false, properties: { value: { $ref: '#/components/schemas/Modality' }, label: { type: string } } } }
+  responses:
+    ValidationError: { description: Consulta inválida, content: { application/json: { schema: { type: object, required: [message, errors] } } } }
+    NotFound: { description: Produto não encontrado, content: { application/json: { schema: { type: object, required: [message] } } } }
+    RateLimited: { description: Limite excedido, content: { application/json: { schema: { type: object, required: [message, retry_after] } } } }
+    Unavailable: { description: Temporariamente indisponível, content: { application/json: { schema: { type: object, required: [message] } } } }

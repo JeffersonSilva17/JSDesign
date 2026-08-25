@@ -43,6 +43,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ], $exception->errorCode === 'product_not_found' ? 404 : 409);
         });
         $exceptions->render(function (NotFoundHttpException $exception, HttpRequest $request) {
+            if ($request->is('api/v1/catalog/*')) {
+                return response()->json(['message' => 'Produto não encontrado.'], 404)
+                    ->header('Cache-Control', 'no-store, private');
+            }
+
             if (! $request->is('api/v1/admin/catalog/*')) {
                 return null;
             }

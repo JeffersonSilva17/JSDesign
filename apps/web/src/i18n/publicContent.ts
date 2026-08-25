@@ -104,6 +104,59 @@ export const publicContent = {
         'Use Produtos, Categorias ou Buscar para continuar a descoberta. Essas rotas permanecem honestamente em preparação até receberem catálogo e busca reais.',
     },
   },
+  catalog: {
+    listing: {
+      eyebrow: 'Catálogo JS Designs',
+      title: 'Produtos',
+      description: 'Explore produtos publicados por categoria, ocasião e modalidade.',
+      emptyTitle: 'Nenhum produto encontrado',
+      emptyDescription: 'Esta combinação de filtros ainda não possui produtos publicados.',
+    },
+    categories: {
+      eyebrow: 'Descobrir por categoria',
+      title: 'Categorias',
+      description: 'Escolha uma opção disponível no catálogo publicado.',
+      empty: 'Ainda não há categorias públicas disponíveis.',
+    },
+    filters: {
+      title: 'Filtrar produtos', clear: 'Limpar filtros', category: 'Categoria',
+      occasion: 'Ocasião', modality: 'Tipo',
+    },
+    card: {
+      details: 'Ver detalhes', unavailableImage: 'Imagem indisponível',
+      immediate: 'Download imediato', leadTime: 'Prazo de produção',
+    },
+    pagination: { label: 'Paginação dos produtos', previous: 'Página anterior', next: 'Próxima página' },
+    states: {
+      invalidTitle: 'Filtros inválidos',
+      invalidDescription: 'Revise o endereço ou recomece com todos os produtos.',
+      unavailableTitle: 'Catálogo temporariamente indisponível',
+      unavailableDescription: 'Não foi possível carregar os produtos agora. Tente novamente em instantes.',
+      pageOutOfRangeTitle: 'Página sem produtos',
+      pageOutOfRangeDescription: 'Esta página não possui itens, mas há produtos publicados em páginas anteriores.',
+      back: 'Ver todos os produtos',
+      backToLastPage: 'Voltar para a última página',
+    },
+    detail: { eyebrow: 'Produto publicado', back: 'Voltar aos produtos' },
+    modality: {
+      physical_personalized: 'Produto físico personalizado',
+      digital_personalized: 'Produto digital personalizado',
+      digital_ready: 'Produto digital',
+    },
+    availability: {
+      available: 'Disponível',
+      unavailable: 'Indisponível',
+      made_to_order: 'Produzido sob encomenda',
+    },
+    metadata: {
+      products: { title: 'Produtos', description: 'Catálogo público de produtos físicos e digitais da JS Designs.' },
+      categories: { title: 'Categorias', description: 'Categorias e ocasiões disponíveis no catálogo público da JS Designs.' },
+      detail: {
+        title: 'Detalhes do produto', description: 'Resumo público de um produto da JS Designs.',
+        robots: { index: false, follow: true },
+      },
+    },
+  },
   footer: {
     eyebrow: 'JS Designs',
     title: 'Papelaria afetiva com direção autoral.',
@@ -145,28 +198,6 @@ export const publicContent = {
     ],
   },
   placeholders: {
-    produtos: {
-      title: 'Produtos',
-      eyebrow: 'Catálogo em preparação',
-      description:
-        'A listagem real de produtos será conectada nas próximas stories. Esta página preserva a navegação pública sem simular catálogo, preço, disponibilidade, carrinho ou compra.',
-      metadata: {
-        title: 'Produtos em preparação',
-        description:
-          'Entrada pública do catálogo JS Designs em preparação, sem simular preço ou disponibilidade.',
-      },
-    },
-    categorias: {
-      title: 'Categorias',
-      eyebrow: 'Descoberta em preparação',
-      description:
-        'As categorias de lembrancinhas físicas personalizadas, convites digitais personalizados e Produto Digital Pronto serão organizadas sem antecipar filtros ou catálogo real nesta etapa.',
-      metadata: {
-        title: 'Categorias em preparação',
-        description:
-          'Categorias públicas da JS Designs em preparação para lembrancinhas, convites e produtos digitais.',
-      },
-    },
     buscar: {
       title: 'Buscar',
       eyebrow: 'Busca em preparação',
@@ -274,10 +305,6 @@ export const publicContent = {
     },
   },
   placeholderFallbackCtas: {
-    produtos: {
-      href: '/',
-      label: 'Voltar para a home',
-    },
     default: {
       href: '/produtos',
       label: 'Voltar para produtos',

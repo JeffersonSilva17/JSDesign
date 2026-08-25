@@ -70,6 +70,18 @@ export type PublicContent = Readonly<{
       description: string;
     }>;
   }>;
+  catalog: Readonly<{
+    listing: Readonly<{ eyebrow: string; title: string; description: string; emptyTitle: string; emptyDescription: string }>;
+    categories: Readonly<{ eyebrow: string; title: string; description: string; empty: string }>;
+    filters: Readonly<{ title: string; clear: string; category: string; occasion: string; modality: string }>;
+    card: Readonly<{ details: string; unavailableImage: string; immediate: string; leadTime: string }>;
+    pagination: Readonly<{ label: string; previous: string; next: string }>;
+    states: Readonly<{ invalidTitle: string; invalidDescription: string; unavailableTitle: string; unavailableDescription: string; pageOutOfRangeTitle: string; pageOutOfRangeDescription: string; back: string; backToLastPage: string }>;
+    detail: Readonly<{ eyebrow: string; back: string }>;
+    modality: Readonly<Record<'physical_personalized' | 'digital_personalized' | 'digital_ready', string>>;
+    availability: Readonly<Record<'available' | 'unavailable' | 'made_to_order', string>>;
+    metadata: Readonly<{ products: MetadataContent; categories: MetadataContent; detail: MetadataContent }>;
+  }>;
   footer: Readonly<{
     eyebrow: string;
     title: string;
@@ -86,7 +98,6 @@ export type PublicContent = Readonly<{
   }>;
   placeholders: Readonly<Record<string, PlaceholderContent>>;
   placeholderFallbackCtas: Readonly<{
-    produtos: LinkContent;
     default: LinkContent;
   }>;
   firstPurchaseDiscount: Readonly<{

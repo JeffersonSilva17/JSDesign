@@ -10,3 +10,4 @@ export const secondaryPublicCta = publicContent.cta.secondary;
 export const footerSections = publicContent.footer.sections;
 export const placeholderPages = publicContent.placeholders;
 export const placeholderFallbackCtas = publicContent.placeholderFallbackCtas;
+export const catalogContent = publicContent.catalog;
