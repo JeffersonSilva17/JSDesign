@@ -8,3 +8,7 @@
 ## Deferred from: code review of 2-1-cadastrar-produtos-com-estrutura-de-catalogo-comercial (2026-08-13)
 
 - Politicas de IDE/sandbox (`Artifact Review Policy`, bloqueio de comandos destrutivos e allowlist de browser) nao foram encontradas em arquivo auditavel no repo; tratar como hardening de governanca do ambiente.
+
+## Deferred from: code review of 2-2-exibir-listagens-publicas-por-categoria-ocasiao-e-tipo (2026-08-25)
+
+- SAST/secret scan seguem sem ferramenta configurada no repositório — deferred porque a ausência da ferramenta é um hardening operacional preexistente; a story não deve declarar cobertura inexistente, e o gate deve ser resolvido por CI/ferramenta aprovada.

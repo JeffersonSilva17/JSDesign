@@ -12,6 +12,7 @@ Thumbs.db
 # Node/Next
 node_modules/
 .next/
+.next-*/
 *.tsbuildinfo
 out/
 playwright-report/

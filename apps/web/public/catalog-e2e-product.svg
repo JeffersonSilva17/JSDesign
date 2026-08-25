@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Produto digital em tons neutros">
+  <rect width="800" height="600" fill="#efe8df"/>
+  <circle cx="400" cy="260" r="150" fill="#c8a46b"/>
+  <path d="M250 430h300" stroke="#765321" stroke-width="28" stroke-linecap="round"/>
+</svg>

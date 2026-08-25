@@ -2,6 +2,12 @@
 
 Monorepo inicial da loja online JS Designs.
 
+## Catálogo público
+
+`/produtos` e `/categorias` são Server Components que consultam o Laravel somente pelo BFF server-side. A API oferece os três GETs sob `/api/v1/catalog`, sempre com `Cache-Control: no-store`, paginação máxima de 48, throttle e statement timeout configuráveis.
+
+Fotos reais continuam fail-closed: `storage_reference` nunca sai do backend e só um adapter aprovado poderá convertê-la em path same-origin. Categorias precisam ser provisionadas operacionalmente. Busca entra na Story 2.3, SEO/canonical na 2.4 e detalhe completo/compra nos Epics 3 e 4.
+
 ## Stack
 
 - Frontend/BFF: Next.js 16.3, React 19.2 e TypeScript em `apps/web`.

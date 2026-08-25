@@ -2,10 +2,14 @@
 
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\CreateCatalogProductController;
+use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublicCatalogFacetsController;
+use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublishedCatalogProductController;
+use App\Modules\Catalog\Interfaces\Http\Controllers\ListPublicCatalogProductsController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\PublishCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\UnpublishCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\UpdateCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Middleware\CatalogAdminAuthorization;
+use App\Modules\Catalog\Interfaces\Http\Middleware\PublicCatalogNoStore;
 use App\Modules\Promotions\Interfaces\Http\Controllers\FirstPurchaseCouponController;
 use App\Modules\Promotions\Interfaces\Http\Controllers\FirstPurchaseOfferController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +20,13 @@ Route::prefix('v1')->group(function (): void {
         ->name('api.v1.promotions.first-purchase-offer');
     Route::post('/promotions/first-purchase-coupons', FirstPurchaseCouponController::class)
         ->name('api.v1.promotions.first-purchase-coupons');
+
+    Route::prefix('catalog')->middleware([PublicCatalogNoStore::class, 'throttle:public-catalog'])->group(function (): void {
+        Route::get('/products', ListPublicCatalogProductsController::class)->name('api.v1.catalog.products.index');
+        Route::get('/products/{slug}', GetPublishedCatalogProductController::class)
+            ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('api.v1.catalog.products.show');
+        Route::get('/facets', GetPublicCatalogFacetsController::class)->name('api.v1.catalog.facets.index');
+    });
 
     Route::prefix('admin/catalog/products')
         ->middleware(CatalogAdminAuthorization::class)

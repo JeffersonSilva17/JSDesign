@@ -256,8 +256,6 @@ test('placeholders transacionais não são indexáveis', async ({ page }) => {
 
 test('rotas placeholder públicas renderizam conteúdo honesto', async ({ page }) => {
   const placeholderRoutes = [
-    { path: '/produtos', heading: 'Produtos' },
-    { path: '/categorias', heading: 'Categorias' },
     { path: '/buscar', heading: 'Buscar' },
     { path: '/carrinho', heading: 'Carrinho' },
     { path: '/entrar', heading: 'Área da Cliente' },
@@ -281,13 +279,13 @@ test('rotas placeholder públicas renderizam conteúdo honesto', async ({ page }
   }
 });
 
-test('metadata pública de placeholder permanece em português do Brasil', async ({ page }) => {
+test('metadata pública do catálogo permanece em português do Brasil', async ({ page }) => {
   await page.goto('/produtos');
 
-  await expect(page).toHaveTitle('Produtos em preparação | JS Designs');
+  await expect(page).toHaveTitle('Produtos | JS Designs');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     'content',
-    publicContent.placeholders.produtos.metadata.description,
+    publicContent.catalog.metadata.products.description,
   );
 });
 

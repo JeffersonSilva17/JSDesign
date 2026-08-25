@@ -6,7 +6,6 @@ use App\Modules\Catalog\Application\FileReferenceStatus;
 use App\Modules\Catalog\Application\FileReferenceValidator;
 use App\Modules\Catalog\Application\Security\AdminIdentity;
 use App\Modules\Catalog\Application\Security\AdminIdentityResolver;
-use App\Modules\Catalog\Interfaces\Http\Resources\PublicCatalogProductResource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -292,7 +291,9 @@ final class CatalogAdminApiTest extends TestCase
             ->assertJsonPath('data.status', 'published')
             ->json('data');
 
-        $public = (new PublicCatalogProductResource($published))->resolve(request());
+        $public = $this->getJson('/api/v1/catalog/products/'.$published['slug'])
+            ->assertOk()
+            ->json('data');
         self::assertArrayNotHasKey('protected_assets', $public);
         self::assertStringNotContainsString('evidence_', json_encode($public, JSON_THROW_ON_ERROR));
         self::assertStringNotContainsString('Licen', json_encode($public, JSON_THROW_ON_ERROR));

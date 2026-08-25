@@ -2,6 +2,8 @@
 
 Espaço reservado para contratos entre o Next.js BFF e a Laravel API.
 
+O contrato público versionado do catálogo está em `catalog-public-v1.openapi.yaml`. Ele cobre listagem, detalhe mínimo e facetas somente de produtos publicados, com paginação limitada, allowlist explícita e erros sanitizados. O contrato administrativo continua separado em `catalog-admin-v1.openapi.yaml`.
+
 Uso previsto:
 
 - OpenAPI/JSON Schema quando os endpoints forem formalizados.
