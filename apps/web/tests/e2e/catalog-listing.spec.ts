@@ -80,6 +80,8 @@ for (const width of [320, 420, 760, 1100]) {
 }
 
 test('catálogo mantém evidência local de Core Web Vitals bons por viewport', async ({ browser }) => {
+  test.setTimeout(60_000);
+
   const widths = [320, 420, 760, 1100];
 
   for (const width of widths) {

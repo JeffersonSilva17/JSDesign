@@ -6,13 +6,22 @@ use App\Modules\Catalog\Application\Queries\PublicCatalogFilters;
 use App\Modules\Catalog\Application\Queries\PublicCatalogImageResolver;
 use App\Modules\Catalog\Application\Queries\PublicCatalogPage;
 use App\Modules\Catalog\Application\Queries\PublicCatalogQuery;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSearchCriteria;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSearchGroup;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSearchIntent;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSearchPage;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSearchQuery;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSearchSuggestion;
 use App\Modules\Catalog\Application\Queries\PublicCatalogText;
 use App\Modules\Catalog\Domain\ProductModality;
 use App\Modules\Catalog\Infrastructure\Files\PublicImagePath;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Normalizer;
+use PDOException;
 
-final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery
+final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, PublicCatalogSearchQuery
 {
     public function __construct(private PublicCatalogImageResolver $images) {}
 
@@ -28,7 +37,8 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery
             $lastPage = max(1, (int) ceil($total / $filters->perPage));
             $currentPage = $total === 0 ? 1 : $filters->page;
 
-            $items = $this->hydrate($rows->map(static fn (object $row): array => (array) $row)->all(), false);
+            $rawRows = $rows->map(static fn (object $row): array => (array) $row)->all();
+            $items = $this->hydrate($rawRows, false);
 
             return new PublicCatalogPage(
                 $items,
@@ -36,7 +46,7 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery
                 $filters->perPage,
                 $lastPage,
                 $total,
-                $this->filterLabels($filters),
+                $this->filterLabels($filters, $rawRows),
             );
         });
     }
@@ -78,6 +88,275 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery
 
             return $this->hydrate([(array) $row], true)[0];
         });
+    }
+
+    public function search(PublicCatalogSearchCriteria $criteria): PublicCatalogSearchPage
+    {
+        $page = $this->withStatementTimeout(function () use ($criteria): PublicCatalogSearchPage {
+            $threshold = max(0.20, min(0.80, (float) config('catalog.search_similarity_threshold', 0.30)));
+            $candidateLimit = max(50, min(2000, (int) config('catalog.search_candidate_limit', 500)));
+            DB::select("SELECT set_config('pg_trgm.similarity_threshold', ?, true)", [(string) $threshold]);
+            $offset = ($criteria->page - 1) * $criteria->perPage;
+            $rows = DB::select($this->searchSql(), [
+                $criteria->normalizedQuery,
+                $threshold,
+                $candidateLimit,
+                $offset,
+                $criteria->perPage,
+            ]);
+            $first = $rows[0] ?? null;
+            $total = $first === null ? 0 : (int) $first->__total;
+            $totalExact = $first === null ? 0 : (int) $first->__total_exact;
+            $totalSimilar = $first === null ? 0 : (int) $first->__total_similar;
+            $pageRows = array_values(array_filter($rows, static fn (object $row): bool => $row->id !== null));
+            $projections = $this->hydrate(array_map(static fn (object $row): array => (array) $row, $pageRows), false);
+            $projectionById = [];
+            foreach ($projections as $projection) {
+                $projectionById[$projection['id']] = $projection;
+            }
+
+            $exactGroups = [];
+            $similar = [];
+            foreach ($pageRows as $row) {
+                $projection = $projectionById[(string) $row->id];
+                if ((int) $row->__rank <= 1) {
+                    $slug = (string) $row->category_slug;
+                    if (! isset($exactGroups[$slug])) {
+                        $exactGroups[$slug] = [
+                            'slug' => $slug,
+                            'label' => (string) $row->category_label,
+                            'rank' => (int) $row->__rank,
+                            'score' => (float) $row->__score,
+                            'items' => [],
+                        ];
+                    }
+                    $exactGroups[$slug]['items'][] = $projection;
+                } else {
+                    $similar[] = $projection;
+                }
+            }
+
+            $groups = [];
+            uasort($exactGroups, static function (array $left, array $right): int {
+                return $left['rank'] <=> $right['rank']
+                    ?: $right['score'] <=> $left['score']
+                    ?: strcmp($left['label'], $right['label'])
+                    ?: strcmp($left['slug'], $right['slug']);
+            });
+            foreach ($exactGroups as $slug => $group) {
+                $groups[] = new PublicCatalogSearchGroup($slug, $group['label'], $group['items']);
+            }
+
+            return new PublicCatalogSearchPage(
+                $groups,
+                $similar,
+                [],
+                $this->searchIntent($criteria, $total),
+                $criteria->query,
+                $criteria->page,
+                $criteria->perPage,
+                max(1, (int) ceil($total / $criteria->perPage)),
+                $total,
+                $totalExact,
+                $totalSimilar,
+            );
+        }, 'catalog.search_statement_timeout_ms');
+
+        try {
+            $suggestions = $this->withStatementTimeout(
+                fn (): array => $this->searchSuggestions($criteria->normalizedQuery),
+                'catalog.search_statement_timeout_ms',
+            );
+        } catch (QueryException|PDOException) {
+            return $page;
+        }
+
+        return new PublicCatalogSearchPage(
+            $page->exactGroups,
+            $page->similar,
+            $suggestions,
+            $page->intent,
+            $page->query,
+            $page->currentPage,
+            $page->perPage,
+            $page->lastPage,
+            $page->total,
+            $page->totalExact,
+            $page->totalSimilar,
+        );
+    }
+
+    private function searchSql(): string
+    {
+        return <<<'SQL'
+            WITH params AS NOT MATERIALIZED (
+                SELECT ?::text AS query, ?::real AS threshold, ?::integer AS candidate_limit,
+                       ?::integer AS page_offset, ?::integer AS page_limit
+            ), match_values AS (
+                SELECT p.id AS product_id, 'name'::text AS source, catalog_public_search_normalize_v1(p.name) AS value
+                FROM catalog_products p WHERE p.status = 'published'
+                UNION ALL
+                SELECT p.id, 'category', catalog_public_search_normalize_v1(c.label)
+                FROM catalog_products p JOIN catalog_categories c ON c.id = p.category_id WHERE p.status = 'published'
+                UNION ALL
+                SELECT p.id, 'modality', catalog_public_search_normalize_v1(CASE p.modality
+                    WHEN 'physical_personalized' THEN 'Produto físico personalizado'
+                    WHEN 'digital_personalized' THEN 'Produto digital personalizado'
+                    WHEN 'digital_ready' THEN 'Produto digital' END)
+                FROM catalog_products p WHERE p.status = 'published'
+                UNION ALL
+                SELECT p.id, t.type, catalog_public_search_normalize_v1(t.label)
+                FROM catalog_products p
+                JOIN catalog_product_taxonomy pt ON pt.product_id = p.id
+                JOIN catalog_taxonomy_terms t ON t.id = pt.taxonomy_term_id
+                WHERE p.status = 'published' AND (
+                    (t.type IN ('theme', 'occasion', 'search_alias') AND pt.is_protected = false)
+                    OR (t.type = 'character' AND pt.is_protected = true AND pt.verification_status = 'verified')
+                )
+            ), non_fuzzy_scored AS (
+                SELECT mv.*, CASE
+                    WHEN mv.value = params.query AND mv.source = 'name' THEN 0
+                    WHEN mv.value = params.query THEN 1
+                    ELSE 2 END AS rank,
+                    CASE
+                    WHEN mv.value = params.query THEN 1.0
+                    ELSE length(params.query)::real / greatest(length(mv.value), 1) END AS score
+                FROM match_values mv CROSS JOIN params
+                WHERE mv.value = params.query
+                   OR left(mv.value, length(params.query)) = params.query
+                   OR position(' ' || params.query IN mv.value) > 0
+            ), non_fuzzy_best AS (
+                SELECT DISTINCT ON (product_id) * FROM non_fuzzy_scored
+                ORDER BY product_id, rank, score DESC, source
+            ), non_fuzzy AS (
+                SELECT non_fuzzy_best.* FROM non_fuzzy_best
+            ), fuzzy_match_values AS (
+                SELECT p.id AS product_id, 'name'::text AS source, catalog_public_search_normalize_v1(p.name) AS value
+                FROM catalog_products p CROSS JOIN params
+                WHERE p.status = 'published' AND catalog_public_search_normalize_v1(p.name) % params.query
+                UNION ALL
+                SELECT p.id, 'category', catalog_public_search_normalize_v1(c.label)
+                FROM catalog_categories c CROSS JOIN params
+                JOIN catalog_products p ON p.category_id = c.id
+                WHERE p.status = 'published' AND catalog_public_search_normalize_v1(c.label) % params.query
+                UNION ALL
+                SELECT p.id, 'modality', catalog_public_search_normalize_v1(CASE p.modality
+                    WHEN 'physical_personalized' THEN 'Produto físico personalizado'
+                    WHEN 'digital_personalized' THEN 'Produto digital personalizado'
+                    WHEN 'digital_ready' THEN 'Produto digital' END)
+                FROM catalog_products p CROSS JOIN params
+                WHERE p.status = 'published' AND catalog_public_search_normalize_v1(CASE p.modality
+                    WHEN 'physical_personalized' THEN 'Produto físico personalizado'
+                    WHEN 'digital_personalized' THEN 'Produto digital personalizado'
+                    WHEN 'digital_ready' THEN 'Produto digital' END) % params.query
+                UNION ALL
+                SELECT p.id, t.type, catalog_public_search_normalize_v1(t.label)
+                FROM catalog_taxonomy_terms t CROSS JOIN params
+                JOIN catalog_product_taxonomy pt ON pt.taxonomy_term_id = t.id
+                JOIN catalog_products p ON p.id = pt.product_id
+                WHERE p.status = 'published' AND catalog_public_search_normalize_v1(t.label) % params.query AND (
+                    (t.type IN ('theme', 'occasion', 'search_alias') AND pt.is_protected = false)
+                    OR (t.type = 'character' AND pt.is_protected = true AND pt.verification_status = 'verified')
+                )
+            ), fuzzy_scored AS (
+                SELECT fmv.*, 3 AS rank, similarity(fmv.value, params.query) AS score
+                FROM fuzzy_match_values fmv CROSS JOIN params
+            ), fuzzy_best AS (
+                SELECT DISTINCT ON (product_id) * FROM fuzzy_scored
+                ORDER BY product_id, score DESC, source
+            ), fuzzy AS (
+                SELECT fuzzy_best.* FROM fuzzy_best
+                JOIN catalog_products p ON p.id = fuzzy_best.product_id
+                CROSS JOIN params
+                ORDER BY score DESC, p.published_at DESC, product_id DESC LIMIT (SELECT candidate_limit FROM params)
+            ), eligible AS (
+                SELECT * FROM non_fuzzy UNION ALL SELECT * FROM fuzzy
+            ), best AS (
+                SELECT DISTINCT ON (product_id) product_id, rank, score
+                FROM eligible ORDER BY product_id, rank, score DESC, source
+            ), ranked AS (
+                SELECT p.id, p.slug, p.name, p.description, p.modality, p.price_minor, p.currency,
+                       p.availability, p.delivery_type, p.production_lead_time_days, p.is_immediate_delivery,
+                       p.compatibility, p.published_at, c.slug AS category_slug, c.label AS category_label,
+                       best.rank AS __rank, best.score AS __score
+                FROM best JOIN catalog_products p ON p.id = best.product_id
+                JOIN catalog_categories c ON c.id = p.category_id
+                WHERE p.status = 'published'
+            ), meta AS (
+                SELECT count(*) AS total,
+                       count(*) FILTER (WHERE __rank <= 1) AS total_exact,
+                       count(*) FILTER (WHERE __rank >= 2) AS total_similar
+                FROM ranked
+            ), page_rows AS (
+                SELECT ranked.* FROM ranked CROSS JOIN params
+                ORDER BY __rank, __score DESC, published_at DESC, id DESC
+                OFFSET (SELECT page_offset FROM params) LIMIT (SELECT page_limit FROM params)
+            )
+            SELECT page_rows.*, meta.total AS __total, meta.total_exact AS __total_exact,
+                   meta.total_similar AS __total_similar
+            FROM meta LEFT JOIN page_rows ON true
+            ORDER BY page_rows.__rank, page_rows.__score DESC, page_rows.published_at DESC, page_rows.id DESC
+        SQL;
+    }
+
+    /** @return list<PublicCatalogSearchSuggestion> */
+    private function searchSuggestions(string $query): array
+    {
+        $rows = DB::select(<<<'SQL'
+            WITH editorial AS (
+                SELECT c.label, c.slug AS key
+                FROM catalog_categories c JOIN catalog_products p ON p.category_id = c.id
+                WHERE p.status = 'published'
+                UNION
+                SELECT t.label, t.canonical_key
+                FROM catalog_taxonomy_terms t
+                JOIN catalog_product_taxonomy pt ON pt.taxonomy_term_id = t.id
+                JOIN catalog_products p ON p.id = pt.product_id
+                WHERE p.status = 'published' AND pt.is_protected = false AND t.type IN ('theme', 'occasion')
+            )
+            SELECT label FROM (
+                SELECT DISTINCT ON (catalog_public_search_normalize_v1(label)) label,
+                       CASE
+                         WHEN catalog_public_search_normalize_v1(label) = ?::text THEN 2.0
+                         WHEN left(catalog_public_search_normalize_v1(label), length(?::text)) = ?::text THEN 1.5
+                         ELSE similarity(catalog_public_search_normalize_v1(label), ?::text)
+                       END AS score,
+                       catalog_public_search_normalize_v1(label) AS normalized_label
+                FROM editorial
+                ORDER BY catalog_public_search_normalize_v1(label), score DESC, label
+            ) ranked_suggestions
+            ORDER BY score DESC, normalized_label, label
+            LIMIT 6
+        SQL, [$query, $query, $query, $query]);
+        $suggestions = [];
+        foreach ($rows as $row) {
+            $label = $this->canonicalSuggestionLabel((string) $row->label);
+            if ($label !== null) {
+                $suggestions[] = new PublicCatalogSearchSuggestion($label, '/buscar?q='.rawurlencode($label));
+            }
+        }
+
+        return $suggestions;
+    }
+
+    private function searchIntent(PublicCatalogSearchCriteria $criteria, int $total): PublicCatalogSearchIntent
+    {
+        $invitation = false;
+        if ($total === 0) {
+            foreach ((array) config('catalog.search_invitation_vocabulary', ['convite', 'convites']) as $term) {
+                $normalized = PublicCatalogSearchCriteria::normalize((string) $term);
+                if ($normalized !== '' && preg_match('/(?:^|\s)'.preg_quote($normalized, '/').'(?:\s|$)/u', $criteria->normalizedQuery) === 1) {
+                    $invitation = true;
+                    break;
+                }
+            }
+        }
+
+        return new PublicCatalogSearchIntent(
+            $invitation ? 'invitation' : 'generic',
+            $criteria->query,
+            $invitation ? '/produtos?modality=digital_personalized#busca='.rawurlencode($criteria->query) : null,
+        );
     }
 
     private function publishedQuery(PublicCatalogFilters $filters): Builder
@@ -174,15 +453,19 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery
     }
 
     /** @return array<string, string> */
-    private function filterLabels(PublicCatalogFilters $filters): array
+    /** @param list<array<string, mixed>> $rows */
+    private function filterLabels(PublicCatalogFilters $filters, array $rows): array
     {
         $labels = [];
         if ($filters->category !== null) {
-            $label = DB::table('catalog_categories as c')
-                ->join('catalog_products as p', 'p.category_id', '=', 'c.id')
-                ->where('p.status', 'published')
-                ->where('c.slug', $filters->category)
-                ->value('c.label');
+            $label = $rows[0]['category_label'] ?? null;
+            if (! is_string($label)) {
+                $label = DB::table('catalog_categories as c')
+                    ->join('catalog_products as p', 'p.category_id', '=', 'c.id')
+                    ->where('p.status', 'published')
+                    ->where('c.slug', $filters->category)
+                    ->value('c.label');
+            }
             if (is_string($label)) {
                 $labels['category'] = $label;
             }
@@ -217,13 +500,31 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery
         ];
     }
 
-    private function withStatementTimeout(callable $operation): mixed
+    private function withStatementTimeout(callable $operation, string $configKey = 'catalog.public_read_statement_timeout_ms'): mixed
     {
-        return DB::transaction(function () use ($operation): mixed {
-            $milliseconds = max(100, min(30000, (int) config('catalog.public_read_statement_timeout_ms', 3000)));
+        return DB::transaction(function () use ($operation, $configKey): mixed {
+            $maximum = $configKey === 'catalog.search_statement_timeout_ms' ? 5000 : 30000;
+            $milliseconds = max(100, min($maximum, (int) config($configKey, 3000)));
             DB::select("SELECT set_config('statement_timeout', ?, true)", [$milliseconds.'ms']);
 
             return $operation();
         }, 1);
+    }
+
+    private function canonicalSuggestionLabel(string $label): ?string
+    {
+        if (preg_match('/[\p{Cc}\p{Cf}]/u', $label) === 1) {
+            return null;
+        }
+        $canonical = Normalizer::normalize($label, Normalizer::FORM_KC);
+        if (! is_string($canonical)) {
+            return null;
+        }
+        $canonical = trim((string) preg_replace('/[\p{Z}\s]+/u', ' ', $canonical));
+        if (mb_strlen($canonical) < 2 || mb_strlen($canonical) > 120 || strlen($canonical) > 512) {
+            return null;
+        }
+
+        return $canonical;
     }
 }

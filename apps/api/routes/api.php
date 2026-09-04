@@ -6,6 +6,7 @@ use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublicCatalogFacetsContro
 use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublishedCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\ListPublicCatalogProductsController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\PublishCatalogProductController;
+use App\Modules\Catalog\Interfaces\Http\Controllers\SearchPublicCatalogController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\UnpublishCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\UpdateCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Middleware\CatalogAdminAuthorization;
@@ -27,6 +28,10 @@ Route::prefix('v1')->group(function (): void {
             ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('api.v1.catalog.products.show');
         Route::get('/facets', GetPublicCatalogFacetsController::class)->name('api.v1.catalog.facets.index');
     });
+
+    Route::get('/catalog/search', SearchPublicCatalogController::class)
+        ->middleware([PublicCatalogNoStore::class, 'throttle:public-catalog-search'])
+        ->name('api.v1.catalog.search');
 
     Route::prefix('admin/catalog/products')
         ->middleware(CatalogAdminAuthorization::class)

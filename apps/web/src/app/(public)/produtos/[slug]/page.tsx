@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CatalogApiError, fetchCatalogProduct, parseCatalogSearchParams } from '@/bff/catalogApi';
+import { CatalogApiError, fetchCatalogProduct, parseCatalogSearchParams, parsePublicSearchParams } from '@/bff/catalogApi';
 import { CatalogState } from '@/features/catalog/CatalogState';
 import { catalogContent } from '@/features/public-store/publicLayoutContent';
 
@@ -46,7 +46,7 @@ function safeReturnHref(value: string | string[] | undefined): string {
   if (typeof value !== 'string') return '/produtos';
   try {
     const url = new URL(value, 'http://same-origin.invalid');
-    if (url.origin !== 'http://same-origin.invalid' || url.pathname !== '/produtos') return '/produtos';
+    if (url.origin !== 'http://same-origin.invalid' || !['/produtos', '/buscar'].includes(url.pathname)) return '/produtos';
     const params: Record<string, string> = {};
     const seen = new Set<string>();
     for (const [key, paramValue] of url.searchParams.entries()) {
@@ -54,7 +54,12 @@ function safeReturnHref(value: string | string[] | undefined): string {
       seen.add(key);
       params[key] = paramValue;
     }
-    parseCatalogSearchParams(params);
+    if (url.pathname === '/buscar') {
+      const criteria = parsePublicSearchParams(params);
+      if (criteria.query === null) return '/produtos';
+    } else {
+      parseCatalogSearchParams(params);
+    }
     return `${url.pathname}${url.search}`;
   } catch {
     return '/produtos';

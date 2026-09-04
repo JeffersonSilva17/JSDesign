@@ -256,7 +256,6 @@ test('placeholders transacionais não são indexáveis', async ({ page }) => {
 
 test('rotas placeholder públicas renderizam conteúdo honesto', async ({ page }) => {
   const placeholderRoutes = [
-    { path: '/buscar', heading: 'Buscar' },
     { path: '/carrinho', heading: 'Carrinho' },
     { path: '/entrar', heading: 'Área da Cliente' },
     { path: '/suporte', heading: 'Suporte' },

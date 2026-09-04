@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     template: `%s | ${publicContent.brand.name}`,
   },
   description: publicContent.metadata.root.description,
+  referrer: 'strict-origin-when-cross-origin',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
