@@ -4,9 +4,10 @@ import Link from 'next/link';
 import type { CatalogCard as CatalogCardData } from '@/bff/catalogApi';
 import { catalogContent } from '@/features/public-store/publicLayoutContent';
 
-export function CatalogCard({ product, preload = false, returnHref = '/produtos' }: Readonly<{ product: CatalogCardData; preload?: boolean; returnHref?: string }>) {
+export function CatalogCard({ product, preload = false, returnHref = '/produtos', headingLevel = 2 }: Readonly<{ product: CatalogCardData; preload?: boolean; returnHref?: string; headingLevel?: 2 | 3 | 4 }>) {
   const price = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: product.currency }).format(product.price_minor / 100);
   const detailHref = `/produtos/${encodeURIComponent(product.slug)}?return_to=${encodeURIComponent(returnHref)}`;
+  const Heading = `h${headingLevel}` as const;
   return (
     <article className="catalog-card" aria-labelledby={`product-${product.id}`}>
       <div className="catalog-card__media">
@@ -15,7 +16,7 @@ export function CatalogCard({ product, preload = false, returnHref = '/produtos'
       <div className="catalog-card__body">
         <p className="catalog-card__modality">{catalogContent.modality[product.modality]}</p>
         <p className="catalog-card__availability">{catalogContent.availability[product.availability]}</p>
-        <h2 id={`product-${product.id}`}>{product.name}</h2>
+        <Heading id={`product-${product.id}`}>{product.name}</Heading>
         <p>{product.description_excerpt}</p>
         {product.compatibility_excerpt && <p>{product.compatibility_excerpt}</p>}
         {product.is_immediate_delivery && <p className="catalog-card__delivery">{catalogContent.card.immediate}</p>}

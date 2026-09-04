@@ -82,6 +82,32 @@ export type PublicContent = Readonly<{
     availability: Readonly<Record<'available' | 'unavailable' | 'made_to_order', string>>;
     metadata: Readonly<{ products: MetadataContent; categories: MetadataContent; detail: MetadataContent }>;
   }>;
+  search: Readonly<{
+    metadata: MetadataContent;
+    eyebrow: string;
+    title: string;
+    description: string;
+    form: Readonly<{ label: string; placeholder: string; submit: string; help: string; error: string }>;
+    initial: Readonly<{ title: string; description: string; categories: string; editorialSuggestions: string }>;
+    exact: Readonly<{ title: string; categoryPrefix: string }>;
+    similar: Readonly<{ title: string; description: string }>;
+    suggestions: Readonly<{ title: string }>;
+    termLabel: string;
+    invitation: Readonly<{ title: string; description: string; action: string }>;
+    states: Readonly<{
+      emptyTitle: string;
+      emptyDescription: string;
+      invalidTitle: string;
+      invalidDescription: string;
+      unavailableTitle: string;
+      unavailableDescription: string;
+      outOfRangeTitle: string;
+      outOfRangeDescription: string;
+      retry: string;
+      lastPage: string;
+    }>;
+    pagination: Readonly<{ label: string; previous: string; next: string }>;
+  }>;
   footer: Readonly<{
     eyebrow: string;
     title: string;

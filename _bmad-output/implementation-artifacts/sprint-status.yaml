@@ -1,5 +1,5 @@
 # generated: 2026-07-31
-# last_updated: 2026-08-25
+# last_updated: 2026-09-02
 # project: JSDESIGN
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: "2026-07-31"
-last_updated: "2026-08-25"
+last_updated: "2026-09-04"
 project: "JSDESIGN"
 project_key: "NOKEY"
 tracking_system: "file-system"
@@ -58,7 +58,7 @@ development_status:
   epic-2: in-progress
   2-1-cadastrar-produtos-com-estrutura-de-catalogo-comercial: done
   2-2-exibir-listagens-publicas-por-categoria-ocasiao-e-tipo: done
-  2-3-implementar-busca-publica-por-intencao: backlog
+  2-3-implementar-busca-publica-por-intencao: done
   2-4-preparar-paginas-publicas-de-catalogo-para-seo-e-compartilhamento: backlog
   epic-2-retrospective: optional
   epic-3: backlog

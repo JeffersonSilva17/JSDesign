@@ -2,11 +2,13 @@ import 'server-only';
 
 import { getApiInternalUrl } from '@/bff/apiClient';
 import { CatalogApiError } from '@/bff/catalogErrors';
+import type { CatalogSearchCriteria } from '@/bff/catalogSearchParams';
 import { fetchCatalogJson } from '@/bff/catalogTransport';
 import {
   isCatalogFacetsEnvelope,
   isCatalogListingPayload,
   isCatalogProductEnvelope,
+  isCatalogSearchPayload,
 } from '@/bff/catalogValidation';
 
 export type CatalogModality =
@@ -54,6 +56,25 @@ export type CatalogListing = Readonly<{
     total: number;
     applied_filters: Readonly<Partial<Record<'category' | 'occasion' | 'modality', string>>>;
     filter_labels: Readonly<Partial<Record<'category' | 'occasion' | 'modality', string>>>;
+  }>;
+}>;
+export type { CatalogSearchCriteria } from '@/bff/catalogSearchParams';
+export { parsePublicSearchParams, publicSearchHref } from '@/bff/catalogSearchParams';
+export type CatalogSearchResult = Readonly<{
+  data: Readonly<{
+    exact_groups: readonly Readonly<{ category: Readonly<{ slug: string; label: string }>; items: readonly CatalogCard[] }>[];
+    similar: readonly CatalogCard[];
+    suggestions: readonly Readonly<{ label: string; href: string }>[];
+    intent: Readonly<{ type: 'generic' | 'invitation'; preserved_term: string; handoff_href: string | null }>;
+  }>;
+  meta: Readonly<{
+    query: string;
+    current_page: number;
+    per_page: number;
+    last_page: number;
+    total: number;
+    total_exact: number;
+    total_similar: number;
   }>;
 }>;
 
@@ -126,6 +147,17 @@ export async function fetchCatalogProduct(slug: string): Promise<CatalogProduct>
     throw new CatalogApiError('invalid-payload');
   }
   return (payload as { data: CatalogProduct }).data;
+}
+
+export async function fetchPublicCatalogSearch(criteria: CatalogSearchCriteria): Promise<CatalogSearchResult> {
+  if (criteria.query === null) throw new CatalogApiError('invalid-filter');
+  const url = apiUrl('/api/v1/catalog/search');
+  url.searchParams.set('q', criteria.query);
+  url.searchParams.set('page', String(criteria.page));
+  url.searchParams.set('per_page', '12');
+  const payload = await fetchCatalogJson(url);
+  if (!isCatalogSearchPayload(payload, { query: criteria.query, page: criteria.page, perPage: 12 })) throw new CatalogApiError('invalid-payload');
+  return payload as CatalogSearchResult;
 }
 
 function apiUrl(path: string): URL {

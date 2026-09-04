@@ -101,7 +101,7 @@ export const publicContent = {
       eyebrow: 'Próximos caminhos',
       title: 'Continue explorando',
       description:
-        'Use Produtos, Categorias ou Buscar para continuar a descoberta. Essas rotas permanecem honestamente em preparação até receberem catálogo e busca reais.',
+        'Use Produtos, Categorias ou Buscar para explorar o catálogo público e encontrar opções por tema, produto ou ocasião.',
     },
   },
   catalog: {
@@ -157,6 +157,50 @@ export const publicContent = {
       },
     },
   },
+  search: {
+    metadata: {
+      title: 'Buscar produtos',
+      description: 'Busca pública da JS Designs por produto, categoria, tema, ocasião ou tipo.',
+    },
+    eyebrow: 'Descoberta por intenção',
+    title: 'Buscar',
+    description: 'Encontre produtos publicados por nome, categoria, tipo, tema ou ocasião.',
+    form: {
+      label: 'O que você procura?',
+      placeholder: 'Ex.: convite de aniversário',
+      submit: 'Buscar produtos',
+      help: 'Use de 2 a 120 caracteres. Não inclua dados pessoais: o termo ficará no endereço da página.',
+      error: 'Revise o termo informado antes de buscar.',
+    },
+    initial: {
+      title: 'Comece por uma ideia',
+      description: 'Digite um termo ou explore categorias e ocasiões públicas disponíveis.',
+      categories: 'Categorias principais',
+      editorialSuggestions: 'Sugestões editoriais',
+    },
+    exact: { title: 'Resultados exatos', categoryPrefix: 'Categoria' },
+    similar: { title: 'Resultados semelhantes', description: 'Estas opções se aproximam do termo informado.' },
+    suggestions: { title: 'Você também pode buscar por' },
+    termLabel: 'Termo buscado',
+    invitation: {
+      title: 'Seu tema pode virar um convite personalizado',
+      description: 'Os temas de convite não formam uma lista fechada. Explore os convites digitais personalizados disponíveis.',
+      action: 'Descobrir convites digitais personalizados',
+    },
+    states: {
+      emptyTitle: 'Nenhum resultado encontrado',
+      emptyDescription: 'Tente outro nome, tema, categoria ou ocasião usando as sugestões abaixo.',
+      invalidTitle: 'Busca inválida',
+      invalidDescription: 'O termo precisa ter entre 2 e 120 caracteres e usar um formato válido.',
+      unavailableTitle: 'Busca temporariamente indisponível',
+      unavailableDescription: 'Não foi possível consultar os produtos agora. Seu termo continua no formulário para você tentar novamente.',
+      outOfRangeTitle: 'Página fora do intervalo',
+      outOfRangeDescription: 'Esta página não existe para a busca informada.',
+      retry: 'Tentar novamente',
+      lastPage: 'Voltar para a última página',
+    },
+    pagination: { label: 'Paginação dos resultados da busca', previous: 'Página anterior', next: 'Próxima página' },
+  },
   footer: {
     eyebrow: 'JS Designs',
     title: 'Papelaria afetiva com direção autoral.',
@@ -198,16 +242,6 @@ export const publicContent = {
     ],
   },
   placeholders: {
-    buscar: {
-      title: 'Buscar',
-      eyebrow: 'Busca em preparação',
-      description:
-        'A busca por tema, produto ou ocasião será implementada depois. Por enquanto, este espaço confirma o caminho público de descoberta.',
-      metadata: {
-        title: 'Busca em preparação',
-        description: 'Busca pública da JS Designs em preparação para temas, produtos e ocasiões.',
-      },
-    },
     carrinho: {
       title: 'Carrinho',
       eyebrow: 'Carrinho em preparação',

@@ -2,6 +2,22 @@ openapi: 3.1.0
 info: { title: JS Designs Public Catalog API, version: 1.0.0 }
 servers: [{ url: /api/v1 }]
 paths:
+  /catalog/search:
+    get:
+      operationId: searchPublicCatalog
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Termo Unicode normalizado; entre 2 e 120 caracteres, no máximo 512 bytes e sem controles invisíveis.
+          schema: { type: string, minLength: 2, maxLength: 120 }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 48, default: 12 } }
+      responses:
+        '200': { description: Resultados publicados ordenados por relevância; resposta não armazenável, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SearchEnvelope' } } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
   /catalog/products:
     get:
       operationId: listPublicCatalogProducts
@@ -33,6 +49,10 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/Unavailable' }
 components:
+  headers:
+    NoStore:
+      description: Impede armazenamento de resultados de busca em caches intermediários.
+      schema: { type: string, const: 'no-store, private' }
   schemas:
     Modality: { type: string, enum: [physical_personalized, digital_personalized, digital_ready] }
     Category: { type: object, required: [slug, label], additionalProperties: false, properties: { slug: { type: string, maxLength: 160, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }, label: { type: string } } }
@@ -119,6 +139,62 @@ components:
               type: object
               additionalProperties: false
               properties: { category: { type: string }, occasion: { type: string }, modality: { type: string } }
+    SearchSuggestion:
+      type: object
+      required: [label, href]
+      additionalProperties: false
+      properties:
+        label: { type: string }
+        href:
+          type: string
+          description: Link same-origin permitido somente para nova busca pelo label sugerido.
+          pattern: '^/buscar\?q=[^#&]+$'
+    SearchIntent:
+      type: object
+      required: [type, preserved_term, handoff_href]
+      additionalProperties: false
+      properties:
+        type: { type: string, enum: [generic, invitation] }
+        preserved_term: { type: string, minLength: 2, maxLength: 120 }
+        handoff_href:
+          oneOf:
+            - type: string
+              description: Link same-origin permitido somente para descoberta de convites digitais com termo preservado no fragmento.
+              pattern: '^/produtos\?modality=digital_personalized#busca=[^#&]+$'
+            - type: 'null'
+    SearchExactGroup:
+      type: object
+      required: [category, items]
+      additionalProperties: false
+      properties:
+        category: { $ref: '#/components/schemas/Category' }
+        items: { type: array, items: { $ref: '#/components/schemas/ProductCard' } }
+    SearchEnvelope:
+      type: object
+      required: [data, meta]
+      additionalProperties: false
+      properties:
+        data:
+          type: object
+          required: [exact_groups, similar, suggestions, intent]
+          additionalProperties: false
+          properties:
+            exact_groups: { type: array, items: { $ref: '#/components/schemas/SearchExactGroup' } }
+            similar: { type: array, items: { $ref: '#/components/schemas/ProductCard' } }
+            suggestions: { type: array, maxItems: 6, uniqueItems: true, items: { $ref: '#/components/schemas/SearchSuggestion' } }
+            intent: { $ref: '#/components/schemas/SearchIntent' }
+        meta:
+          type: object
+          required: [query, current_page, per_page, last_page, total, total_exact, total_similar]
+          additionalProperties: false
+          properties:
+            query: { type: string, minLength: 2, maxLength: 120 }
+            current_page: { type: integer, minimum: 1, maximum: 1000 }
+            per_page: { type: integer, minimum: 1, maximum: 48 }
+            last_page: { type: integer, minimum: 1 }
+            total: { type: integer, minimum: 0 }
+            total_exact: { type: integer, minimum: 0 }
+            total_similar: { type: integer, minimum: 0 }
     FacetsEnvelope:
       type: object
       required: [data]
@@ -132,8 +208,32 @@ components:
             categories: { type: array, items: { $ref: '#/components/schemas/Category' } }
             occasions: { type: array, items: { type: object, required: [key, label], additionalProperties: false, properties: { key: { type: string }, label: { type: string } } } }
             modalities: { type: array, items: { type: object, required: [value, label], additionalProperties: false, properties: { value: { $ref: '#/components/schemas/Modality' }, label: { type: string } } } }
+    SimpleErrorEnvelope:
+      type: object
+      required: [message]
+      additionalProperties: false
+      properties:
+        message: { type: string }
+    ValidationErrorEnvelope:
+      type: object
+      required: [message, errors]
+      additionalProperties: false
+      properties:
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+    RateLimitErrorEnvelope:
+      type: object
+      required: [message, retry_after]
+      additionalProperties: false
+      properties:
+        message: { type: string }
+        retry_after: { type: integer, minimum: 1 }
   responses:
-    ValidationError: { description: Consulta inválida, content: { application/json: { schema: { type: object, required: [message, errors] } } } }
-    NotFound: { description: Produto não encontrado, content: { application/json: { schema: { type: object, required: [message] } } } }
-    RateLimited: { description: Limite excedido, content: { application/json: { schema: { type: object, required: [message, retry_after] } } } }
-    Unavailable: { description: Temporariamente indisponível, content: { application/json: { schema: { type: object, required: [message] } } } }
+    ValidationError: { description: Consulta inválida, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/ValidationErrorEnvelope' } } } }
+    NotFound: { description: Produto não encontrado, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }
+    RateLimited: { description: Limite excedido, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/RateLimitErrorEnvelope' } } } }
+    Unavailable: { description: Temporariamente indisponível, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }
