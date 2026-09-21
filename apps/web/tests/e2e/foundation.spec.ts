@@ -131,7 +131,11 @@ test('home mantém descoberta honesta, indexável e sem linguagem transacional s
     'content',
     publicContent.metadata.home.description,
   );
-  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  if (process.env.SEO_INDEXING_ENABLED === 'true') {
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  } else {
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  }
 
   const mainText = await page.getByRole('main').innerText();
   expect(mainText).toMatch(/produto digital/i);

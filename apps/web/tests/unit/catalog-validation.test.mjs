@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
+  isCatalogFacetsEnvelope,
   isCatalogListingPayload,
   isCatalogSearchPayload,
   isSafeCatalogImagePath,
@@ -51,12 +52,24 @@ test('rejeita payload malformado, preço inventado e URL de imagem insegura', ()
   for (const path of ['//unsafe.example/a.jpg', '/media/../secret', '/media\\a.jpg', '/media/a.jpg#x', '/media/a.jpg?v=1']) {
     assert.equal(isSafeCatalogImagePath(path), false);
   }
+  assert.equal(isSafeCatalogImagePath('/catalog-e2e-product.svg'), true);
   assert.equal(isSafeCatalogImagePath('/missing-public-file.jpg'), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), id: 'not-a-uuid' })), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), slug: 'x'.repeat(181) })), false);
+  assert.equal(isCatalogListingPayload(listing({ ...product(), name: 'x'.repeat(181) })), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), category: { slug: '../segredo', label: 'Festas' } })), false);
+  assert.equal(isCatalogListingPayload(listing({ ...product(), category: { slug: 'festas', label: 'x'.repeat(161) } })), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), description_excerpt: 'x'.repeat(241) })), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), compatibility_excerpt: 'x'.repeat(121) })), false);
+});
+
+test('facetas aceitas geram links parseáveis e rejeitam termos quebrados', () => {
+  const facets = { data: { categories: [{ slug: 'festas', label: 'Festas' }], occasions: [{ key: 'aniversario', label: 'Aniversário' }], modalities: [{ value: 'digital_ready', label: 'Produto digital' }] } };
+  assert.equal(isCatalogFacetsEnvelope(facets), true);
+  assert.equal(isCatalogFacetsEnvelope({ data: { ...facets.data, occasions: [{ key: 'Aniversário', label: 'Aniversário' }] } }), false);
+  assert.equal(isCatalogFacetsEnvelope({ data: { ...facets.data, occasions: [{ key: 'aniversario', label: 'x' }] } }), false);
+  assert.equal(isCatalogFacetsEnvelope({ data: { ...facets.data, categories: [{ slug: 'festas', label: 'x'.repeat(161) }] } }), false);
+  assert.equal(isCatalogFacetsEnvelope({ data: { ...facets.data, modalities: [{ value: 'digital_ready', label: 'x'.repeat(161) }] } }), false);
 });
 
 test('aceita envelope fechado de busca e rejeita campos internos ou extras', () => {

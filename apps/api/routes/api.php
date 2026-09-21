@@ -5,17 +5,23 @@ use App\Modules\Catalog\Interfaces\Http\Controllers\CreateCatalogProductControll
 use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublicCatalogFacetsController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublishedCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\ListPublicCatalogProductsController;
+use App\Modules\Catalog\Interfaces\Http\Controllers\PublicCatalogSitemapController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\PublishCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\SearchPublicCatalogController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\UnpublishCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\UpdateCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Middleware\CatalogAdminAuthorization;
 use App\Modules\Catalog\Interfaces\Http\Middleware\PublicCatalogNoStore;
+use App\Modules\Catalog\Interfaces\Http\Middleware\SitemapClientIdentity;
 use App\Modules\Promotions\Interfaces\Http\Controllers\FirstPurchaseCouponController;
 use App\Modules\Promotions\Interfaces\Http\Controllers\FirstPurchaseOfferController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
+    Route::prefix('catalog')->middleware([PublicCatalogNoStore::class, SitemapClientIdentity::class, 'throttle:public-catalog-sitemap'])->group(function (): void {
+        Route::get('/sitemap', [PublicCatalogSitemapController::class, 'products']);
+        Route::get('/sitemap-facets', [PublicCatalogSitemapController::class, 'facets']);
+    });
     Route::get('/health', HealthController::class)->name('api.v1.health');
     Route::get('/promotions/first-purchase-offer', FirstPurchaseOfferController::class)
         ->name('api.v1.promotions.first-purchase-offer');

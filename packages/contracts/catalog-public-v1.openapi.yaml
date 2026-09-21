@@ -2,6 +2,29 @@ openapi: 3.1.0
 info: { title: JS Designs Public Catalog API, version: 1.0.0 }
 servers: [{ url: /api/v1 }]
 paths:
+  /catalog/sitemap:
+    get:
+      operationId: listPublicCatalogSitemap
+      description: Lote fixo de 500 slugs publicados, ordenado por ID. Query aceita somente page canônico único. Sem snapshot entre requisições; sem cache persistente. Cota de crawl independente da navegação.
+      parameters:
+        - { name: page, in: query, required: true, schema: { type: integer, minimum: 1, maximum: 10000 } }
+      responses:
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '200': { description: Lote completo inclusive página 1 vazia, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SitemapPage' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /catalog/sitemap-facets:
+    get:
+      operationId: getPublicCatalogSitemapFacets
+      description: Categorias com produtos publicados, sem query; máximo 4998 categorias. Excesso retorna 503, sem truncamento. Compartilha somente a cota de sitemap.
+      responses:
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '200': { description: Projeção editorial limitada, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SitemapFacets' } } } }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/Unavailable' }
   /catalog/search:
     get:
       operationId: searchPublicCatalog
@@ -53,7 +76,40 @@ components:
     NoStore:
       description: Impede armazenamento de resultados de busca em caches intermediários.
       schema: { type: string, const: 'no-store, private' }
+    RetryAfter:
+      description: Segundos até uma nova tentativa recomendada.
+      schema: { type: integer, minimum: 1 }
   schemas:
+    SitemapPage:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          maxItems: 500
+          uniqueItems: true
+          items: { type: object, additionalProperties: false, required: [slug], properties: { slug: { type: string, maxLength: 180, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' } } }
+        meta:
+          type: object
+          additionalProperties: false
+          required: [current_page, per_page, last_page, total]
+          properties:
+            current_page: { type: integer, minimum: 1, maximum: 10000 }
+            per_page: { type: integer, const: 500 }
+            last_page: { type: integer, minimum: 1, maximum: 10000 }
+            total: { type: integer, minimum: 0, maximum: 5000000 }
+    SitemapFacets:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          type: object
+          additionalProperties: false
+          required: [categories]
+          properties:
+            categories: { type: array, maxItems: 4998, uniqueItems: true, items: { $ref: '#/components/schemas/Category' } }
     Modality: { type: string, enum: [physical_personalized, digital_personalized, digital_ready] }
     Category: { type: object, required: [slug, label], additionalProperties: false, properties: { slug: { type: string, maxLength: 160, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }, label: { type: string } } }
     Image: { type: object, required: [url, alt_text], additionalProperties: false, properties: { url: { type: string, pattern: '^/(?!/)(?!.*(?:\\.\\.|%2[eE]%2[eE]))[^\\\\#?\\x00-\\x1F\\x7F]+$' }, alt_text: { type: string } } }
@@ -234,6 +290,7 @@ components:
         retry_after: { type: integer, minimum: 1 }
   responses:
     ValidationError: { description: Consulta inválida, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/ValidationErrorEnvelope' } } } }
-    NotFound: { description: Produto não encontrado, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }
-    RateLimited: { description: Limite excedido, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/RateLimitErrorEnvelope' } } } }
-    Unavailable: { description: Temporariamente indisponível, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }
+    Forbidden: { description: Header interno X-Catalog-Client presente com assinatura inválida ou expirada. Sem header a cota usa o socket remoto., headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }
+    NotFound: { description: Recurso público não encontrado, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }
+    RateLimited: { description: Limite excedido, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' }, Retry-After: { $ref: '#/components/headers/RetryAfter' } }, content: { application/json: { schema: { $ref: '#/components/schemas/RateLimitErrorEnvelope' } } } }
+    Unavailable: { description: Temporariamente indisponível, headers: { Cache-Control: { $ref: '#/components/headers/NoStore' }, Retry-After: { $ref: '#/components/headers/RetryAfter' } }, content: { application/json: { schema: { $ref: '#/components/schemas/SimpleErrorEnvelope' } } } }

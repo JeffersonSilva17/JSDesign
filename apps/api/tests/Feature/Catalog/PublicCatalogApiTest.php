@@ -6,6 +6,7 @@ use App\Modules\Catalog\Application\Queries\PublicCatalogFilters;
 use App\Modules\Catalog\Application\Queries\PublicCatalogImageResolver;
 use App\Modules\Catalog\Application\Queries\PublicCatalogPage;
 use App\Modules\Catalog\Application\Queries\PublicCatalogQuery;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSitemapPage;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -190,6 +191,16 @@ final class PublicCatalogApiTest extends TestCase
                 ]], 1, 12, 1, 1);
             }
 
+            public function sitemapPage(int $page): PublicCatalogSitemapPage
+            {
+                throw new \LogicException('Not used');
+            }
+
+            public function sitemapCategories(): array
+            {
+                throw new \LogicException('Not used');
+            }
+
             public function facets(): array
             {
                 return [];
@@ -246,6 +257,16 @@ final class PublicCatalogApiTest extends TestCase
                 throw new QueryException('pgsql', 'select storage_reference from catalog_products', [], new \PDOException('SQL secret'));
             }
 
+            public function sitemapPage(int $page): PublicCatalogSitemapPage
+            {
+                throw new \LogicException('Not used');
+            }
+
+            public function sitemapCategories(): array
+            {
+                throw new \LogicException('Not used');
+            }
+
             public function facets(): array
             {
                 throw new QueryException('pgsql', 'select storage_reference from catalog_products', [], new \PDOException('SQL secret'));
@@ -268,6 +289,16 @@ final class PublicCatalogApiTest extends TestCase
             public function list(PublicCatalogFilters $filters): PublicCatalogPage
             {
                 throw new \RuntimeException('programming bug');
+            }
+
+            public function sitemapPage(int $page): PublicCatalogSitemapPage
+            {
+                throw new \LogicException('Not used');
+            }
+
+            public function sitemapCategories(): array
+            {
+                throw new \LogicException('Not used');
             }
 
             public function facets(): array

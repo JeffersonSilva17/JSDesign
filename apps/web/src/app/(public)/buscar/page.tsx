@@ -9,11 +9,12 @@ import { SearchResults } from '@/features/catalog-search/SearchResults';
 import { SearchState } from '@/features/catalog-search/SearchState';
 import { searchContent } from '@/features/public-store/publicLayoutContent';
 
+import { catalogMetadata } from '@/features/catalog-seo/catalogMetadata';
+
 type Props = Readonly<{ searchParams: Promise<Record<string, string | string[] | undefined>> }>;
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const parameterized = Object.keys(await searchParams).length > 0;
-  return { ...searchContent.metadata, robots: parameterized ? { index: false, follow: true } : undefined };
+export function generateMetadata(): Metadata {
+  return catalogMetadata(searchContent.metadata.title, searchContent.metadata.description);
 }
 
 export default async function BuscarPage({ searchParams }: Props) {

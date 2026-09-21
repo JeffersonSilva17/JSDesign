@@ -3,6 +3,8 @@
 use App\Modules\Catalog\Infrastructure\Config\CatalogSearchConfiguration;
 
 return [
+    'sitemap_client_key' => env('SITEMAP_CLIENT_KEY'),
+    'sitemap_rate_limit_per_minute' => CatalogSearchConfiguration::integer(env('CATALOG_SITEMAP_RATE_LIMIT_PER_MINUTE'), 60, 1, 240),
     'public_read_rate_limit_per_minute' => (int) env('CATALOG_PUBLIC_RATE_LIMIT_PER_MINUTE', 240),
     'public_read_statement_timeout_ms' => (int) env('CATALOG_PUBLIC_STATEMENT_TIMEOUT_MS', 3000),
     'search_similarity_threshold' => CatalogSearchConfiguration::decimal(env('CATALOG_SEARCH_SIMILARITY_THRESHOLD'), 0.30, 0.20, 0.80),

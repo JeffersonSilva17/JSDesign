@@ -57,10 +57,20 @@ jobs:
           php artisan key:generate --ansi
 
       - name: Run PostgreSQL migrations
-        run: DB_DATABASE=jsdesign_test php artisan migrate:fresh --force --ansi
+        env:
+          BOOTSTRAP_DB_USERNAME: jsdesign
+          BOOTSTRAP_DB_PASSWORD: jsdesign
+        run: |
+          php scripts/provision-local-security.php
+          php artisan migrate:fresh --env=testing --force --ansi
 
       - name: Run Laravel tests
         run: composer test
+
+      - name: Benchmark bounded sitemap reads
+        env:
+          CATALOG_SITEMAP_BENCHMARK: '1'
+        run: php artisan test --filter=CatalogSitemapBenchmarkTest
 
       - name: Run Laravel Pint
         run: vendor/bin/pint --test

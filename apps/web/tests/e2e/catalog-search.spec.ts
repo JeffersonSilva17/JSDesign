@@ -156,10 +156,12 @@ function percentile75(values: number[]): number {
 async function startIsolatedNextWithBrokenApi(): Promise<ChildProcess> {
   const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', '3012'], {
     cwd: process.cwd(),
-    env: { ...safeEnv(), API_INTERNAL_URL: 'http://127.0.0.1:65530', NODE_ENV: 'production' },
+    env: { ...safeEnv(), API_INTERNAL_URL: 'http://127.0.0.1:65530', SITE_URL: 'http://127.0.0.1:3012', SEO_INDEXING_ENABLED: process.env.SEO_INDEXING_ENABLED ?? 'false', NODE_ENV: 'production' },
     stdio: 'ignore',
   });
   for (let attempt = 0; attempt < 80; attempt += 1) {
+    // Loopback readiness probe for an isolated test server; no credentials or external traffic.
+    // nosemgrep: typescript.react.security.react-insecure-request.react-insecure-request
     try { await fetch('http://127.0.0.1:3012/buscar'); return server; } catch {}
     await new Promise((resolve) => setTimeout(resolve, 250));
   }

@@ -12,6 +12,7 @@ use App\Modules\Catalog\Application\Queries\PublicCatalogSearchIntent;
 use App\Modules\Catalog\Application\Queries\PublicCatalogSearchPage;
 use App\Modules\Catalog\Application\Queries\PublicCatalogSearchQuery;
 use App\Modules\Catalog\Application\Queries\PublicCatalogSearchSuggestion;
+use App\Modules\Catalog\Application\Queries\PublicCatalogSitemapPage;
 use App\Modules\Catalog\Application\Queries\PublicCatalogText;
 use App\Modules\Catalog\Domain\ProductModality;
 use App\Modules\Catalog\Infrastructure\Files\PublicImagePath;
@@ -24,6 +25,40 @@ use PDOException;
 final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, PublicCatalogSearchQuery
 {
     public function __construct(private PublicCatalogImageResolver $images) {}
+
+    public function sitemapPage(int $page): PublicCatalogSitemapPage
+    {
+        return $this->withStatementTimeout(function () use ($page): PublicCatalogSitemapPage {
+            $query = $this->publishedQuery(new PublicCatalogFilters);
+            // The aggregate and page share one PostgreSQL snapshot, including empty pages.
+            $rows = DB::query()->fromSub((clone $query)->selectRaw('count(*) as total'), 'totals')
+                ->leftJoinSub((clone $query)->select('p.slug', 'p.id')->orderBy('p.id')->offset(($page - 1) * 500)->limit(500), 'items', fn ($join) => $join->whereRaw('true'))
+                ->orderBy('items.id')->get(['items.slug', 'totals.total']);
+            $total = (int) $rows->first()->total;
+            if ($total > 5000000) {
+                throw new \OverflowException('Catalog sitemap limit');
+            }
+
+            return new PublicCatalogSitemapPage($rows->pluck('slug')->filter(fn ($slug) => $slug !== null)->values()->all(), $page, $total);
+        });
+    }
+
+    public function sitemapCategories(): array
+    {
+        return $this->withStatementTimeout(function (): array {
+            $categories = $this->categoryQuery()->limit(4999)->get(['c.slug', 'c.label'])->map(static fn (object $row): array => (array) $row)->all();
+            if (count($categories) > 4998) {
+                throw new \OverflowException('Catalog editorial limit');
+            }
+
+            return $categories;
+        });
+    }
+
+    private function categoryQuery(): Builder
+    {
+        return $this->publishedQuery(new PublicCatalogFilters)->distinct()->orderBy('c.label')->orderBy('c.slug');
+    }
 
     public function list(PublicCatalogFilters $filters): PublicCatalogPage
     {
@@ -54,8 +89,7 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
     public function facets(): array
     {
         return $this->withStatementTimeout(function (): array {
-            $categories = DB::table('catalog_categories as c')->join('catalog_products as p', 'p.category_id', '=', 'c.id')
-                ->where('p.status', 'published')->distinct()->orderBy('c.label')->orderBy('c.slug')
+            $categories = $this->categoryQuery()
                 ->get(['c.slug', 'c.label'])->map(static fn (object $row): array => (array) $row)->all();
             $occasions = DB::table('catalog_taxonomy_terms as t')
                 ->join('catalog_product_taxonomy as pt', 'pt.taxonomy_term_id', '=', 't.id')

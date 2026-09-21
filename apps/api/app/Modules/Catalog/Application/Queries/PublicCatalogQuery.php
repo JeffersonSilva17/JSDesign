@@ -4,6 +4,11 @@ namespace App\Modules\Catalog\Application\Queries;
 
 interface PublicCatalogQuery
 {
+    public function sitemapPage(int $page): PublicCatalogSitemapPage;
+
+    /** @return list<array{slug: string, label: string}> */
+    public function sitemapCategories(): array;
+
     public function list(PublicCatalogFilters $filters): PublicCatalogPage;
 
     /** @return array{categories: list<array{slug: string, label: string}>, occasions: list<array{key: string, label: string}>, modalities: list<array{value: string, label: string}>} */

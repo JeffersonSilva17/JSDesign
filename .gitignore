@@ -28,3 +28,20 @@ storage/logs/*.log
 # Builds
 dist/
 coverage/
+
+# Credenciais e exportações locais (fixtures sintéticas devem usar outra extensão).
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.dump
+*.backup
+*.bak
+*.sql.gz
+*.sql
+!infra/docker/postgres/init/*.sql
+*.sqlite
+*.sqlite3
+security-reports/
+.security-tools/

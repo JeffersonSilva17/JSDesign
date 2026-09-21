@@ -1,16 +1,23 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { fetchCatalogFacets } from '@/bff/catalogApi';
+import { readFacets } from '@/features/catalog-seo/catalogReads';
+import { catalogMetadata } from '@/features/catalog-seo/catalogMetadata';
 import { CatalogState } from '@/features/catalog/CatalogState';
 import { catalogContent } from '@/features/public-store/publicLayoutContent';
 
-export const metadata: Metadata = catalogContent.metadata.categories;
+type Props = Readonly<{ searchParams: Promise<Record<string, string | string[] | undefined>> }>;
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const facets = await readFacets().catch(() => null);
+  const eligible = facets !== null && Object.keys(await searchParams).length === 0;
+  return catalogMetadata(catalogContent.metadata.categories.title, catalogContent.metadata.categories.description, eligible ? '/categorias' : undefined, eligible);
+}
 
 export default async function CategoriasPage() {
   let facets;
   try {
-    facets = await fetchCatalogFacets();
+    facets = await readFacets();
   } catch { facets = null; }
   if (facets === null) return <CatalogState kind="unavailable" />;
   return <div className="catalog-page">
