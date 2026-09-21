@@ -8,6 +8,12 @@ jobs:
   bff-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      matrix:
+        indexing: ['false', 'true']
+    env:
+      SITE_URL: http://127.0.0.1:3000
+      SEO_INDEXING_ENABLED: ${{ matrix.indexing }}
 
     services:
       postgres:
@@ -65,6 +71,13 @@ jobs:
         working-directory: apps/web
         run: npm ci
 
+      - name: Provision isolated database roles
+        working-directory: apps/api
+        env:
+          BOOTSTRAP_DB_USERNAME: jsdesign
+          BOOTSTRAP_DB_PASSWORD: jsdesign
+        run: php scripts/provision-local-security.php
+
       - name: Install Playwright Chromium
         working-directory: apps/web
         run: npx playwright install --with-deps chromium
@@ -85,5 +98,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: laravel-smoke-server-log
+          name: laravel-smoke-server-log-${{ matrix.indexing }}
           path: apps/api/storage/logs/ci-server.log

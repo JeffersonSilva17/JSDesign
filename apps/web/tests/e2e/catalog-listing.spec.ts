@@ -138,6 +138,8 @@ async function startIsolatedNextWithBrokenApi(): Promise<ChildProcess> {
     env: {
       ...safeEnv(),
       API_INTERNAL_URL: 'http://127.0.0.1:65530',
+      SITE_URL: 'http://127.0.0.1:3011',
+      SEO_INDEXING_ENABLED: process.env.SEO_INDEXING_ENABLED ?? 'false',
       NEXT_DIST_DIR: '.next/broken-api-e2e',
       NODE_ENV: process.env.NODE_ENV ?? 'test',
     },
@@ -146,6 +148,8 @@ async function startIsolatedNextWithBrokenApi(): Promise<ChildProcess> {
 
   for (let attempt = 0; attempt < 80; attempt++) {
     try {
+      // Loopback readiness probe for an isolated test server; no credentials or external traffic.
+      // nosemgrep: typescript.react.security.react-insecure-request.react-insecure-request
       await fetch('http://127.0.0.1:3011/produtos');
       return server;
     } catch {}

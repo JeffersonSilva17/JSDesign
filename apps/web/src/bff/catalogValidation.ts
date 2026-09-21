@@ -1,18 +1,48 @@
-import { existsSync } from 'node:fs';
+import { statSync } from 'node:fs';
 import { join, normalize, sep } from 'node:path';
 
 const modalities = ['physical_personalized', 'digital_personalized', 'digital_ready'] as const;
+const modalityLabels: Readonly<Record<string, string>> = { physical_personalized: 'Produto físico personalizado', digital_personalized: 'Produto digital personalizado', digital_ready: 'Produto digital' };
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const publicRoot = normalize(join(process.cwd(), 'public'));
 type ExpectedSearchCriteria = Readonly<{ query: string; page: number; perPage: number }>;
 
-export function isCatalogListingPayload(value: unknown): boolean {
+type ExpectedListing = Readonly<{ page: number; category?: string; occasion?: string; modality?: string }>;
+
+export function isCatalogListingPayload(value: unknown, expected?: ExpectedListing): boolean {
   if (!isRecord(value) || !hasOnlyKeys(value, ['data', 'meta']) || !Array.isArray(value.data) || !isRecord(value.meta)) return false;
   const meta = value.meta;
-  return value.data.every((item) => isProduct(item, false)) && hasOnlyKeys(meta, ['current_page', 'per_page', 'last_page', 'total', 'applied_filters', 'filter_labels']) &&
+  const valid = value.data.every((item) => isProduct(item, false)) && hasOnlyKeys(meta, ['current_page', 'per_page', 'last_page', 'total', 'applied_filters', 'filter_labels']) &&
     positiveInteger(meta.current_page) && positiveInteger(meta.per_page) && (meta.per_page as number) <= 48 && positiveInteger(meta.last_page) &&
     nonNegativeInteger(meta.total) && isSafeFilterMap(meta.applied_filters) && isSafeFilterMap(meta.filter_labels);
+  if (!valid || expected === undefined) return valid;
+  // Legacy empty collections normalize current_page to 1 and omit unknown labels.
+  // This exception cannot carry products or establish an indexable category identity.
+  if (meta.total === 0 && value.data.length === 0 && meta.current_page === 1 && meta.last_page === 1 && meta.per_page === 12) {
+    const applied = meta.applied_filters as Record<string, string>;
+    const labels = meta.filter_labels as Record<string, string>;
+    const keys = (['category', 'occasion', 'modality'] as const).filter((key) => expected[key] !== undefined);
+    return Object.keys(applied).length === keys.length && keys.every((key) => applied[key] === expected[key]) &&
+      Object.keys(labels).every((key) => key in applied) && (!expected.modality || labels.modality === modalityLabels[expected.modality]);
+  }
+  if (meta.current_page !== expected.page || meta.per_page !== 12 ||
+      meta.last_page !== Math.max(1, Math.ceil((meta.total as number) / 12)) ||
+      value.data.length !== Math.min(12, Math.max(0, (meta.total as number) - (expected.page - 1) * 12))) return false;
+  const applied = meta.applied_filters as Record<string, string>;
+  const labels = meta.filter_labels as Record<string, string>;
+  const keys = (['category', 'occasion', 'modality'] as const).filter((key) => expected[key] !== undefined);
+  if (Object.keys(applied).length !== keys.length || Object.keys(labels).length !== keys.length ||
+      keys.some((key) => applied[key] !== expected[key] || !nonEmpty(labels[key]))) return false;
+  if (expected.modality && labels.modality !== modalityLabels[expected.modality]) return false;
+  const ids = new Set<string>();
+  return value.data.every((item) => {
+    if (!isRecord(item) || !recordProductId(item, ids) || !isRecord(item.category) || !Array.isArray(item.taxonomy)) return false;
+    if (expected.category && (item.category.slug !== expected.category || item.category.label !== labels.category)) return false;
+    if (expected.modality && item.modality !== expected.modality) return false;
+    if (expected.occasion && !item.taxonomy.some((term) => isRecord(term) && term.type === 'occasion' && term.key === expected.occasion && term.label === labels.occasion)) return false;
+    return true;
+  });
 }
 
 export function isCatalogFacetsEnvelope(value: unknown): boolean {
@@ -20,12 +50,13 @@ export function isCatalogFacetsEnvelope(value: unknown): boolean {
   const facets = value.data;
   if (!hasOnlyKeys(facets, ['categories', 'occasions', 'modalities'])) return false;
   return Array.isArray(facets.categories) && facets.categories.every(isCategory) &&
-    Array.isArray(facets.occasions) && facets.occasions.every((item) => namedKey(item, 'key')) &&
-    Array.isArray(facets.modalities) && facets.modalities.every((item) => isRecord(item) && hasOnlyKeys(item, ['value', 'label']) && modalities.includes(item.value as (typeof modalities)[number]) && nonEmpty(item.label));
+    Array.isArray(facets.occasions) && facets.occasions.every(isOccasionFacet) &&
+    Array.isArray(facets.modalities) && facets.modalities.every((item) => isRecord(item) && hasOnlyKeys(item, ['value', 'label']) && modalities.includes(item.value as (typeof modalities)[number]) && nonEmptyMax(item.label, 160));
 }
 
-export function isCatalogProductEnvelope(value: unknown): boolean {
-  return isRecord(value) && hasOnlyKeys(value, ['data']) && isProduct(value.data, true);
+export function isCatalogProductEnvelope(value: unknown, slug?: string): boolean {
+  return isRecord(value) && hasOnlyKeys(value, ['data']) && isProduct(value.data, true) &&
+    (slug === undefined || (isRecord(value.data) && value.data.slug === slug));
 }
 
 export function isCatalogSearchPayload(value: unknown, expected?: ExpectedSearchCriteria): boolean {
@@ -105,13 +136,17 @@ export function isSafeCatalogImagePath(value: unknown): value is string {
   try { decoded = decodeURIComponent(value); } catch { return false; }
   if (decoded.includes('..')) return false;
   const candidate = normalize(join(publicRoot, decoded.slice(1)));
-  return candidate.startsWith(`${publicRoot}${sep}`) && existsSync(candidate);
+  try {
+    return candidate.startsWith(`${publicRoot}${sep}`) && statSync(candidate).isFile();
+  } catch {
+    return false;
+  }
 }
 
 function isProduct(value: unknown, detail: boolean): boolean {
   if (!isRecord(value)) return false;
   const common = ['id','slug','name',detail ? 'description' : 'description_excerpt','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy',detail ? 'compatibility' : 'compatibility_excerpt'];
-  if (!hasOnlyKeys(value, common) || !nonEmpty(value.id) || !uuidPattern.test(value.id) || !nonEmpty(value.name) || !nonEmpty(value.slug) || value.slug.length > 180 || !slugPattern.test(value.slug)) return false;
+  if (!hasOnlyKeys(value, common) || !nonEmpty(value.id) || !uuidPattern.test(value.id) || !nonEmptyMax(value.name, 180) || !nonEmpty(value.slug) || value.slug.length > 180 || !slugPattern.test(value.slug)) return false;
   if (!isCategory(value.category) || !modalities.includes(value.modality as (typeof modalities)[number])) return false;
   if (!nonNegativeInteger(value.price_minor) || value.currency !== 'EUR' || !['available','unavailable','made_to_order'].includes(value.availability as string) || !['physical','digital'].includes(value.delivery_type as string)) return false;
   if (value.production_lead_time_days !== null && !nonNegativeInteger(value.production_lead_time_days)) return false;
@@ -123,13 +158,14 @@ function isProduct(value: unknown, detail: boolean): boolean {
   return compatibility === null || (typeof compatibility === 'string' && compatibility.length <= (detail ? 5000 : 120));
 }
 
-function isTaxonomy(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['type','key','label']) && (value.type === 'theme' || value.type === 'occasion') && nonEmpty(value.key) && nonEmpty(value.label); }
-function isCategory(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['slug', 'label']) && nonEmpty(value.slug) && value.slug.length <= 160 && slugPattern.test(value.slug) && nonEmpty(value.label); }
-function namedKey(value: unknown, key: 'slug' | 'key'): boolean { return isRecord(value) && hasOnlyKeys(value, [key, 'label']) && nonEmpty(value[key]) && nonEmpty(value.label); }
+function isTaxonomy(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['type','key','label']) && (value.type === 'theme' || value.type === 'occasion') && nonEmptyMax(value.key, 180) && nonEmptyMax(value.label, 160); }
+function isCategory(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['slug', 'label']) && nonEmpty(value.slug) && value.slug.length <= 160 && slugPattern.test(value.slug) && nonEmptyMax(value.label, 160); }
+function isOccasionFacet(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['key', 'label']) && validOccasionKey(value.key) && validSearchQuery(value.label); }
 function isSafeFilterMap(value: unknown): boolean { return isRecord(value) && Object.keys(value).every((key) => ['category','occasion','modality'].includes(key)) && Object.values(value).every(nonEmpty); }
 function hasOnlyKeys(value: Record<string, unknown>, allowed: readonly string[]): boolean { return Object.keys(value).length === allowed.length && Object.keys(value).every((key) => allowed.includes(key)); }
 function isRecord(value: unknown): value is Record<string, unknown> { return !!value && typeof value === 'object' && !Array.isArray(value); }
 function nonEmpty(value: unknown): value is string { return typeof value === 'string' && value.trim().length > 0; }
+function nonEmptyMax(value: unknown, max: number): value is string { return nonEmpty(value) && value.length <= max; }
 function positiveInteger(value: unknown): boolean { return Number.isSafeInteger(value) && (value as number) >= 1; }
 function nonNegativeInteger(value: unknown): boolean { return Number.isSafeInteger(value) && (value as number) >= 0; }
 
@@ -144,6 +180,13 @@ function validSearchQuery(value: unknown): value is string {
   const canonical = value.normalize('NFKC').trim().replace(/[\p{Z}\s]+/gu, ' ');
   const length = Array.from(canonical).length;
   return canonical === value && length >= 2 && length <= 120 && new TextEncoder().encode(canonical).length <= 512;
+}
+
+function validOccasionKey(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length > 180 || value.trim() === '' || /[\p{Cc}\p{Cf}]/u.test(value)) return false;
+  const canonical = value.normalize('NFC').trim().replace(/\s+/gu, ' ').toLocaleLowerCase('pt-BR')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
+  return canonical === value;
 }
 
 function searchHrefQuery(value: unknown): string | null {

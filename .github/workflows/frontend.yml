@@ -8,6 +8,12 @@ jobs:
   next-checks:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        indexing: ['false', 'true']
+    env:
+      SITE_URL: http://127.0.0.1:3000
+      SEO_INDEXING_ENABLED: ${{ matrix.indexing }}
 
     defaults:
       run:
@@ -32,6 +38,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test:bff && npm run test:seo
 
       - name: Build
         run: npm run build

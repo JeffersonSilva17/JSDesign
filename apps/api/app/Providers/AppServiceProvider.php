@@ -51,6 +51,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('public-catalog-sitemap', static function (Request $request): Limit {
+            return Limit::perMinute((int) config('catalog.sitemap_rate_limit_per_minute', 60))
+                ->by('public-catalog-sitemap:'.hash('sha256', $request->attributes->get('sitemap_client') ?? $request->server('REMOTE_ADDR', 'unknown')))
+                ->response(static fn (Request $request, array $headers) => response()->json([
+                    'message' => 'Muitas solicitações. Tente novamente em instantes.',
+                    'retry_after' => (int) ($headers['Retry-After'] ?? 60),
+                ], 429, $headers)->header('Cache-Control', 'no-store, private'));
+        });
+
         RateLimiter::for('public-catalog', static function (Request $request): Limit {
             $clientIp = $request->getClientIp() ?? 'unknown';
 

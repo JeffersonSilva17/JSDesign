@@ -1,0 +1,31 @@
+title = "JS Designs: default rules plus narrowly scoped documentation false positives"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "BMAD file manifest SHA-256 checksums are integrity metadata"
+condition = "AND"
+paths = ['''(^|/)_bmad/_config/files-manifest\.csv$''']
+regexTarget = "match"
+regexes = ['''"[a-f0-9]{64}"''']
+
+[[allowlists]]
+description = "Truncated JWT header in the bundled expired-token tutorial (not a usable JWT)"
+condition = "AND"
+paths = ['''(^|/)api-testing-patterns\.md$''']
+regexTarget = "match"
+regexes = ['''expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.\.\.''']
+
+[[allowlists]]
+description = "Design-token vocabulary in the bundled asset workflow"
+condition = "AND"
+paths = ['''wds-6-asset-generation/steps-p/step-01-load-context\.md$''']
+regexTarget = "match"
+regexes = ['''tokens, border/shadow/elevation''']
+
+[[allowlists]]
+description = "Public BMAD story identifier, not a credential"
+condition = "AND"
+paths = ['''_bmad-output/implementation-artifacts/2-1-cadastrar-produtos-com-estrutura-de-catalogo-comercial\.md$''']
+regexTarget = "match"
+regexes = ['''story_key: 2-1-cadastrar-produtos-com-estrutura-de-catalogo-comercial''']

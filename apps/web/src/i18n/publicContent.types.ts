@@ -1,5 +1,13 @@
 import type { SupportedLocale } from './locales';
 
+export type CatalogSeoContent = Readonly<{
+  categoryDescription: (label: string) => string;
+  pageTitle: (title: string, page: number) => string;
+  socialAlt: string;
+  socialTitle: string;
+  socialDescription: string;
+}>;
+
 type LinkContent = Readonly<{
   label: string;
   href: string;

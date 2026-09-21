@@ -1,4 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
+import { randomBytes } from 'node:crypto';
+import { databaseEnv } from './tests/e2e/database-env';
+
+process.env.SITEMAP_CLIENT_KEY ??= randomBytes(32).toString('hex');
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -20,7 +24,8 @@ export default defineConfig({
       timeout: 120_000,
       env: {
         APP_ENV: 'testing', DB_CONNECTION: 'pgsql', DB_HOST: '127.0.0.1', DB_PORT: '5432',
-        DB_DATABASE: 'jsdesign_test', DB_USERNAME: 'jsdesign', DB_PASSWORD: 'jsdesign',
+        DB_DATABASE: 'jsdesign_test', ...databaseEnv('runtime'),
+        SITEMAP_CLIENT_KEY: process.env.SITEMAP_CLIENT_KEY,
         CATALOG_PUBLIC_IMAGE_RESOLVER: 'e2e', CACHE_STORE: 'array', QUEUE_CONNECTION: 'sync', SESSION_DRIVER: 'array',
       },
     },
@@ -29,7 +34,7 @@ export default defineConfig({
       url: 'http://127.0.0.1:3000',
       reuseExistingServer: false,
       timeout: 120_000,
-      env: { API_INTERNAL_URL: 'http://127.0.0.1:8000' },
+      env: { API_INTERNAL_URL: 'http://127.0.0.1:8000', SITE_URL: 'http://127.0.0.1:3000', SEO_INDEXING_ENABLED: process.env.SEO_INDEXING_ENABLED ?? 'false', SITEMAP_CLIENT_KEY: process.env.SITEMAP_CLIENT_KEY },
     },
   ],
   projects: [
