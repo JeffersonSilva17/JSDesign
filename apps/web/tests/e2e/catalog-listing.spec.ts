@@ -170,8 +170,11 @@ test('catálogo mantém evidência local de Core Web Vitals bons por viewport', 
       await page.goto('/produtos');
       await expect(page.getByRole('heading', { level: 1, name: 'Produtos' })).toBeVisible();
       const interactionStart = Date.now();
-      await page.getByRole('link', { name: 'Festas', exact: true }).click();
-      await expect(page).toHaveURL(/category=festas/);
+      // Subscribe before clicking so assertion polling does not inflate the timing.
+      await Promise.all([
+        page.waitForURL(/category=festas/),
+        page.getByRole('link', { name: 'Festas', exact: true }).click(),
+      ]);
       const interactionMs = Date.now() - interactionStart;
       await page.waitForTimeout(500);
       const vitals = await page.evaluate(() => (window as unknown as { __catalogVitals: { lcp: number; cls: number } }).__catalogVitals);

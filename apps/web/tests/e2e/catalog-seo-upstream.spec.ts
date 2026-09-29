@@ -2,6 +2,7 @@ import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { createServer, type Server } from 'node:http';
 
 import { expect, test } from '@playwright/test';
+import type { CatalogProduct } from '../../src/bff/catalogApi';
 import { validClient } from '../../src/features/catalog-seo/sitemapIdentity';
 
 const enabled = process.env.SEO_INDEXING_ENABLED === 'true';
@@ -16,7 +17,13 @@ const product = {
   description: 'Descrição pública', category: { slug: 'festas', label: 'Festas' }, modality: 'digital_ready', price_minor: 100,
   currency: 'EUR', availability: 'unavailable', delivery_type: 'digital', production_lead_time_days: null,
   is_immediate_delivery: true, primary_image: null, taxonomy: [], compatibility: null,
-};
+} as const;
+const productDetail = {
+  ...product,
+  gallery: [], materials: null, composition: null, file_description: null,
+  usage_terms: null, minimum_quantity: null,
+  models: [{ key: 'padrao', label: 'Modelo de teste', difference: 'Versao padrao.', is_default: true, image: null }],
+} satisfies CatalogProduct;
 
 test.beforeAll(async () => {
   api = createServer((req, res) => {
@@ -28,7 +35,7 @@ test.beforeAll(async () => {
     if (mode === 'rate') { res.statusCode = 429; res.setHeader('Retry-After', '19'); res.end('{}'); return; }
     if (url.pathname.endsWith('/publico')) {
       if (mode === 'withdrawn') { res.statusCode = 404; res.end('{}'); return; }
-      res.end(JSON.stringify({ data: { ...product, ...(mode === 'wrong-product' ? { slug: 'outro', name: 'IDENTIDADE ERRADA' } : {}) } })); return;
+      res.end(JSON.stringify({ data: { ...productDetail, ...(mode === 'wrong-product' ? { slug: 'outro', name: 'IDENTIDADE ERRADA' } : {}) } })); return;
     }
     if (url.pathname.endsWith('/sitemap-facets')) {
       res.end(JSON.stringify({ data: { categories: mode === 'bad-facets' ? [{ slug: '../private', label: 'Secret' }] : [{ slug: 'festas', label: 'Festas' }] } })); return;
@@ -86,6 +93,8 @@ test('memoização por requisição em sucesso e falha; identidade e retirada', 
   expect(first.status()).toBe(200);
   expect(counts.get('/api/v1/catalog/products/publico')).toBe(1);
   const html = await first.text();
+  expect(html).toContain('Modelo de teste');
+  expect(html).not.toContain('Catálogo temporariamente indisponível');
   if (enabled) {
     const script = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)?.[1];
     expect(script).toBeTruthy();

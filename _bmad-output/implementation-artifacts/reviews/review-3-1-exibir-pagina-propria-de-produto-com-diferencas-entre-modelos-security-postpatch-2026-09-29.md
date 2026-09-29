@@ -70,3 +70,17 @@ Nenhum achado aberto ou confirmado.
 - Observações: a governança em `AGENTS.md` foi auditada como política do repositório; este relatório não certifica enforcement do cliente/IDE fora dos comandos executados.
 - Owner: time de desenvolvimento.
 - Próximo checkpoint: próxima story do Épico 3 deve herdar os limites de modelo/galeria, o contrato de CTA como handoff e a regra de não calcular preço/carrinho no BFF.
+
+## Complemento: Correcao do Smoke CI
+
+- Escopo adicional: `catalog-seo-upstream.spec.ts`, `catalog-listing.spec.ts` e `playwright.config.ts`.
+- Evidencia inicial: a suite completa com SEO ativo reproduziu ausencia de JSON-LD no mock de detalhe; a fixture ainda usava o contrato anterior a 3.1. A validacao anterior executara a suite completa apenas com SEO desativado e seis testes especificos com SEO ativo.
+- Correcao: fixture de detalhe completa, verificada por `satisfies CatalogProduct`, separada do payload de listagem. O teste agora exige o modelo renderizado e rejeita a pagina de indisponibilidade nos dois modos de SEO.
+- Estabilidade: um worker no CI para os testes que compartilham a API; medicao de navegacao aguarda `waitForURL` registrado antes do clique, eliminando o intervalo de sondagem de `toHaveURL`. Limites de LCP, CLS e interacao preservados.
+- Validacao final local: build de producao em cada modo e `CI=true npm run test:e2e -- --reporter=line`; 70 testes aprovados com `SEO_INDEXING_ENABLED=true` e 70 com `false`. Lint e TypeScript aprovados.
+- STRIDE revisado: autenticacao de sitemap, rejeicao de identidade incorreta, escape de JSON-LD e sanitizacao de erros continuam exercitados. Somente dados sinteticos em loopback; runtime e migrator separados; migrations restritas a `jsdesign_test`. Nenhuma mudanca em permissoes, dependencias ou validadores de producao.
+- Alto risco: nenhum achado confirmado no complemento.
+- Medio risco: nenhum achado confirmado no complemento.
+- Baixo risco corrigido: a fixture invalida permitia falso positivo no cenario de sucesso com SEO desativado; evidencia na reproducao e nas novas assercoes independentes do modo.
+- Gates executados nesta revisao: SAST sem achados; npm e Composer sem vulnerabilidades; Gitleaks sem vazamentos nos arquivos atuais e no historico de 18 commits.
+- Limite da evidencia: execucoes locais em Windows; os logs remotos nao estavam acessiveis nesta sessao. A aprovacao do GitHub Actions depende de publicar a correcao e executar novamente o workflow em Ubuntu.

@@ -7,6 +7,8 @@ process.env.SITEMAP_CLIENT_KEY ??= randomBytes(32).toString('hex');
 export default defineConfig({
   testDir: './tests/e2e',
   globalSetup: './tests/e2e/global-setup.ts',
+  // Performance checks share the same API process with the other smoke tests.
+  workers: process.env.CI ? 1 : undefined,
   timeout: 30_000,
   expect: {
     timeout: 5_000,
