@@ -109,6 +109,271 @@ final class PublicCatalogApiTest extends TestCase
         $this->getJson('/api/v1/catalog/products/../segredo')->assertNotFound();
     }
 
+    public function test_detail_exposes_enriched_allowlist_gallery_and_models(): void
+    {
+        $this->app->instance(PublicCatalogImageResolver::class, new class implements PublicCatalogImageResolver
+        {
+            public function resolveBatch(array $references): array
+            {
+                return array_intersect_key([
+                    'gallery-primary' => '/catalog-e2e-product.svg',
+                    'gallery-secondary' => '/catalog-e2e-product.svg',
+                    'unsafe-image' => 'https://unsafe.example/private.jpg',
+                ], array_flip($references));
+            }
+        });
+        $category = $this->category('festas', 'Festas');
+        $product = $this->product($category, 'topo-fazendinha', 'Topo Fazendinha', 'published', 'physical_personalized');
+        DB::table('catalog_products')->where('id', $product)->update([
+            'materials' => 'Papel fotográfico 180g',
+            'composition' => 'Topo de bolo em camadas',
+            'file_description' => null,
+            'usage_terms' => null,
+            'minimum_quantity' => 12,
+            'variants_reference' => 'admin-only',
+        ]);
+        $this->taxonomy($product, 'occasion', 'Aniversário', 'aniversario');
+        $this->taxonomy($product, 'character', 'Personagem protegido', 'personagem-protegido', true);
+        $this->image($product, 'gallery-primary', 20, true);
+        $this->image($product, 'gallery-secondary', 30, false);
+        $this->image($product, 'unsafe-image', 40, false);
+        DB::table('catalog_product_models')->insert([
+            [
+                'id' => (string) Str::uuid(),
+                'product_id' => $product,
+                'public_key' => 'classico',
+                'label' => 'Clássico',
+                'difference' => 'Topo com camadas principais e acabamento simples.',
+                'image_reference' => 'gallery-primary',
+                'sort_order' => 10,
+                'is_default' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'product_id' => $product,
+                'public_key' => 'premium',
+                'label' => 'Premium',
+                'difference' => 'Topo com mais camadas e acabamento reforçado.',
+                'image_reference' => null,
+                'sort_order' => 20,
+                'is_default' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $response = $this->getJson('/api/v1/catalog/products/topo-fazendinha')->assertOk();
+        $data = $response->json('data');
+
+        self::assertSame([
+            'id', 'slug', 'name', 'description', 'category', 'modality', 'price_minor', 'currency', 'availability',
+            'delivery_type', 'production_lead_time_days', 'is_immediate_delivery', 'primary_image', 'taxonomy',
+            'compatibility', 'gallery', 'materials', 'composition', 'file_description', 'usage_terms',
+            'minimum_quantity', 'models',
+        ], array_keys($data));
+        self::assertSame('/catalog-e2e-product.svg', $data['primary_image']['url']);
+        self::assertSame([
+            ['url' => '/catalog-e2e-product.svg', 'alt_text' => 'Imagem do produto'],
+            ['url' => '/catalog-e2e-product.svg', 'alt_text' => 'Imagem do produto'],
+        ], $data['gallery']);
+        self::assertSame('Papel fotográfico 180g', $data['materials']);
+        self::assertSame('Topo de bolo em camadas', $data['composition']);
+        self::assertSame(12, $data['minimum_quantity']);
+        self::assertSame([
+            [
+                'key' => 'classico',
+                'label' => 'Clássico',
+                'difference' => 'Topo com camadas principais e acabamento simples.',
+                'is_default' => true,
+                'image' => ['url' => '/catalog-e2e-product.svg', 'alt_text' => 'Clássico'],
+            ],
+            [
+                'key' => 'premium',
+                'label' => 'Premium',
+                'difference' => 'Topo com mais camadas e acabamento reforçado.',
+                'is_default' => false,
+                'image' => null,
+            ],
+        ], $data['models']);
+        self::assertStringNotContainsString('variants_reference', $response->getContent());
+        self::assertStringNotContainsString('storage_reference', $response->getContent());
+        self::assertStringNotContainsString('character', $response->getContent());
+        self::assertStringNotContainsString('admin-only', $response->getContent());
+    }
+
+    public function test_detail_derives_required_default_model_when_product_has_no_model_rows(): void
+    {
+        $category = $this->category('digitais', 'Digitais');
+        $this->product($category, 'arquivo-pronto', 'Arquivo pronto', 'published', 'digital_ready');
+
+        $this->getJson('/api/v1/catalog/products/arquivo-pronto')->assertOk()
+            ->assertJsonPath('data.models', [[
+                'key' => 'padrao',
+                'label' => 'Modelo padrão',
+                'difference' => 'Versão padrão do produto.',
+                'is_default' => true,
+                'image' => null,
+            ]]);
+    }
+
+    public function test_detail_falls_back_to_product_name_when_public_image_alt_is_empty(): void
+    {
+        $this->app->instance(PublicCatalogImageResolver::class, new class implements PublicCatalogImageResolver
+        {
+            public function resolveBatch(array $references): array
+            {
+                return ['safe-image' => '/catalog-e2e-product.svg'];
+            }
+        });
+        $category = $this->category('festas', 'Festas');
+        $product = $this->product($category, 'imagem-sem-alt', 'Imagem sem alt', 'published', 'digital_ready');
+        DB::table('catalog_product_images')->insert([
+            'id' => (string) Str::uuid(),
+            'product_id' => $product,
+            'storage_reference' => 'safe-image',
+            'alt_text' => null,
+            'sort_order' => 0,
+            'is_primary' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->getJson('/api/v1/catalog/products/imagem-sem-alt')->assertOk()
+            ->assertJsonPath('data.primary_image.alt_text', 'Imagem sem alt')
+            ->assertJsonPath('data.gallery.0.alt_text', 'Imagem sem alt');
+    }
+
+    public function test_detail_fails_closed_when_model_rows_are_invalid(): void
+    {
+        $category = $this->category('festas', 'Festas');
+        $product = $this->product($category, 'modelos-invalidos', 'Modelos invalidos', 'published', 'digital_ready');
+        DB::table('catalog_product_models')->insert([
+            [
+                'id' => (string) Str::uuid(),
+                'product_id' => $product,
+                'public_key' => 'primeiro',
+                'label' => 'Primeiro',
+                'difference' => 'Sem modelo padrao.',
+                'image_reference' => null,
+                'sort_order' => 10,
+                'is_default' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'product_id' => $product,
+                'public_key' => 'segundo',
+                'label' => 'Segundo',
+                'difference' => 'Tambem sem modelo padrao.',
+                'image_reference' => null,
+                'sort_order' => 20,
+                'is_default' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->getJson('/api/v1/catalog/products/modelos-invalidos')->assertStatus(503)
+            ->assertExactJson(['message' => 'Catálogo temporariamente indisponível.']);
+    }
+
+    public function test_model_image_reference_must_belong_to_the_same_product_public_images(): void
+    {
+        $this->app->instance(PublicCatalogImageResolver::class, new class implements PublicCatalogImageResolver
+        {
+            public function resolveBatch(array $references): array
+            {
+                return ['shared-image' => '/catalog-e2e-product.svg'];
+            }
+        });
+        $category = $this->category('festas', 'Festas');
+        $owner = $this->product($category, 'dono-da-imagem', 'Dono da imagem', 'published', 'digital_ready');
+        $target = $this->product($category, 'modelo-cruzado', 'Modelo cruzado', 'published', 'digital_ready');
+        $this->image($owner, 'shared-image');
+        DB::table('catalog_product_models')->insert([
+            'id' => (string) Str::uuid(),
+            'product_id' => $target,
+            'public_key' => 'premium',
+            'label' => 'Premium',
+            'difference' => 'Referencia imagem de outro produto.',
+            'image_reference' => 'shared-image',
+            'sort_order' => 10,
+            'is_default' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->getJson('/api/v1/catalog/products/modelo-cruzado')->assertOk()
+            ->assertJsonPath('data.models.0.image', null);
+    }
+
+    public function test_detail_resource_strips_nested_private_fields_from_alternative_adapter(): void
+    {
+        $category = $this->category('festas', 'Festas');
+        $this->product($category, 'projecao-publica', 'Projecao publica', 'published', 'digital_ready');
+        $projection = $this->app->make(PublicCatalogQuery::class)->findPublishedBySlug('projecao-publica');
+        $image = ['url' => '/catalog-e2e-product.svg', 'alt_text' => 'Produto', 'storage_reference' => 'private/evidence'];
+        $projection['gallery'] = [$image, ['url' => 'https://unsafe.example/private.jpg', 'alt_text' => 'Privado']];
+        $projection['models'][0]['image'] = $image;
+        $projection['models'][0]['admin_notes'] = 'private/evidence';
+        $query = \Mockery::mock(PublicCatalogQuery::class);
+        $query->shouldReceive('findPublishedBySlug')->with('projecao-publica')->once()->andReturn($projection);
+        $this->app->instance(PublicCatalogQuery::class, $query);
+
+        $response = $this->getJson('/api/v1/catalog/products/projecao-publica')->assertOk();
+        $response->assertJsonPath('data.gallery', [['url' => '/catalog-e2e-product.svg', 'alt_text' => 'Produto']]);
+        self::assertSame(['key', 'label', 'difference', 'is_default', 'image'], array_keys($response->json('data.models.0')));
+        self::assertSame(['url', 'alt_text'], array_keys($response->json('data.models.0.image')));
+        self::assertStringNotContainsString('private/evidence', $response->getContent());
+        self::assertStringNotContainsString('storage_reference', $response->getContent());
+        self::assertStringNotContainsString('admin_notes', $response->getContent());
+    }
+
+    public function test_detail_bounds_gallery_and_models_with_a_constant_query_budget(): void
+    {
+        $this->app->instance(PublicCatalogImageResolver::class, new class implements PublicCatalogImageResolver
+        {
+            public function resolveBatch(array $references): array
+            {
+                return array_fill_keys($references, '/catalog-e2e-product.svg');
+            }
+        });
+        $category = $this->category('festas', 'Festas');
+        $product = $this->product($category, 'detalhe-limites', 'Detalhe limites', 'published', 'digital_ready');
+        for ($index = 0; $index < 9; $index++) {
+            $this->image($product, "image-$index", $index, $index === 0);
+        }
+        for ($index = 0; $index < 12; $index++) {
+            DB::table('catalog_product_models')->insert([
+                'id' => (string) Str::uuid(), 'product_id' => $product, 'public_key' => "modelo-$index",
+                'label' => "Modelo $index", 'difference' => 'Diferenca publica.',
+                'sort_order' => $index, 'is_default' => $index === 0,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        }
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        try {
+            $this->getJson('/api/v1/catalog/products/detalhe-limites')->assertOk()
+                ->assertJsonCount(8, 'data.gallery')->assertJsonCount(12, 'data.models');
+            self::assertLessThanOrEqual(8, count(DB::getQueryLog()));
+        } finally {
+            DB::disableQueryLog();
+        }
+
+        DB::table('catalog_product_models')->insert([
+            'id' => (string) Str::uuid(), 'product_id' => $product, 'public_key' => 'excedente',
+            'label' => 'Excedente', 'difference' => 'Modelo fora do limite.',
+            'sort_order' => 12, 'is_default' => false, 'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $this->getJson('/api/v1/catalog/products/detalhe-limites')->assertStatus(503)
+            ->assertExactJson(['message' => 'Catálogo temporariamente indisponível.']);
+    }
+
     public function test_query_validation_rejects_unknown_duplicate_array_and_non_canonical_values(): void
     {
         $this->getJson('/api/v1/catalog/products?character=x')->assertUnprocessable();
@@ -160,6 +425,32 @@ final class PublicCatalogApiTest extends TestCase
         $this->image($product, 'opaque-reference');
 
         $this->getJson('/api/v1/catalog/products')->assertOk()->assertJsonPath('data.0.primary_image', null);
+    }
+
+    public function test_listing_resolves_only_primary_images(): void
+    {
+        $resolver = new class implements PublicCatalogImageResolver
+        {
+            /** @var list<string> */
+            public array $references = [];
+
+            public function resolveBatch(array $references): array
+            {
+                $this->references = array_values($references);
+
+                return array_fill_keys($references, '/catalog-e2e-product.svg');
+            }
+        };
+        $this->app->instance(PublicCatalogImageResolver::class, $resolver);
+        $category = $this->category('festas', 'Festas');
+        $product = $this->product($category, 'produto-com-galeria', 'Produto com galeria', 'published', 'digital_ready');
+        $this->image($product, 'primary-image', 0, true);
+        $this->image($product, 'secondary-image', 10, false);
+
+        $this->getJson('/api/v1/catalog/products')->assertOk()
+            ->assertJsonPath('data.0.primary_image.url', '/catalog-e2e-product.svg');
+
+        self::assertSame(['primary-image'], $resolver->references);
     }
 
     public function test_public_resource_defends_allowlist_even_with_alternate_query_adapter(): void
@@ -352,11 +643,11 @@ final class PublicCatalogApiTest extends TestCase
         ]);
     }
 
-    private function image(string $productId, string $reference): void
+    private function image(string $productId, string $reference, int $sortOrder = 0, bool $primary = true): void
     {
         DB::table('catalog_product_images')->insert([
             'id' => (string) Str::uuid(), 'product_id' => $productId, 'storage_reference' => $reference,
-            'alt_text' => 'Imagem do produto', 'sort_order' => 0, 'is_primary' => true,
+            'alt_text' => 'Imagem do produto', 'sort_order' => $sortOrder, 'is_primary' => $primary,
             'created_at' => now(), 'updated_at' => now(),
         ]);
     }

@@ -22,7 +22,7 @@ export function CatalogCard({ product, preload = false, returnHref = '/produtos'
         {product.is_immediate_delivery && <p className="catalog-card__delivery">{catalogContent.card.immediate}</p>}
         {product.production_lead_time_days !== null && <p>{catalogContent.card.leadTime}: {product.production_lead_time_days} dias</p>}
         <p className="catalog-card__price">{price}</p>
-        <Link className="button button--primary" href={detailHref} aria-label={`${catalogContent.card.details}: ${product.name}`}>{catalogContent.card.details}</Link>
+        <Link className="button button--primary" href={detailHref} aria-label={`${catalogContent.card.details}: ${product.name}`} prefetch={false}>{catalogContent.card.details}</Link>
       </div>
     </article>
   );

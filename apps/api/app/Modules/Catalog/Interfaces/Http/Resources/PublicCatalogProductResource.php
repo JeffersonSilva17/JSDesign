@@ -2,6 +2,7 @@
 
 namespace App\Modules\Catalog\Interfaces\Http\Resources;
 
+use App\Modules\Catalog\Infrastructure\Files\PublicImagePath;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -61,7 +62,30 @@ final class PublicCatalogProductResource extends JsonResource
             'primary_image' => $base['primary_image'],
             'taxonomy' => $base['taxonomy'],
             'compatibility' => $this->resource['compatibility'],
+            'gallery' => array_values(array_filter(array_map($this->publicImage(...), $this->resource['gallery']))),
+            'materials' => $this->resource['materials'],
+            'composition' => $this->resource['composition'],
+            'file_description' => $this->resource['file_description'],
+            'usage_terms' => $this->resource['usage_terms'],
+            'minimum_quantity' => $this->resource['minimum_quantity'],
+            'models' => array_map(fn (array $model): array => [
+                'key' => $model['key'],
+                'label' => $model['label'],
+                'difference' => $model['difference'],
+                'is_default' => $model['is_default'],
+                'image' => $this->publicImage($model['image']),
+            ], $this->resource['models']),
         ];
+    }
+
+    /** @return array{url: string, alt_text: string}|null */
+    private function publicImage(?array $image): ?array
+    {
+        if ($image === null || ! is_string($image['url'] ?? null) || PublicImagePath::validate($image['url']) === null) {
+            return null;
+        }
+
+        return ['url' => $image['url'], 'alt_text' => (string) $image['alt_text']];
     }
 
     /**
