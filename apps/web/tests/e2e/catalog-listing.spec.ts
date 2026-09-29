@@ -27,7 +27,42 @@ test('lista modalidades, filtra, pagina e abre o detalhe publicado', async ({ pa
   const details = page.getByRole('link', { name: /^Ver detalhes:/ }).first();
   await details.click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Produto \d+/);
+  await expect(page.getByText('Modelos disponíveis')).toBeVisible();
+  await expect(page.getByRole('link', { name: /Essencial/ })).toHaveAttribute('aria-current', 'true');
+  await page.getByRole('link', { name: /Premium/ }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/modelo=premium/);
+  await expect(page.getByRole('link', { name: /Premium/ })).toHaveAttribute('aria-current', 'true');
+  await expect(page.getByRole('link', { name: 'Comprar agora' })).toHaveAttribute('href', /\/carrinho\?produto=produto-1&modelo=premium/);
+  await expect(page.getByText('A compra/configuração será ativada em etapa própria.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Voltar aos produtos' })).toBeVisible();
+});
+
+test('detalhe diferencia modalidades e modelo unico sem inventar compra', async ({ page }) => {
+  await page.goto('/produtos/produto-3');
+  const facts = page.getByRole('definition');
+  await expect(facts.filter({ hasText: /^Festas$/ })).toBeVisible();
+  await expect(facts.filter({ hasText: 'Papel fotográfico 180g' })).toBeVisible();
+  await expect(facts.filter({ hasText: '12 unidades' })).toBeVisible();
+  await expect(facts.filter({ hasText: '5 dias' })).toBeVisible();
+  await expect(page.getByText('Modelo único', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Personalizar e comprar' })).toHaveAttribute('href', '/carrinho?produto=produto-3&modelo=padrao');
+
+  await page.goto('/produtos/produto-2');
+  await expect(page.getByText(/não há entrega imediata; haverá edição\/criação, prévia e aprovação/)).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Escolher modelo' })).toHaveAttribute('href', '/carrinho?produto=produto-2&modelo=padrao');
+
+  for (const query of ['modelo=desconhecido', 'modelo=%3Cscript%3E', 'modelo=essencial&modelo=premium']) {
+    await page.goto(`/produtos/produto-1?${query}`);
+    await expect(page.getByRole('link', { name: /Essencial/ })).toHaveAttribute('aria-current', 'true');
+  }
+  await expect(page.getByText('Download imediato', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Uso permitido em peças físicas; redistribuição digital/)).toBeVisible();
+  const gallery = page.getByRole('region', { name: 'Galeria do produto' });
+  await expect(gallery.getByRole('img')).toHaveCount(3);
+  await expect.poll(() => gallery.locator('img').evaluateAll((images) => images.every((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0))).toBe(true);
+  await page.getByRole('link', { name: 'Comprar agora' }).click();
+  await expect(page).toHaveURL(/\/carrinho\?produto=produto-1&modelo=essencial/);
 });
 
 test('rejeita filtro e slug malformados sem falso vazio ou falso 404 upstream', async ({ page }) => {
@@ -62,6 +97,9 @@ test('listagem renderiza indisponibilidade sanitizada quando o upstream falha', 
   try {
     await page.goto('http://127.0.0.1:3011/produtos');
     await expect(page.getByRole('heading', { name: 'Catálogo temporariamente indisponível' })).toBeVisible();
+    await page.goto('http://127.0.0.1:3011/produtos/produto-1');
+    await expect(page.getByRole('heading', { name: 'Catálogo temporariamente indisponível' })).toBeVisible();
+    await expect(page.locator('body')).not.toContainText(/SQLSTATE|storage_reference|Stack trace/);
   } finally {
     stopProcess(server);
   }
@@ -76,6 +114,27 @@ for (const width of [320, 420, 760, 1100]) {
     const box = await page.getByRole('link', { name: /^Ver detalhes:/ }).first().boundingBox();
     expect(box?.height).toBeGreaterThanOrEqual(44);
     expect(box?.width).toBeGreaterThanOrEqual(44);
+  });
+
+  test(`detalhe preserva reflow, modelos e CTA em ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/produtos/produto-1?modelo=premium');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Produto 1/);
+    await expect(page.getByRole('link', { name: /Premium/ })).toHaveAttribute('aria-current', 'true');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    const gallery = page.getByRole('region', { name: 'Galeria do produto' });
+    expect(await gallery.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    for (const locator of [
+      page.getByRole('link', { name: /Premium/ }),
+      page.getByRole('link', { name: 'Comprar agora' }),
+      page.getByRole('link', { name: 'Voltar aos produtos' }),
+      page.getByRole('link', { name: 'Ver termos', exact: true }),
+    ]) {
+      const box = await locator.boundingBox();
+      expect(box?.height).toBeGreaterThanOrEqual(44);
+      expect(box?.width).toBeGreaterThanOrEqual(44);
+    }
+    await page.screenshot({ path: testInfo.outputPath(`detail-${width}.png`), fullPage: true });
   });
 }
 

@@ -20,12 +20,12 @@ export function CatalogFiltersView({ facets, filters }: Props) {
           <div className="catalog-filter-links">
             {group.values.map((item) => {
               const selected = filters[group.key] === item.value;
-              return <Link aria-current={selected ? 'page' : undefined} key={item.value} href={catalogHref({ ...filters, [group.key]: selected ? undefined : item.value, page: 1 } as CatalogFilters)}>{item.label}</Link>;
+              return <Link aria-current={selected ? 'page' : undefined} key={item.value} href={catalogHref({ ...filters, [group.key]: selected ? undefined : item.value, page: 1 } as CatalogFilters)} prefetch={false}>{item.label}</Link>;
             })}
           </div>
         </div>
       ))}
-      {(filters.category || filters.occasion || filters.modality) && <Link className="catalog-filter-clear" href="/produtos">{catalogContent.filters.clear}</Link>}
+      {(filters.category || filters.occasion || filters.modality) && <Link className="catalog-filter-clear" href="/produtos" prefetch={false}>{catalogContent.filters.clear}</Link>}
     </nav>
   );
 }

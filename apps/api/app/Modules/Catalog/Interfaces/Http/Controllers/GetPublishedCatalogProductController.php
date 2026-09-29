@@ -8,6 +8,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use PDOException;
+use UnexpectedValueException;
 
 final readonly class GetPublishedCatalogProductController
 {
@@ -21,7 +22,7 @@ final readonly class GetPublishedCatalogProductController
 
         try {
             $product = $this->get->execute($slug);
-        } catch (QueryException|PDOException) {
+        } catch (QueryException|PDOException|UnexpectedValueException) {
             return response()->json(['message' => 'Catálogo temporariamente indisponível.'], 503)
                 ->header('Cache-Control', 'no-store, private');
         }

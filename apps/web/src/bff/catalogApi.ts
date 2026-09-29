@@ -23,6 +23,13 @@ export type CatalogFilters = Readonly<{
 }>;
 export type CatalogImage = Readonly<{ url: string; alt_text: string }>;
 export type CatalogTaxonomy = Readonly<{ type: 'theme' | 'occasion'; key: string; label: string }>;
+export type CatalogProductModel = Readonly<{
+  key: string;
+  label: string;
+  difference: string;
+  is_default: boolean;
+  image: CatalogImage | null;
+}>;
 type CatalogProductBase = Readonly<{
   id: string;
   slug: string;
@@ -41,7 +48,17 @@ type CatalogProductBase = Readonly<{
 export type CatalogCard = CatalogProductBase &
   Readonly<{ description_excerpt: string; compatibility_excerpt: string | null }>;
 export type CatalogProduct = CatalogProductBase &
-  Readonly<{ description: string; compatibility: string | null }>;
+  Readonly<{
+    description: string;
+    compatibility: string | null;
+    gallery: readonly CatalogImage[];
+    materials: string | null;
+    composition: string | null;
+    file_description: string | null;
+    usage_terms: string | null;
+    minimum_quantity: number | null;
+    models: readonly CatalogProductModel[];
+  }>;
 export type CatalogFacets = Readonly<{
   categories: readonly Readonly<{ slug: string; label: string }>[];
   occasions: readonly Readonly<{ key: string; label: string }>[];

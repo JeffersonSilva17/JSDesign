@@ -152,6 +152,17 @@ final class CatalogAdminApiTest extends TestCase
             ->assertJsonPath('errors.0.field_path', 'images');
     }
 
+    public function test_usage_terms_limit_matches_public_contract(): void
+    {
+        $this->authorize();
+        $payload = $this->validPayload($this->category());
+        $payload['usage_terms'] = str_repeat('a', 5001);
+
+        $this->postJson('/api/v1/admin/catalog/products', $payload)
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.0.field_path', 'usage_terms');
+    }
+
     public function test_image_contract_rejects_urls_paths_base64_and_unapproved_opaque_references(): void
     {
         $this->authorize();

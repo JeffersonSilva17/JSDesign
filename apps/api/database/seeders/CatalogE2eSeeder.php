@@ -49,6 +49,11 @@ final class CatalogE2eSeeder extends Seeder
                 'delivery_type' => $modality === 'physical_personalized' ? 'physical' : 'digital',
                 'is_immediate_delivery' => $modality === 'digital_ready',
                 'production_lead_time_days' => $modality === 'digital_ready' ? null : 5,
+                'materials' => $modality === 'physical_personalized' ? 'Papel fotográfico 180g' : null,
+                'composition' => $modality === 'physical_personalized' ? 'Peças impressas e recortadas para montagem.' : null,
+                'file_description' => $modality === 'digital_ready' ? 'Arquivo digital para Silhouette Studio.' : null,
+                'usage_terms' => $modality === 'digital_ready' ? 'Uso permitido em peças físicas; redistribuição digital do arquivo não autorizada.' : null,
+                'minimum_quantity' => $modality === 'physical_personalized' ? 12 : null,
                 'compatibility' => $modality === 'digital_ready' ? 'Silhouette Studio' : null,
                 'published_at' => $now->copy()->subMinutes($index), 'created_at' => $now, 'updated_at' => $now,
             ]);
@@ -74,6 +79,21 @@ final class CatalogE2eSeeder extends Seeder
             }
             if ($index === 1) {
                 DB::table('catalog_product_images')->insert(['id' => (string) Str::uuid(), 'product_id' => $id, 'storage_reference' => 'catalog-e2e-image', 'alt_text' => 'Produto digital em tons neutros', 'sort_order' => 0, 'is_primary' => true, 'created_at' => $now, 'updated_at' => $now]);
+                DB::table('catalog_product_images')->insert(['id' => (string) Str::uuid(), 'product_id' => $id, 'storage_reference' => 'catalog-e2e-detail', 'alt_text' => 'Detalhe do produto digital', 'sort_order' => 1, 'is_primary' => false, 'created_at' => $now, 'updated_at' => $now]);
+                DB::table('catalog_product_models')->insert([
+                    [
+                        'id' => (string) Str::uuid(), 'product_id' => $id, 'public_key' => 'essencial',
+                        'label' => 'Essencial', 'difference' => 'Arquivo principal pronto para corte.',
+                        'image_reference' => 'catalog-e2e-image', 'sort_order' => 10, 'is_default' => true,
+                        'created_at' => $now, 'updated_at' => $now,
+                    ],
+                    [
+                        'id' => (string) Str::uuid(), 'product_id' => $id, 'public_key' => 'premium',
+                        'label' => 'Premium', 'difference' => 'Inclui arquivo principal e variação complementar.',
+                        'image_reference' => null, 'sort_order' => 20, 'is_default' => false,
+                        'created_at' => $now, 'updated_at' => $now,
+                    ],
+                ]);
             }
         }
     }

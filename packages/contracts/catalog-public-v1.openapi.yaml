@@ -112,8 +112,18 @@ components:
             categories: { type: array, maxItems: 4998, uniqueItems: true, items: { $ref: '#/components/schemas/Category' } }
     Modality: { type: string, enum: [physical_personalized, digital_personalized, digital_ready] }
     Category: { type: object, required: [slug, label], additionalProperties: false, properties: { slug: { type: string, maxLength: 160, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }, label: { type: string } } }
-    Image: { type: object, required: [url, alt_text], additionalProperties: false, properties: { url: { type: string, pattern: '^/(?!/)(?!.*(?:\\.\\.|%2[eE]%2[eE]))[^\\\\#?\\x00-\\x1F\\x7F]+$' }, alt_text: { type: string } } }
+    Image: { type: object, required: [url, alt_text], additionalProperties: false, properties: { url: { type: string, pattern: '^/(?!/)(?!.*(?:\\.\\.|%2[eE]%2[eE]))[^\\\\#?\\x00-\\x1F\\x7F]+$' }, alt_text: { type: string, minLength: 1, maxLength: 300 } } }
     Taxonomy: { type: object, required: [type, key, label], additionalProperties: false, properties: { type: { type: string, enum: [theme, occasion] }, key: { type: string }, label: { type: string } } }
+    ProductModel:
+      type: object
+      required: [key, label, difference, is_default, image]
+      additionalProperties: false
+      properties:
+        key: { type: string, minLength: 1, maxLength: 120, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        label: { type: string, minLength: 1, maxLength: 120 }
+        difference: { type: string, minLength: 1, maxLength: 360 }
+        is_default: { type: boolean }
+        image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
     ProductBase:
       type: object
       required: [id, slug, name, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy]
@@ -154,7 +164,7 @@ components:
         compatibility_excerpt: { type: [string, 'null'], maxLength: 120 }
     ProductDetail:
       type: object
-      required: [id, slug, name, description, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy, compatibility]
+      required: [id, slug, name, description, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy, compatibility, gallery, materials, composition, file_description, usage_terms, minimum_quantity, models]
       additionalProperties: false
       properties:
         id: { type: string, format: uuid }
@@ -172,6 +182,13 @@ components:
         primary_image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
         taxonomy: { type: array, items: { $ref: '#/components/schemas/Taxonomy' } }
         compatibility: { type: [string, 'null'] }
+        gallery: { type: array, maxItems: 8, items: { $ref: '#/components/schemas/Image' } }
+        materials: { type: [string, 'null'], maxLength: 5000 }
+        composition: { type: [string, 'null'], maxLength: 5000 }
+        file_description: { type: [string, 'null'], maxLength: 5000 }
+        usage_terms: { type: [string, 'null'], maxLength: 5000 }
+        minimum_quantity: { type: [integer, 'null'], minimum: 1 }
+        models: { type: array, minItems: 1, maxItems: 12, items: { $ref: '#/components/schemas/ProductModel' } }
     ProductPage:
       type: object
       required: [data, meta]

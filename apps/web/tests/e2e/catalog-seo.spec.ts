@@ -11,6 +11,8 @@ for (const bot of ['Twitterbot/1.0', 'facebookexternalhit/1.1', 'Slackbot-LinkEx
       ['/produtos?category=festas&page=2', '/produtos?category=festas&page=2', 'Festas'],
       ['/categorias', '/categorias', 'Categorias'],
       ['/produtos/produto-1?return_to=%2Fbuscar%3Fq%3Dconvite', '/produtos/produto-1', 'Produto 1'],
+      ['/produtos/produto-1?modelo=premium', '/produtos/produto-1', 'Produto 1'],
+      ['/produtos/produto-1?modelo=%3Cscript%3E', '/produtos/produto-1', 'Produto 1'],
     ]) {
       const response = await request.get(path, { headers: { 'user-agent': bot, 'x-forwarded-host': 'attacker.test' } });
       expect(response.status()).toBe(200);
@@ -103,6 +105,9 @@ test('categoria e retorno funcionam sem JavaScript', async ({ browser }) => {
   await page.goto(`${origin}/produtos?category=festas`);
   await expect(page.getByRole('heading', { level: 1, name: 'Festas' })).toBeVisible();
   await page.getByRole('link', { name: /^Ver detalhes:/ }).first().click();
+  await page.getByRole('link', { name: /Premium/ }).click();
+  await expect(page).toHaveURL(/modelo=premium/);
+  await expect(page.getByRole('link', { name: 'Comprar agora' })).toHaveAttribute('href', /\/carrinho\?produto=produto-1&modelo=premium/);
   await page.getByRole('link', { name: 'Voltar aos produtos' }).click();
   await expect(page).toHaveURL(/category=festas/);
   await context.close();

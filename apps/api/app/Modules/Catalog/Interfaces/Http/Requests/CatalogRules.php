@@ -32,7 +32,7 @@ final class CatalogRules
             'composition' => [$optional, 'nullable', 'string', 'max:5000'],
             'file_description' => [$optional, 'nullable', 'string', 'max:5000'],
             'compatibility' => [$optional, 'nullable', 'string', 'max:5000'],
-            'usage_terms' => [$optional, 'nullable', 'string', 'max:10000'],
+            'usage_terms' => [$optional, 'nullable', 'string', 'max:5000'],
             'taxonomy' => [$optional, 'array', 'max:50'],
             'taxonomy.*.type' => ['required', Rule::in(['theme', 'occasion', 'search_alias'])],
             'taxonomy.*.label' => ['required', 'string', 'max:160'],

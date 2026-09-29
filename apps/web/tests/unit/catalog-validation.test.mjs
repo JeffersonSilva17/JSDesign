@@ -5,6 +5,7 @@ import test from 'node:test';
 import {
   isCatalogFacetsEnvelope,
   isCatalogListingPayload,
+  isCatalogProductEnvelope,
   isCatalogSearchPayload,
   isSafeCatalogImagePath,
 } from '../../src/bff/catalogValidation.ts';
@@ -19,6 +20,29 @@ function product() {
     delivery_type: 'digital', production_lead_time_days: null, is_immediate_delivery: true,
     primary_image: { url: '/catalog-e2e-product.svg', alt_text: 'Produto digital' }, taxonomy: [],
     compatibility_excerpt: 'Silhouette Studio',
+  };
+}
+
+function productDetail(overrides = {}) {
+  const { description_excerpt, compatibility_excerpt, ...base } = product();
+  return {
+    ...base,
+    description: description_excerpt,
+    compatibility: compatibility_excerpt,
+    gallery: [{ url: '/catalog-e2e-product.svg', alt_text: 'Produto digital' }],
+    materials: null,
+    composition: null,
+    file_description: 'Arquivo em Studio pronto para corte.',
+    usage_terms: 'Uso permitido em peças físicas; redistribuição digital do arquivo não autorizada.',
+    minimum_quantity: null,
+    models: [{
+      key: 'padrao',
+      label: 'Modelo padrão',
+      difference: 'Versão padrão do produto.',
+      is_default: true,
+      image: null,
+    }],
+    ...overrides,
   };
 }
 
@@ -61,6 +85,26 @@ test('rejeita payload malformado, preço inventado e URL de imagem insegura', ()
   assert.equal(isCatalogListingPayload(listing({ ...product(), category: { slug: 'festas', label: 'x'.repeat(161) } })), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), description_excerpt: 'x'.repeat(241) })), false);
   assert.equal(isCatalogListingPayload(listing({ ...product(), compatibility_excerpt: 'x'.repeat(121) })), false);
+});
+
+test('aceita detalhe enriquecido e rejeita modelos publicos invalidos', () => {
+  assert.equal(isCatalogProductEnvelope({ data: productDetail() }, 'convite-digital'), true);
+  assert.equal(isCatalogProductEnvelope({ data: { ...productDetail(), admin_notes: 'secret' } }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ gallery: Array.from({ length: 9 }, () => ({ url: '/catalog-e2e-product.svg', alt_text: 'Produto digital' })) }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [] }) }, 'convite-digital'), false);
+  const defaultModel = productDetail().models[0];
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [defaultModel, { ...defaultModel, key: 'segundo' }] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [{ ...defaultModel, admin_notes: 'private' }] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ gallery: [{ url: '/catalog-e2e-product.svg', alt_text: 'Produto', storage_reference: 'private' }] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: Array.from({ length: 13 }, (_, index) => ({ key: `modelo-${index}`, label: `Modelo ${index}`, difference: 'Diferença pública.', is_default: index === 0, image: null })) }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [
+    { key: 'padrao', label: 'Modelo padrão', difference: 'Versão padrão.', is_default: true, image: null },
+    { key: 'padrao', label: 'Duplicado', difference: 'Versão duplicada.', is_default: false, image: null },
+  ] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [{ key: 'padrao', label: 'Modelo padrão', difference: 'Versão padrão.', is_default: false, image: null }] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [{ key: 'padrao', label: '', difference: 'Versão padrão.', is_default: true, image: null }] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [{ key: 'padrao', label: 'Modelo padrão', difference: 'x'.repeat(361), is_default: true, image: null }] }) }, 'convite-digital'), false);
+  assert.equal(isCatalogProductEnvelope({ data: productDetail({ models: [{ key: 'padrao', label: 'Modelo padrão', difference: 'Versão padrão.', is_default: true, image: { url: 'https://unsafe.example/a.jpg', alt_text: 'Modelo' } }] }) }, 'convite-digital'), false);
 });
 
 test('facetas aceitas geram links parseáveis e rejeitam termos quebrados', () => {

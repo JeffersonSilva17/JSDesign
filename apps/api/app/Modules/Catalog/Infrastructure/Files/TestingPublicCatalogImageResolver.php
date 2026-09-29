@@ -12,8 +12,9 @@ final class TestingPublicCatalogImageResolver implements PublicCatalogImageResol
             return [];
         }
 
-        return in_array('catalog-e2e-image', $references, true)
-            ? ['catalog-e2e-image' => '/catalog-e2e-product.svg']
-            : [];
+        return array_intersect_key([
+            'catalog-e2e-image' => '/catalog-e2e-product.svg',
+            'catalog-e2e-detail' => '/catalog-e2e-product.svg',
+        ], array_flip($references));
     }
 }

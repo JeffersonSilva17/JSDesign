@@ -145,7 +145,9 @@ export function isSafeCatalogImagePath(value: unknown): value is string {
 
 function isProduct(value: unknown, detail: boolean): boolean {
   if (!isRecord(value)) return false;
-  const common = ['id','slug','name',detail ? 'description' : 'description_excerpt','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy',detail ? 'compatibility' : 'compatibility_excerpt'];
+  const common = detail
+    ? ['id','slug','name','description','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy','compatibility','gallery','materials','composition','file_description','usage_terms','minimum_quantity','models']
+    : ['id','slug','name','description_excerpt','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy','compatibility_excerpt'];
   if (!hasOnlyKeys(value, common) || !nonEmpty(value.id) || !uuidPattern.test(value.id) || !nonEmptyMax(value.name, 180) || !nonEmpty(value.slug) || value.slug.length > 180 || !slugPattern.test(value.slug)) return false;
   if (!isCategory(value.category) || !modalities.includes(value.modality as (typeof modalities)[number])) return false;
   if (!nonNegativeInteger(value.price_minor) || value.currency !== 'EUR' || !['available','unavailable','made_to_order'].includes(value.availability as string) || !['physical','digital'].includes(value.delivery_type as string)) return false;
@@ -155,9 +157,30 @@ function isProduct(value: unknown, detail: boolean): boolean {
   const text = value[detail ? 'description' : 'description_excerpt'];
   const compatibility = value[detail ? 'compatibility' : 'compatibility_excerpt'];
   if (!nonEmpty(text) || text.length > (detail ? 10000 : 240)) return false;
-  return compatibility === null || (typeof compatibility === 'string' && compatibility.length <= (detail ? 5000 : 120));
+  if (!(compatibility === null || (typeof compatibility === 'string' && compatibility.length <= (detail ? 5000 : 120)))) return false;
+  if (!detail) return true;
+  return Array.isArray(value.gallery) && value.gallery.length <= 8 && value.gallery.every(isImage) &&
+    nullableText(value.materials, 5000) && nullableText(value.composition, 5000) &&
+    nullableText(value.file_description, 5000) && nullableText(value.usage_terms, 5000) &&
+    (value.minimum_quantity === null || positiveInteger(value.minimum_quantity)) && isModelList(value.models);
 }
 
+function isImage(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['url', 'alt_text']) && isSafeCatalogImagePath(value.url) && nonEmptyMax(value.alt_text, 300); }
+function nullableText(value: unknown, max: number): boolean { return value === null || (typeof value === 'string' && value.length <= max); }
+function isModelList(value: unknown): boolean {
+  if (!Array.isArray(value) || value.length < 1 || value.length > 12) return false;
+  const keys = new Set<string>();
+  let defaults = 0;
+  for (const model of value) {
+    if (!isRecord(model) || !hasOnlyKeys(model, ['key', 'label', 'difference', 'is_default', 'image']) ||
+        !nonEmptyMax(model.key, 120) || !slugPattern.test(model.key) || keys.has(model.key) ||
+        !nonEmptyMax(model.label, 120) || !nonEmptyMax(model.difference, 360) ||
+        typeof model.is_default !== 'boolean' || (model.image !== null && !isImage(model.image))) return false;
+    keys.add(model.key);
+    if (model.is_default) defaults += 1;
+  }
+  return defaults === 1;
+}
 function isTaxonomy(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['type','key','label']) && (value.type === 'theme' || value.type === 'occasion') && nonEmptyMax(value.key, 180) && nonEmptyMax(value.label, 160); }
 function isCategory(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['slug', 'label']) && nonEmpty(value.slug) && value.slug.length <= 160 && slugPattern.test(value.slug) && nonEmptyMax(value.label, 160); }
 function isOccasionFacet(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['key', 'label']) && validOccasionKey(value.key) && validSearchQuery(value.label); }

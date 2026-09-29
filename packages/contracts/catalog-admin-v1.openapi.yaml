@@ -119,7 +119,7 @@ components:
         composition: { type: [string, 'null'] }
         file_description: { type: [string, 'null'] }
         compatibility: { type: [string, 'null'] }
-        usage_terms: { type: [string, 'null'] }
+        usage_terms: { type: [string, 'null'], maxLength: 5000 }
         taxonomy:
           type: array
           maxItems: 50

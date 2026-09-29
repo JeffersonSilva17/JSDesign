@@ -134,7 +134,18 @@ test('identidade de produto, labels de categoria, modalidade e IDs duplicados', 
   assert.equal(isCatalogListingPayload({ ...listing, data: [item, item], meta: { ...listing.meta, total: 2 } }, filters), false);
   assert.equal(isCatalogListingPayload({ ...listing, meta: { ...listing.meta, applied_filters: { modality: 'digital_ready' }, filter_labels: { modality: 'Outra' } } }, { page: 1, modality: 'digital_ready' }), false);
   const { description_excerpt, compatibility_excerpt, ...base } = item;
-  const detail = { data: { ...base, description: description_excerpt, compatibility: compatibility_excerpt } };
+  const detail = { data: {
+    ...base,
+    description: description_excerpt,
+    compatibility: compatibility_excerpt,
+    gallery: [],
+    materials: null,
+    composition: null,
+    file_description: null,
+    usage_terms: null,
+    minimum_quantity: null,
+    models: [{ key: 'padrao', label: 'Modelo padrão', difference: 'Versão padrão do produto.', is_default: true, image: null }],
+  } };
   assert.equal(isCatalogProductEnvelope(detail, 'festa'), true);
   assert.equal(isCatalogProductEnvelope(detail, 'outro'), false);
 });
@@ -144,6 +155,9 @@ test('query do detalhe permite somente retorno seguro e único', () => {
     assert.deepEqual(detailQuery(query), { valid: false, returnHref: '/produtos' });
   }
   assert.deepEqual(detailQuery({ return_to: '/buscar?q=convite' }), { valid: true, returnHref: '/buscar?q=convite' });
+  assert.deepEqual(detailQuery({ modelo: 'premium' }), { valid: true, returnHref: '/produtos', modelKey: 'premium' });
+  assert.deepEqual(detailQuery({ modelo: 'modelo-desconhecido', return_to: '/buscar?q=convite' }), { valid: true, returnHref: '/buscar?q=convite', modelKey: 'modelo-desconhecido' });
+  assert.deepEqual(detailQuery({ modelo: '../segredo' }), { valid: true, returnHref: '/produtos', modelKey: null });
   assert.equal(detailQuery({ return_to: '/produtos' }).valid, true);
   assert.equal(detailQuery({}).valid, true);
 });

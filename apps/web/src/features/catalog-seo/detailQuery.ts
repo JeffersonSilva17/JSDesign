@@ -29,6 +29,14 @@ export function detailQuery(input: Readonly<Record<string, string | string[] | u
   if (Object.keys(input).length === 0) return { valid: true, returnHref: '/produtos' };
   const value = input.return_to;
   const href = safeReturnHref(value);
-  const valid = Object.keys(input).length === 1 && typeof value === 'string' && (href !== '/produtos' || value === '/produtos');
-  return { valid, returnHref: valid ? href : '/produtos' };
+  const keys = Object.keys(input);
+  const allowed = keys.every((key) => key === 'return_to' || key === 'modelo');
+  const validReturn = value === undefined || (typeof value === 'string' && (href !== '/produtos' || value === '/produtos'));
+  const modelKey = typeof input.modelo === 'string' && input.modelo.length <= 120 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(input.modelo)
+    ? input.modelo
+    : null;
+  const valid = allowed && validReturn;
+  return input.modelo === undefined
+    ? { valid, returnHref: valid ? href : '/produtos' }
+    : { valid, returnHref: valid ? href : '/produtos', modelKey };
 }

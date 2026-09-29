@@ -21,6 +21,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Normalizer;
 use PDOException;
+use UnexpectedValueException;
 
 final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, PublicCatalogSearchQuery
 {
@@ -114,7 +115,7 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
     {
         return $this->withStatementTimeout(function () use ($slug): ?array {
             $row = $this->publishedQuery(new PublicCatalogFilters)
-                ->where('p.slug', $slug)->first($this->productColumns());
+                ->where('p.slug', $slug)->first($this->productColumns(true));
 
             if ($row === null) {
                 return null;
@@ -417,13 +418,26 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
     }
 
     /** @return list<string> */
-    private function productColumns(): array
+    private function productColumns(bool $detail = false): array
     {
-        return [
+        $columns = [
             'p.id', 'p.slug', 'p.name', 'p.description', 'p.modality', 'p.price_minor', 'p.currency',
             'p.availability', 'p.delivery_type', 'p.production_lead_time_days', 'p.is_immediate_delivery',
             'p.compatibility', 'c.slug as category_slug', 'c.label as category_label',
         ];
+
+        if ($detail) {
+            array_push(
+                $columns,
+                'p.materials',
+                'p.composition',
+                'p.file_description',
+                'p.usage_terms',
+                'p.minimum_quantity',
+            );
+        }
+
+        return $columns;
     }
 
     /** @param list<array<string, mixed>> $rows @return list<array<string, mixed>> */
@@ -434,17 +448,70 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
         }
 
         $ids = array_column($rows, 'id');
-        $imageRows = DB::table('catalog_product_images')->whereIn('product_id', $ids)->where('is_primary', true)
-            ->orderBy('sort_order')->get(['product_id', 'storage_reference', 'alt_text']);
-        $references = $imageRows->pluck('storage_reference')->map(static fn (mixed $value): string => (string) $value)->all();
+        $productNameById = [];
+        foreach ($rows as $row) {
+            $productNameById[(string) $row['id']] = (string) $row['name'];
+        }
+        $imageQuery = DB::table('catalog_product_images')->whereIn('product_id', $ids);
+        if (! $detail) {
+            $imageQuery->where('is_primary', true);
+        }
+        $imageRows = $imageQuery->orderBy('product_id')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')
+            ->get(['id', 'product_id', 'storage_reference', 'alt_text', 'is_primary']);
+        $modelRows = $detail ? DB::table('catalog_product_models')->whereIn('product_id', $ids)
+            ->orderBy('product_id')->orderBy('sort_order')->orderBy('id')
+            ->get(['product_id', 'public_key', 'label', 'difference', 'image_reference', 'is_default']) : collect();
+        $references = array_values(array_unique(array_filter([
+            ...$imageRows->pluck('storage_reference')->map(static fn (mixed $value): string => (string) $value)->all(),
+        ], static fn (string $value): bool => $value !== '')));
         $resolved = $this->images->resolveBatch($references);
         $primaryByProduct = [];
+        $galleryPrimaryByProduct = [];
+        $gallerySecondaryByProduct = [];
+        $publicImageByProductReference = [];
         foreach ($imageRows as $image) {
             $url = is_string($resolved[$image->storage_reference] ?? null)
                 ? PublicImagePath::validate($resolved[$image->storage_reference])
                 : null;
             if ($url !== null) {
-                $primaryByProduct[$image->product_id] = ['url' => $url, 'alt_text' => (string) $image->alt_text];
+                $productId = (string) $image->product_id;
+                $reference = (string) $image->storage_reference;
+                $altText = trim((string) $image->alt_text);
+                $item = ['url' => $url, 'alt_text' => $altText === '' ? $productNameById[$productId] : $altText];
+                $publicImageByProductReference[$productId][$reference] = $item;
+                if ((bool) $image->is_primary && ! isset($primaryByProduct[$productId])) {
+                    $primaryByProduct[$productId] = $item;
+                    $galleryPrimaryByProduct[$productId] = $item;
+                } elseif ($detail) {
+                    $gallerySecondaryByProduct[$productId][] = $item;
+                }
+            }
+        }
+
+        $modelsByProduct = [];
+        if ($detail) {
+            $rawModelsByProduct = [];
+            foreach ($modelRows as $model) {
+                $rawModelsByProduct[$model->product_id][] = $model;
+            }
+            foreach ($rawModelsByProduct as $productId => $productModels) {
+                if (count($productModels) > 12 || count(array_filter($productModels, static fn (object $model): bool => (bool) $model->is_default)) !== 1) {
+                    throw new UnexpectedValueException('Invalid public catalog product models.');
+                }
+                foreach ($productModels as $model) {
+                    $image = null;
+                    if (is_string($model->image_reference) && $model->image_reference !== '') {
+                        $modelImage = $publicImageByProductReference[(string) $productId][$model->image_reference] ?? null;
+                        $image = $modelImage === null ? null : ['url' => $modelImage['url'], 'alt_text' => (string) $model->label];
+                    }
+                    $modelsByProduct[$productId][] = [
+                        'key' => (string) $model->public_key,
+                        'label' => (string) $model->label,
+                        'difference' => (string) $model->difference,
+                        'is_default' => (bool) $model->is_default,
+                        'image' => $image,
+                    ];
+                }
             }
         }
 
@@ -462,7 +529,7 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
             ];
         }
 
-        return array_map(function (array $row) use ($detail, $primaryByProduct, $taxonomyByProduct): array {
+        return array_map(function (array $row) use ($detail, $primaryByProduct, $galleryPrimaryByProduct, $gallerySecondaryByProduct, $modelsByProduct, $taxonomyByProduct): array {
             $projection = [
                 'id' => (string) $row['id'], 'slug' => (string) $row['slug'], 'name' => (string) $row['name'],
                 'category' => ['slug' => (string) $row['category_slug'], 'label' => (string) $row['category_label']],
@@ -477,6 +544,23 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
             if ($detail) {
                 $projection['description'] = (string) $row['description'];
                 $projection['compatibility'] = $row['compatibility'] === null ? null : (string) $row['compatibility'];
+                $gallery = array_values(array_slice([
+                    ...array_values(isset($galleryPrimaryByProduct[$row['id']]) ? [$galleryPrimaryByProduct[$row['id']]] : []),
+                    ...array_values($gallerySecondaryByProduct[$row['id']] ?? []),
+                ], 0, 8));
+                $projection['gallery'] = $gallery;
+                $projection['materials'] = $row['materials'] === null ? null : (string) $row['materials'];
+                $projection['composition'] = $row['composition'] === null ? null : (string) $row['composition'];
+                $projection['file_description'] = $row['file_description'] === null ? null : (string) $row['file_description'];
+                $projection['usage_terms'] = $row['usage_terms'] === null ? null : (string) $row['usage_terms'];
+                $projection['minimum_quantity'] = $row['minimum_quantity'] === null ? null : (int) $row['minimum_quantity'];
+                $projection['models'] = $modelsByProduct[$row['id']] ?? [[
+                    'key' => 'padrao',
+                    'label' => 'Modelo padrão',
+                    'difference' => 'Versão padrão do produto.',
+                    'is_default' => true,
+                    'image' => null,
+                ]];
             } else {
                 $projection['description_excerpt'] = PublicCatalogText::excerpt((string) $row['description'], 240);
                 $projection['compatibility_excerpt'] = $row['compatibility'] === null ? null : PublicCatalogText::excerpt((string) $row['compatibility'], 120);
