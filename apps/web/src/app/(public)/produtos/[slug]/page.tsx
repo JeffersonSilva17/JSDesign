@@ -14,6 +14,8 @@ import { detailQuery } from '@/features/catalog-seo/detailQuery';
 import { productStructuredData } from '@/features/catalog-seo/catalogStructuredData';
 import { StructuredData } from '@/features/catalog-seo/StructuredData';
 import { seoConfig } from '@/features/catalog-seo/siteUrl';
+import { PricingConfigurator } from '@/features/pricing/PricingConfigurator';
+import { defaultLocale } from '@/i18n/locales';
 
 type Props = Readonly<{
   params: Promise<{ slug: string }>;
@@ -44,9 +46,7 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
   const returnHref = query.returnHref;
   const modelKey = 'modelKey' in query ? query.modelKey ?? null : null;
   const selectedModel = selectedProductModel(product.models, modelKey);
-  const price = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: product.currency }).format(product.price_minor / 100);
   const gallery = product.gallery.length > 0 ? product.gallery : product.primary_image ? [product.primary_image] : [];
-  const modelPriceLabel = product.models.length > 1 ? catalogContent.detail.priceFrom : catalogContent.detail.priceBase;
   const ctaHref = `/carrinho?produto=${encodeURIComponent(product.slug)}&modelo=${encodeURIComponent(selectedModel.key)}`;
   return <article className="catalog-detail">
     {seoConfig().indexing && query.valid && <StructuredData value={productStructuredData(product, seoConfig().origin)} />}
@@ -69,7 +69,6 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
       <p className="catalog-detail__description">{product.description}</p>
       <p className="catalog-detail__modality-note">{catalogContent.detail.modalityNotes[product.modality]}</p>
       <dl className="catalog-detail__facts" aria-label={catalogContent.detail.summary}>
-        <Fact label={modelPriceLabel} value={price} strong />
         <Fact label={catalogContent.filters.category} value={product.category.label} />
         {product.production_lead_time_days !== null && <Fact label={catalogContent.detail.leadTime} value={`${product.production_lead_time_days} ${catalogContent.detail.days}`} />}
         {product.minimum_quantity !== null && <Fact label={catalogContent.detail.minimumQuantity} value={`${product.minimum_quantity} ${catalogContent.detail.units}`} />}
@@ -78,6 +77,8 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
         {product.file_description && <Fact label={catalogContent.detail.fileDescription} value={product.file_description} />}
         {product.compatibility && <Fact label={catalogContent.detail.compatibility} value={product.compatibility} />}
       </dl>
+      <PricingConfigurator key={`${product.slug}:${product.models.length > 0 ? selectedModel.key : ''}`} slug={product.slug} modelKey={product.models.length > 0 ? selectedModel.key : null}
+        minimumQuantity={product.minimum_quantity} modality={product.modality} ctaHref={ctaHref} locale={defaultLocale} />
       {product.usage_terms && <p className="catalog-detail__terms"><strong>{catalogContent.detail.usageTerms}:</strong> {product.usage_terms} <Link href="/termos">{catalogContent.detail.termsLink}</Link></p>}
       <section className="catalog-detail__models" aria-labelledby="product-models-title">
         <h2 id="product-models-title">{catalogContent.detail.models}</h2>
@@ -95,8 +96,6 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
         </ul>
       </section>
       <div className="catalog-detail__actions">
-        <Link className="button button--primary" href={ctaHref}>{catalogContent.detail.cta[product.modality]}</Link>
-        <p>{catalogContent.detail.handoff}</p>
         <Link className="button button--secondary" href={returnHref}>{catalogContent.detail.back}</Link>
       </div>
     </div>

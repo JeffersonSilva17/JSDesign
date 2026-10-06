@@ -1,5 +1,5 @@
 # generated: 2026-07-31
-# last_updated: 2026-09-29
+# last_updated: 2026-10-06
 # project: JSDESIGN
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: "2026-07-31"
-last_updated: "2026-09-29"
+last_updated: "2026-10-06"
 project: "JSDESIGN"
 project_key: "NOKEY"
 tracking_system: "file-system"
@@ -63,7 +63,7 @@ development_status:
   epic-2-retrospective: optional
   epic-3: in-progress
   3-1-exibir-pagina-propria-de-produto-com-diferencas-entre-modelos: done
-  3-2-configurar-quantidade-e-calcular-preco-antes-do-carrinho: backlog
+  3-2-configurar-quantidade-e-calcular-preco-antes-do-carrinho: done
   3-3-coletar-personalizacao-essencial-no-adicionar-ao-carrinho: backlog
   3-4-oferecer-miniatura-do-aniversariante-como-adicional-pago-uma-unica-vez: backlog
   3-5-diferenciar-produtos-digitais-prontos-e-personalizados-antes-da-compra: backlog

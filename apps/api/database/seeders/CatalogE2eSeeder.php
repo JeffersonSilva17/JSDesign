@@ -57,6 +57,14 @@ final class CatalogE2eSeeder extends Seeder
                 'compatibility' => $modality === 'digital_ready' ? 'Silhouette Studio' : null,
                 'published_at' => $now->copy()->subMinutes($index), 'created_at' => $now, 'updated_at' => $now,
             ]);
+            if ($index === 3) {
+                $ruleId = DB::table('pricing_product_rules')->where('product_id', $id)->value('id');
+                DB::table('pricing_product_rules')->where('id', $ruleId)->update(['maximum_quantity' => 250, 'updated_at' => $now]);
+                DB::table('pricing_quantity_tiers')->insert([
+                    ['id' => (string) Str::uuid(), 'pricing_product_rule_id' => $ruleId, 'minimum_quantity' => 12, 'maximum_quantity' => 49, 'unit_price_minor' => 950, 'created_at' => $now, 'updated_at' => $now],
+                    ['id' => (string) Str::uuid(), 'pricing_product_rule_id' => $ruleId, 'minimum_quantity' => 50, 'maximum_quantity' => null, 'unit_price_minor' => 900, 'created_at' => $now, 'updated_at' => $now],
+                ]);
+            }
             DB::table('catalog_product_taxonomy')->insert(['product_id' => $id, 'taxonomy_term_id' => $occasionId, 'is_protected' => false, 'created_at' => $now, 'updated_at' => $now]);
             if ($index >= 5 && $index <= 8) {
                 DB::table('catalog_product_taxonomy')->insert(['product_id' => $id, 'taxonomy_term_id' => $productAliasId, 'is_protected' => false, 'created_at' => $now, 'updated_at' => $now]);
