@@ -11,12 +11,12 @@
     "start": "node scripts/server.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test:bff": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/catalog-validation.test.mjs",
+    "test:bff": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/catalog-validation.test.mjs tests/unit/pricing-validation.test.mjs tests/unit/pricing-transport.test.mjs",
     "test:e2e": "playwright test",
     "test:seo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/catalog-seo.test.mjs"
   },
   "dependencies": {
-    "next": "16.3.5",
+    "next": "16.3.8",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
@@ -26,7 +26,9 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "16.3.5",
-    "typescript": "^5.9.0"
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "8.66.0"
   }
 }

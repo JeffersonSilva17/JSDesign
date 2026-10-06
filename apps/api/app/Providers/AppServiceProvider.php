@@ -16,6 +16,8 @@ use App\Modules\Catalog\Infrastructure\Identifiers\LaravelUuidGenerator;
 use App\Modules\Catalog\Infrastructure\Persistence\PostgresCatalogProductRepository;
 use App\Modules\Catalog\Infrastructure\Persistence\PostgresPublicCatalogQuery;
 use App\Modules\Catalog\Infrastructure\Security\FailClosedAdminIdentityResolver;
+use App\Modules\Pricing\Application\QuoteProduct;
+use App\Modules\Pricing\Infrastructure\Persistence\PostgresQuoteProduct;
 use App\Modules\Promotions\Domain\PromotionCouponRepository;
 use App\Modules\Promotions\Infrastructure\Delivery\EmailProvider;
 use App\Modules\Promotions\Infrastructure\Delivery\LaravelMailEmailProvider;
@@ -24,6 +26,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PublicCatalogImageResolver::class, $imageResolver);
         $this->app->bind(PromotionCouponRepository::class, PostgresPromotionCouponRepository::class);
         $this->app->bind(EmailProvider::class, LaravelMailEmailProvider::class);
+        $this->app->bind(QuoteProduct::class, PostgresQuoteProduct::class);
     }
 
     /**
@@ -51,6 +55,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('public-pricing-quote', static fn (Request $request): Limit => Limit::perMinute(60)->by('public-pricing-quote:'.hash('sha256', $request->getClientIp() ?? 'unknown'))
+            ->response(static fn (Request $request, array $headers) => response()->json([
+                'error' => ['code' => 'rate_limited', 'message' => 'Muitas cotações. Tente novamente em instantes.', 'correlation_id' => (string) Str::uuid()],
+            ], 429, $headers)->header('Cache-Control', 'no-store, private')));
         RateLimiter::for('public-catalog-sitemap', static function (Request $request): Limit {
             return Limit::perMinute((int) config('catalog.sitemap_rate_limit_per_minute', 60))
                 ->by('public-catalog-sitemap:'.hash('sha256', $request->attributes->get('sitemap_client') ?? $request->server('REMOTE_ADDR', 'unknown')))

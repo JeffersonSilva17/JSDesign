@@ -13,6 +13,7 @@ use App\Modules\Catalog\Interfaces\Http\Controllers\UpdateCatalogProductControll
 use App\Modules\Catalog\Interfaces\Http\Middleware\CatalogAdminAuthorization;
 use App\Modules\Catalog\Interfaces\Http\Middleware\PublicCatalogNoStore;
 use App\Modules\Catalog\Interfaces\Http\Middleware\SitemapClientIdentity;
+use App\Modules\Pricing\Interfaces\Http\Controllers\CreatePricingQuoteController;
 use App\Modules\Promotions\Interfaces\Http\Controllers\FirstPurchaseCouponController;
 use App\Modules\Promotions\Interfaces\Http\Controllers\FirstPurchaseOfferController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,9 @@ Route::prefix('v1')->group(function (): void {
         ->name('api.v1.promotions.first-purchase-offer');
     Route::post('/promotions/first-purchase-coupons', FirstPurchaseCouponController::class)
         ->name('api.v1.promotions.first-purchase-coupons');
+    Route::post('/pricing/quotes', CreatePricingQuoteController::class)
+        ->middleware(['App\\Modules\\Catalog\\Interfaces\\Http\\Middleware\\PublicCatalogNoStore', 'throttle:public-pricing-quote'])
+        ->name('api.v1.pricing.quotes');
 
     Route::prefix('catalog')->middleware([PublicCatalogNoStore::class, 'throttle:public-catalog'])->group(function (): void {
         Route::get('/products', ListPublicCatalogProductsController::class)->name('api.v1.catalog.products.index');

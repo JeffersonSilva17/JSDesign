@@ -16,14 +16,14 @@ _Este arquivo contém regras e padrões críticos que os agentes de IA devem seg
 
 ## Stack de Tecnologia e Versões
 
-- Frontend/BFF: Next.js 16.3.5, React 19.2.0 e React DOM 19.2.0.
+- Frontend/BFF: Next.js 16.3.8, React 19.2.0 e React DOM 19.2.0.
 - Linguagem frontend: TypeScript 5.9.x em modo `strict`, com alvo ES2022.
 - Runtime frontend: Node.js 24.x; instalar com `npm ci`.
 - Backend/API: PHP 8.5.x e Laravel 13.x.
 - Banco transacional: PostgreSQL 18.x.
 - Cache e filas: Redis 8.x; cliente Laravel `predis/predis` 3.x.
 - Testes: PHPUnit 12.5.x para Laravel e Playwright 1.60.0 com Chromium.
-- Qualidade: ESLint 9.x com `eslint-config-next` 16.3.5 e Laravel Pint 1.x.
+- Qualidade: ESLint 9.x com `eslint-config-next` 16.3.8 e Laravel Pint 1.x.
 - Contratos: REST JSON versionado em `/api/v1`; contratos OpenAPI ficam em `packages/contracts`.
 - `package.json` e `composer.json` definem faixas de compatibilidade; `package-lock.json` e `composer.lock` definem os patches efetivamente instalados.
 - Não atualizar dependências, alterar faixas ou regenerar lockfiles fora do escopo explícito da story.

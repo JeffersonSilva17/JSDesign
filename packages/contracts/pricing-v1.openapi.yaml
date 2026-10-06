@@ -1,0 +1,94 @@
+openapi: 3.1.0
+info:
+  title: Pricing API v1
+  version: 1.0.0
+paths:
+  /api/v1/pricing/quotes:
+    post:
+      operationId: createPricingQuote
+      summary: Calcula uma cotação pública sem reservar disponibilidade
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '200':
+          description: Cotação calculada a partir do snapshot atual
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '400': { $ref: '#/components/responses/PublicError' }
+        '404': { $ref: '#/components/responses/PublicError' }
+        '422': { $ref: '#/components/responses/PublicError' }
+        '429': { $ref: '#/components/responses/PublicError' }
+        '503': { $ref: '#/components/responses/PublicError' }
+components:
+  schemas:
+    QuoteRequest:
+      type: object
+      additionalProperties: false
+      required: [product_slug, quantity, currency]
+      properties:
+        product_slug: { type: string, minLength: 1, maxLength: 180, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        model_key: { type: string, minLength: 1, maxLength: 120, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        quantity: { type: integer, minimum: 1, maximum: 10000 }
+        currency: { type: string, const: EUR }
+      x-max-payload-bytes: 4096
+    Quote:
+      type: object
+      additionalProperties: false
+      required: [product_slug, model_key, quantity, minimum_quantity, maximum_quantity, base_unit_price_minor, unit_price_minor, subtotal_minor, discount_minor, total_minor, currency, pricing_rule_version, applied_tier]
+      properties:
+        product_slug: { type: string }
+        model_key: { type: [string, 'null'] }
+        quantity: { type: integer, minimum: 1, maximum: 10000 }
+        minimum_quantity: { type: integer, minimum: 1 }
+        maximum_quantity: { type: integer, minimum: 1, maximum: 10000 }
+        base_unit_price_minor: { type: integer, minimum: 0 }
+        unit_price_minor: { type: integer, minimum: 0 }
+        subtotal_minor: { type: integer, minimum: 0 }
+        discount_minor: { type: integer, minimum: 0 }
+        total_minor: { type: integer, minimum: 0 }
+        currency: { type: string, const: EUR }
+        pricing_rule_version: { type: integer, minimum: 1 }
+        applied_tier:
+          oneOf:
+            - type: 'null'
+            - type: object
+              additionalProperties: false
+              required: [minimum_quantity, maximum_quantity, unit_price_minor]
+              properties:
+                minimum_quantity: { type: integer, minimum: 1 }
+                maximum_quantity: { type: [integer, 'null'], minimum: 1 }
+                unit_price_minor: { type: integer, minimum: 0 }
+    PublicError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, correlation_id]
+          properties:
+            code:
+              type: string
+              enum: [invalid_request, invalid_quantity, invalid_model, unsupported_currency, quote_unavailable, rate_limited, quote_unavailable_temporarily]
+            message: { type: string }
+            correlation_id: { type: string, format: uuid }
+  responses:
+    PublicError:
+      description: Erro público sanitizado
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicError'

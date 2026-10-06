@@ -941,6 +941,25 @@ code {
   display: none;
 }
 
+.pricing-panel {
+  display: grid;
+  gap: 1rem;
+  max-width: 32rem;
+  margin-block: 1.5rem;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--ink-primary);
+}
+.pricing-panel h2 { margin: 0; font-size: 1.25rem; }
+.pricing-panel input { width: 100%; min-height: 2.75rem; padding: .625rem .75rem; border: 1px solid currentColor; border-radius: .5rem; }
+.pricing-panel input:focus-visible, .pricing-panel a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.pricing-panel__values { display: grid; gap: .5rem; margin: 0; }
+.pricing-panel__values div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; }
+.pricing-panel__values dd { margin: 0; font-variant-numeric: tabular-nums; }
+.pricing-panel p { margin: 0; }
+
 .catalog-detail__actions {
   align-items: start;
   display: grid;

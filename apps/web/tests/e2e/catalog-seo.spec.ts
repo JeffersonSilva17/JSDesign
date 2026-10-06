@@ -107,7 +107,7 @@ test('categoria e retorno funcionam sem JavaScript', async ({ browser }) => {
   await page.getByRole('link', { name: /^Ver detalhes:/ }).first().click();
   await page.getByRole('link', { name: /Premium/ }).click();
   await expect(page).toHaveURL(/modelo=premium/);
-  await expect(page.getByRole('link', { name: 'Comprar agora' })).toHaveAttribute('href', /\/carrinho\?produto=produto-1&modelo=premium/);
+  await expect(page.getByRole('link', { name: 'Continuar para configuração' })).toHaveAttribute('href', /\/carrinho\?produto=produto-1&modelo=premium/);
   await page.getByRole('link', { name: 'Voltar aos produtos' }).click();
   await expect(page).toHaveURL(/category=festas/);
   await context.close();
