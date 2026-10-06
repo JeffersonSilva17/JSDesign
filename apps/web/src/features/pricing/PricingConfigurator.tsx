@@ -26,13 +26,6 @@ export function PricingConfigurator({ slug, modelKey, minimumQuantity, modality,
   const valid = Number.isSafeInteger(parsed) && parsed >= minimum && parsed <= maximum && (modality !== 'digital_ready' || parsed === 1);
 
   useEffect(() => {
-    setQuantity(String(minimum));
-    setMaximumQuantity(null);
-    setState({ status: 'idle' });
-    setRetry(0);
-  }, [slug, modelKey, minimum, modality]);
-
-  useEffect(() => {
     const id = ++sequence.current;
     current.current?.abort();
     if (!valid) return;

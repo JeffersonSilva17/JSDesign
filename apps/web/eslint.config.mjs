@@ -6,7 +6,17 @@ const localNextCoreWebVitals = {
   rules: {
     'no-img-element': jsxElementRule('img', 'Use next/image instead of an img element.'),
     'no-head-element': jsxElementRule('head', 'Use the Next.js metadata APIs instead of a head element.'),
-    'no-sync-scripts': jsxElementRule('script', 'Use next/script instead of a script element.'),
+    'no-sync-scripts': {
+      meta: { type: 'problem', messages: { forbidden: 'Use next/script instead of a script element.' } },
+      create(context) {
+        return {
+          JSXOpeningElement(node) {
+            // JSON-LD is a data container; the Next rule only targets blocking scripts.
+            if (jsxName(node) === 'script' && hasAttribute(node, 'src')) context.report({ node, messageId: 'forbidden' });
+          },
+        };
+      },
+    },
     'no-css-tags': {
       meta: { type: 'problem', messages: { forbidden: 'Import styles instead of adding stylesheet link tags.' } },
       create(context) {
@@ -35,7 +45,7 @@ const localNextCoreWebVitals = {
         return {
           Program(node) { isClientComponent = node.body[0]?.type === 'ExpressionStatement' && node.body[0].expression.type === 'Literal' && node.body[0].expression.value === 'use client'; },
           'FunctionDeclaration[async=true], ArrowFunctionExpression[async=true], FunctionExpression[async=true]'(node) {
-            if (isClientComponent) context.report({ node, messageId: 'forbidden' });
+            if (isClientComponent && isTopLevelComponent(node)) context.report({ node, messageId: 'forbidden' });
           },
         };
       },
@@ -72,6 +82,24 @@ function staticAttribute(node, name) {
   if (attribute.value.type === 'Literal' && typeof attribute.value.value === 'string') return attribute.value.value;
   if (attribute.value.type === 'JSXExpressionContainer' && attribute.value.expression.type === 'Literal' && typeof attribute.value.expression.value === 'string') return attribute.value.expression.value;
   return null;
+}
+
+function hasAttribute(node, name) {
+  return node.attributes.some((item) => item.type === 'JSXAttribute' && item.name.name === name);
+}
+
+function isTopLevelComponent(node) {
+  if (node.type === 'FunctionDeclaration') {
+    return /^[A-Z]/.test(node.id?.name ?? '') && isTopLevel(node.parent);
+  }
+
+  if (node.type !== 'ArrowFunctionExpression' && node.type !== 'FunctionExpression') return false;
+  const declarator = node.parent?.type === 'VariableDeclarator' ? node.parent : null;
+  return Boolean(declarator && declarator.id.type === 'Identifier' && /^[A-Z]/.test(declarator.id.name) && isTopLevel(declarator.parent?.parent));
+}
+
+function isTopLevel(node) {
+  return node?.type === 'Program' || node?.type === 'ExportNamedDeclaration' || node?.type === 'ExportDefaultDeclaration';
 }
 
 const eslintConfig = [

@@ -77,7 +77,7 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
         {product.file_description && <Fact label={catalogContent.detail.fileDescription} value={product.file_description} />}
         {product.compatibility && <Fact label={catalogContent.detail.compatibility} value={product.compatibility} />}
       </dl>
-      <PricingConfigurator key={`${product.slug}:${product.models.length > 0 ? selectedModel.key : ''}`} slug={product.slug} modelKey={product.models.length > 0 ? selectedModel.key : null}
+      <PricingConfigurator key={`${product.slug}:${product.models.length > 0 ? selectedModel.key : ''}:${product.minimum_quantity ?? ''}:${product.modality}:${defaultLocale}`} slug={product.slug} modelKey={product.models.length > 0 ? selectedModel.key : null}
         minimumQuantity={product.minimum_quantity} modality={product.modality} ctaHref={ctaHref} locale={defaultLocale} />
       {product.usage_terms && <p className="catalog-detail__terms"><strong>{catalogContent.detail.usageTerms}:</strong> {product.usage_terms} <Link href="/termos">{catalogContent.detail.termsLink}</Link></p>}
       <section className="catalog-detail__models" aria-labelledby="product-models-title">
