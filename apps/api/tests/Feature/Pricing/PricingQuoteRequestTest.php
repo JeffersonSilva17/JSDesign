@@ -49,6 +49,7 @@ final class PricingQuoteRequestTest extends TestCase
         self::assertEqualsCanonicalizing([
             'product_slug', 'model_key', 'quantity', 'minimum_quantity', 'maximum_quantity', 'base_unit_price_minor',
             'unit_price_minor', 'subtotal_minor', 'discount_minor', 'total_minor', 'currency', 'pricing_rule_version', 'applied_tier',
+            'quote_snapshot_id',
         ], array_keys($first->json()));
         self::assertSame(1, DB::table('pricing_quantity_tiers')->count());
     }

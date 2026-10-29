@@ -164,7 +164,7 @@ components:
         compatibility_excerpt: { type: [string, 'null'], maxLength: 120 }
     ProductDetail:
       type: object
-      required: [id, slug, name, description, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy, compatibility, gallery, materials, composition, file_description, usage_terms, minimum_quantity, models]
+      required: [id, slug, name, description, category, modality, price_minor, currency, availability, delivery_type, production_lead_time_days, is_immediate_delivery, primary_image, taxonomy, compatibility, gallery, materials, composition, file_description, usage_terms, minimum_quantity, allows_deferred_briefing, models]
       additionalProperties: false
       properties:
         id: { type: string, format: uuid }
@@ -188,6 +188,7 @@ components:
         file_description: { type: [string, 'null'], maxLength: 5000 }
         usage_terms: { type: [string, 'null'], maxLength: 5000 }
         minimum_quantity: { type: [integer, 'null'], minimum: 1 }
+        allows_deferred_briefing: { type: boolean, description: true only when explicitly configured by administration; legacy absence is false. }
         models: { type: array, minItems: 1, maxItems: 12, items: { $ref: '#/components/schemas/ProductModel' } }
     ProductPage:
       type: object

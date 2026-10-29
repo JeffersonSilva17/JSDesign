@@ -16,7 +16,7 @@ const product = {
   id: '10d6c281-33b2-4d97-857e-29ffccec8ae9', slug: 'publico', name: 'Celebração </script><script>alert(1)</script>',
   description: 'Descrição pública', category: { slug: 'festas', label: 'Festas' }, modality: 'digital_ready', price_minor: 100,
   currency: 'EUR', availability: 'unavailable', delivery_type: 'digital', production_lead_time_days: null,
-  is_immediate_delivery: true, primary_image: null, taxonomy: [], compatibility: null,
+  is_immediate_delivery: true, primary_image: null, taxonomy: [], compatibility: null, allows_deferred_briefing: false,
 } as const;
 const productDetail = {
   ...product,

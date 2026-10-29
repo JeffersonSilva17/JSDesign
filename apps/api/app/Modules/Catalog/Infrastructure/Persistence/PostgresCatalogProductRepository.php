@@ -15,7 +15,7 @@ final class PostgresCatalogProductRepository implements CatalogProductRepository
     private const PRODUCT_COLUMNS = [
         'id', 'slug', 'name', 'description', 'modality', 'status', 'category_id', 'price_minor', 'currency',
         'availability', 'delivery_type', 'minimum_quantity', 'variants_reference', 'is_personalized',
-        'is_immediate_delivery', 'requires_briefing', 'requires_approval', 'production_lead_time_days',
+        'is_immediate_delivery', 'requires_briefing', 'requires_approval', 'allows_deferred_briefing', 'production_lead_time_days',
         'materials', 'composition', 'file_description', 'compatibility', 'usage_terms', 'version',
         'published_at', 'unpublished_at',
     ];
@@ -115,7 +115,7 @@ final class PostgresCatalogProductRepository implements CatalogProductRepository
             }
         }
 
-        foreach (['is_personalized', 'is_immediate_delivery', 'requires_briefing', 'requires_approval'] as $field) {
+        foreach (['is_personalized', 'is_immediate_delivery', 'requires_briefing', 'requires_approval', 'allows_deferred_briefing'] as $field) {
             if ($product[$field] !== null) {
                 $product[$field] = (bool) $product[$field];
             }

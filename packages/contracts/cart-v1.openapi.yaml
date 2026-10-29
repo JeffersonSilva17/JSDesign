@@ -1,0 +1,193 @@
+openapi: 3.1.0
+info:
+  title: Cart Configuration API v1
+  version: 1.0.0
+  description: Inclusão server-owned de item configurado. O navegador acessa esta API somente pelo BFF.
+servers:
+  - url: /
+paths:
+  /api/v1/cart/items:
+    get:
+      operationId: getCurrentGuestCart
+      summary: Lê itens do carrinho convidado derivado da sessão interna
+      security:
+        - bffService: []
+      parameters:
+        - name: X-Guest-Session
+          in: header
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 200 }
+      responses:
+        '200':
+          description: Itens pertencentes exclusivamente ao owner derivado pelo Laravel.
+          headers: { Cache-Control: { schema: { type: string, const: no-store } } }
+          content: { application/json: { schema: { type: object, additionalProperties: false, required: [items], properties: { items: { type: array, items: { $ref: '#/components/schemas/CartItemResult' } } } } } }
+        '503': { $ref: '#/components/responses/PublicError' }
+    post:
+      operationId: addConfiguredCartItem
+      summary: Inclui um item configurado no carrinho convidado corrente
+      security:
+        - bffService: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 20
+            maxLength: 120
+            pattern: '^[A-Za-z0-9._~-]+$'
+        - name: X-Guest-Session
+          in: header
+          required: true
+          description: Referência opaca encaminhada pelo BFF; nunca é aceita diretamente do navegador.
+          schema:
+            type: string
+            minLength: 32
+            maxLength: 200
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCartItemRequest'
+      responses:
+        '201':
+          description: Item incluído e cotação recalculada pelo Laravel
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemResult'
+        '200':
+          description: Replay idempotente da inclusão original
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItemResult'
+        '400': { $ref: '#/components/responses/PublicError' }
+        '409': { $ref: '#/components/responses/PublicError' }
+        '413': { $ref: '#/components/responses/PublicError' }
+        '419': { $ref: '#/components/responses/PublicError' }
+        '422': { $ref: '#/components/responses/PublicError' }
+        '429': { $ref: '#/components/responses/PublicError' }
+        '503': { $ref: '#/components/responses/PublicError' }
+components:
+  securitySchemes:
+    bffService:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-service-credential
+  schemas:
+    AddCartItemRequest:
+      type: object
+      additionalProperties: false
+      required: [product_slug, model_key, quantity, quote_snapshot_id, configuration]
+      properties:
+        product_slug:
+          type: string
+          minLength: 1
+          maxLength: 180
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        model_key:
+          type: string
+          minLength: 1
+          maxLength: 120
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 10000
+        quote_snapshot_id:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: '^[a-f0-9]{64}$'
+        configuration:
+          oneOf:
+            - $ref: '#/components/schemas/PhysicalConfiguration'
+            - $ref: '#/components/schemas/InviteConfiguration'
+      x-max-payload-bytes: 16384
+    PhysicalConfiguration:
+      type: object
+      additionalProperties: false
+      required: [configuration_type, theme, personalization_text, event_date, thumbnail_choice, defer_briefing]
+      properties:
+        configuration_type: { type: string, const: physical_personalized }
+        theme: { type: string, minLength: 1, maxLength: 120 }
+        personalization_text: { type: string, minLength: 1, maxLength: 120 }
+        event_date: { type: string, format: date, pattern: '^\d{4}-\d{2}-\d{2}$' }
+        note: { type: string, maxLength: 500 }
+        thumbnail_choice:
+          type: string
+          enum: [none, client_file, create_by_js_designs]
+        defer_briefing: { type: boolean, default: false, description: Adiamento somente quando o catÃ¡logo do produto permitir. }
+    InviteConfiguration:
+      type: object
+      additionalProperties: false
+      required: [configuration_type, invite_type, theme, colors, event_name, event_date, event_time, event_location, thumbnail_choice, defer_briefing]
+      properties:
+        configuration_type: { type: string, const: digital_personalized }
+        invite_type: { type: string, enum: [standard, complex] }
+        theme: { type: string, minLength: 1, maxLength: 120 }
+        colors: { type: string, minLength: 1, maxLength: 160 }
+        event_name: { type: string, minLength: 1, maxLength: 120 }
+        event_date: { type: string, format: date, pattern: '^\d{4}-\d{2}-\d{2}$' }
+        event_time: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        event_location: { type: string, minLength: 1, maxLength: 200 }
+        thumbnail_choice:
+          type: string
+          enum: [none, client_file, create_by_js_designs]
+        defer_briefing: { type: boolean, default: false }
+    CartItemResult:
+      type: object
+      additionalProperties: false
+      required: [item_reference, product_id, product_slug, model_id, model_key, quantity, configuration, quote_snapshot_id, quote, created_at]
+      properties:
+        item_reference: { type: string, minLength: 20, maxLength: 160 }
+        product_id: { type: string, format: uuid }
+        product_slug: { type: string }
+        model_id: { type: string, format: uuid }
+        model_key: { type: string }
+        quantity: { type: integer, minimum: 1, maximum: 10000 }
+        configuration:
+          oneOf:
+            - $ref: '#/components/schemas/PhysicalConfiguration'
+            - $ref: '#/components/schemas/InviteConfiguration'
+        quote_snapshot_id: { type: string, minLength: 64, maxLength: 64, pattern: '^[a-f0-9]{64}$' }
+        created_at: { type: string, format: date-time }
+        quote:
+          type: object
+          additionalProperties: false
+          required: [total_minor, currency, pricing_rule_version]
+          properties:
+            total_minor: { type: integer, minimum: 0 }
+            currency: { type: string, const: EUR }
+            pricing_rule_version: { type: integer, minimum: 1 }
+    PublicError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, correlation_id]
+          properties:
+            code:
+              type: string
+              enum: [invalid_request, unsupported_mode, invalid_configuration, stale_quote, unavailable, idempotency_conflict, csrf_failed, rate_limited, temporarily_unavailable]
+            message: { type: string }
+            correlation_id: { type: string, format: uuid }
+  responses:
+    PublicError:
+      description: Erro público sanitizado
+      headers:
+        Cache-Control:
+          schema: { type: string, const: no-store }
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicError'

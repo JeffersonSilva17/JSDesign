@@ -959,6 +959,23 @@ code {
 .pricing-panel__values div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; }
 .pricing-panel__values dd { margin: 0; font-variant-numeric: tabular-nums; }
 .pricing-panel p { margin: 0; }
+.cart-configurator { display: grid; gap: 1rem; min-width: 0; margin: .75rem 0; padding: 1rem; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: .75rem; }
+.cart-configurator legend { padding-inline: .35rem; font-weight: 700; }
+.cart-configurator__field { display: grid; gap: .35rem; }
+.cart-configurator__field small { font-size: .875rem; }
+.cart-configurator__field [aria-invalid="true"] { border-color: #a40000; }
+.cart-configurator fieldset fieldset { display: grid; gap: .5rem; border: 0; padding: 0; }
+.cart-configurator fieldset fieldset label, .cart-configurator > label { display: flex; align-items: flex-start; gap: .5rem; }
+.cart-configurator input[type="radio"], .cart-configurator input[type="checkbox"] { width: auto; min-height: auto; margin-top: .2rem; }
+.cart-configurator__actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.pricing-panel select { width: 100%; min-height: 2.75rem; padding: .625rem .75rem; border: 1px solid currentColor; border-radius: .5rem; }
+.pricing-panel button:focus-visible, .pricing-panel select:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.cart-page { width: min(100% - 2rem, 72rem); margin: 2rem auto; }
+.cart-page__items { display: grid; gap: 1rem; padding: 0; list-style: none; }
+.cart-page__item { padding: 1.25rem; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: .75rem; }
+.cart-page__item dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; }
+.cart-page__item dl div { min-width: 0; }
+.cart-page__item dd { margin: .2rem 0 0; overflow-wrap: anywhere; }
 
 .catalog-detail__actions {
   align-items: start;

@@ -434,6 +434,7 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
                 'p.file_description',
                 'p.usage_terms',
                 'p.minimum_quantity',
+                'p.allows_deferred_briefing',
             );
         }
 
@@ -543,6 +544,7 @@ final readonly class PostgresPublicCatalogQuery implements PublicCatalogQuery, P
             ];
             if ($detail) {
                 $projection['description'] = (string) $row['description'];
+                $projection['allows_deferred_briefing'] = (bool) ($row['allows_deferred_briefing'] ?? false);
                 $projection['compatibility'] = $row['compatibility'] === null ? null : (string) $row['compatibility'];
                 $gallery = array_values(array_slice([
                     ...array_values(isset($galleryPrimaryByProduct[$row['id']]) ? [$galleryPrimaryByProduct[$row['id']]] : []),

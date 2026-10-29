@@ -68,6 +68,7 @@ final class PublicCatalogProductResource extends JsonResource
             'file_description' => $this->resource['file_description'],
             'usage_terms' => $this->resource['usage_terms'],
             'minimum_quantity' => $this->resource['minimum_quantity'],
+            'allows_deferred_briefing' => (bool) ($this->resource['allows_deferred_briefing'] ?? false),
             'models' => array_map(fn (array $model): array => [
                 'key' => $model['key'],
                 'label' => $model['label'],

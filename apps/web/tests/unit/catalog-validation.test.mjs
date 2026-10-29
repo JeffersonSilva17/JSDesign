@@ -35,6 +35,7 @@ function productDetail(overrides = {}) {
     file_description: 'Arquivo em Studio pronto para corte.',
     usage_terms: 'Uso permitido em peças físicas; redistribuição digital do arquivo não autorizada.',
     minimum_quantity: null,
+    allows_deferred_briefing: false,
     models: [{
       key: 'padrao',
       label: 'Modelo padrão',

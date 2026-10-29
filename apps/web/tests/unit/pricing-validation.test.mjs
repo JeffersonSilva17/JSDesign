@@ -21,6 +21,7 @@ test('quantity and currency errors retain their explicit public codes', () => {
 
 test('strict quote response allowlist rejects money rounding and extra properties', () => {
   const quote = { product_slug: 'produto-1', model_key: null, quantity: 2, minimum_quantity: 1, maximum_quantity: 100,
+    quote_snapshot_id: 'a'.repeat(64),
     base_unit_price_minor: 500, unit_price_minor: 450, subtotal_minor: 1000, discount_minor: 100, total_minor: 900,
     currency: 'EUR', pricing_rule_version: 2, applied_tier: { minimum_quantity: 2, maximum_quantity: 5, unit_price_minor: 450 } };
   assert.equal(isQuote(quote), true);

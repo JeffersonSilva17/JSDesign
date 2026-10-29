@@ -27,6 +27,7 @@ final class CatalogRules
             'is_immediate_delivery' => [$optional, 'nullable', 'boolean'],
             'requires_briefing' => [$optional, 'nullable', 'boolean'],
             'requires_approval' => [$optional, 'nullable', 'boolean'],
+            'allows_deferred_briefing' => [$optional, 'boolean'],
             'production_lead_time_days' => [$optional, 'nullable', 'integer', 'min:1', 'max:3650'],
             'materials' => [$optional, 'nullable', 'string', 'max:5000'],
             'composition' => [$optional, 'nullable', 'string', 'max:5000'],

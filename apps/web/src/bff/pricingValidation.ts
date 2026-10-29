@@ -1,5 +1,5 @@
 export type PricingQuote = Readonly<{
-  product_slug: string; model_key: string | null; quantity: number; minimum_quantity: number; maximum_quantity: number;
+  product_slug: string; model_key: string | null; quantity: number; minimum_quantity: number; maximum_quantity: number; quote_snapshot_id: string;
   base_unit_price_minor: number; unit_price_minor: number; subtotal_minor: number; discount_minor: number;
   total_minor: number; currency: 'EUR'; pricing_rule_version: number;
   applied_tier: Readonly<{ minimum_quantity: number; maximum_quantity: number | null; unit_price_minor: number }> | null;
@@ -59,7 +59,7 @@ export async function readLimitedJsonBody(stream: ReadableStream<Uint8Array> | n
 }
 
 export function isQuote(value: unknown): value is PricingQuote {
-  if (!isRecord(value) || !hasExactKeys(value, ['product_slug', 'model_key', 'quantity', 'minimum_quantity', 'maximum_quantity', 'base_unit_price_minor', 'unit_price_minor', 'subtotal_minor', 'discount_minor', 'total_minor', 'currency', 'pricing_rule_version', 'applied_tier'])) return false;
+  if (!isRecord(value) || !hasExactKeys(value, ['product_slug', 'model_key', 'quantity', 'minimum_quantity', 'maximum_quantity', 'quote_snapshot_id', 'base_unit_price_minor', 'unit_price_minor', 'subtotal_minor', 'discount_minor', 'total_minor', 'currency', 'pricing_rule_version', 'applied_tier']) || typeof value.quote_snapshot_id !== 'string' || !/^[a-f0-9]{64}$/.test(value.quote_snapshot_id)) return false;
   const numeric = ['quantity', 'minimum_quantity', 'maximum_quantity', 'base_unit_price_minor', 'unit_price_minor', 'subtotal_minor', 'discount_minor', 'total_minor', 'pricing_rule_version'];
   if (!numeric.every((key) => Number.isSafeInteger(value[key]) && (value[key] as number) >= (key.includes('price') || key.includes('minor') || key === 'discount_minor' || key === 'subtotal_minor' || key === 'total_minor' ? 0 : 1))) return false;
   if (typeof value.product_slug !== 'string' || value.product_slug.length > 180 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value.product_slug) ||

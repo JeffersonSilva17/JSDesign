@@ -23,6 +23,7 @@ use App\Modules\Promotions\Infrastructure\Delivery\EmailProvider;
 use App\Modules\Promotions\Infrastructure\Delivery\LaravelMailEmailProvider;
 use App\Modules\Promotions\Infrastructure\Persistence\PostgresPromotionCouponRepository;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -59,6 +60,22 @@ class AppServiceProvider extends ServiceProvider
             ->response(static fn (Request $request, array $headers) => response()->json([
                 'error' => ['code' => 'rate_limited', 'message' => 'Muitas cotações. Tente novamente em instantes.', 'correlation_id' => (string) Str::uuid()],
             ], 429, $headers)->header('Cache-Control', 'no-store, private')));
+        RateLimiter::for('cart-add-item', static fn (Request $request): Limit => Limit::perMinute((int) config('cart.rate_limit_per_minute', 10))
+            ->by('cart-add-item:'.hash('sha256', (string) $request->header('X-Guest-Session')))
+            ->response(static fn (Request $request, array $headers) => response()->json([
+                'error' => ['code' => 'rate_limited', 'message' => 'Too many submissions. Try again shortly.', 'correlation_id' => (string) Str::uuid()],
+            ], 429, $headers)->header('Cache-Control', 'no-store, private')));
+        RateLimiter::for('cart-read', static fn (Request $request): Limit => Limit::perMinute((int) config('cart.read_rate_limit_per_minute', 60))
+            ->by('cart-read:'.hash('sha256', (string) $request->header('X-Guest-Session')))
+            ->response(self::cartRateLimitedResponse(...)));
+        RateLimiter::for('cart-read-ip', static fn (Request $request): Limit => Limit::perMinute((int) config('cart.read_rate_limit_per_minute', 60))
+            ->by('cart-read-ip:'.hash('sha256', $request->getClientIp() ?? 'unknown'))
+            ->response(self::cartRateLimitedResponse(...)));
+        RateLimiter::for('cart-write-ip', static fn (Request $request): Limit => Limit::perMinute((int) config('cart.rate_limit_per_minute', 10))
+            ->by('cart-write-ip:'.hash('sha256', $request->getClientIp() ?? 'unknown'))
+            ->response(self::cartRateLimitedResponse(...)));
+        RateLimiter::for('cart-session', static fn (Request $request): Limit => Limit::perMinute((int) config('cart.read_rate_limit_per_minute', 60))
+            ->by('cart-session:'.hash('sha256', $request->getClientIp() ?? 'unknown')));
         RateLimiter::for('public-catalog-sitemap', static function (Request $request): Limit {
             return Limit::perMinute((int) config('catalog.sitemap_rate_limit_per_minute', 60))
                 ->by('public-catalog-sitemap:'.hash('sha256', $request->attributes->get('sitemap_client') ?? $request->server('REMOTE_ADDR', 'unknown')))
@@ -89,5 +106,13 @@ class AppServiceProvider extends ServiceProvider
                     'retry_after' => (int) ($headers['Retry-After'] ?? 60),
                 ], 429, $headers)->header('Cache-Control', 'no-store, private'));
         });
+    }
+
+    /** @param array<string, string> $headers */
+    private static function cartRateLimitedResponse(Request $request, array $headers): JsonResponse
+    {
+        return response()->json([
+            'error' => ['code' => 'rate_limited', 'message' => 'Too many requests. Try again shortly.', 'correlation_id' => (string) Str::uuid()],
+        ], 429, $headers)->header('Cache-Control', 'no-store, private');
     }
 }

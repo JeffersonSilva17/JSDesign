@@ -7,7 +7,7 @@ paradigm: nextjs-bff-plus-laravel-domain-api
 scope: Loja online JS Designs ponta a ponta
 status: final
 created: 2026-07-27
-updated: 2026-07-27
+updated: 2026-10-14
 supersedes:
   - ../architecture-JSDESIGN-2026-07-27/ARCHITECTURE-SPINE.md
 binds:
@@ -156,7 +156,9 @@ stateDiagram-v2
 
 - **Escopo:** checkout guest, Área da Cliente, admin, arquivos privados, suporte
 - **Risco evitado:** tokens sensíveis no navegador, acesso cruzado entre clientes, bypass de papel admin
-- **Regra:** Laravel é autoridade de autenticação/autorização. Next.js BFF guarda sessão/cookies e nunca expõe segredo server-to-server ao navegador. Estratégia exata fica deferida entre Sanctum SPA/sessão compartilhada/token server-to-server.
+- **Regra:** Laravel é autoridade de autenticação/autorização. Next.js BFF guarda a sessão convidada em referência opaca server-side e em cookie `HttpOnly`, `Secure`, `SameSite=Lax`, sem ID de carrinho ou cliente. O BFF chama o Laravel com credencial server-to-server nunca exposta ao navegador e encaminha apenas o contexto interno da sessão; o Laravel deriva o owner e o carrinho. Acesso e mutações exigem autorização por requisição no Laravel.
+- **CSRF e rotação:** o BFF valida `Origin`/`Referer` same-origin e um token CSRF associado à sessão em toda mutação; o Laravel rejeita chamadas sem contexto interno autenticado. A sessão convidada e a chave de idempotência são rotacionadas quando o contexto muda e expiram conforme a retenção do carrinho abandonado. Nenhum valor recebido do navegador, isoladamente, concede acesso a item ou carrinho.
+- **Decisão registrada:** a opção escolhida para as stories transacionais é sessão convidada mantida pelo BFF + autenticação server-to-server com o Laravel. Sanctum SPA e sessão compartilhada não serão introduzidos neste fluxo.
 
 ### AD-11 — Arquivos privados são domínio do backend
 
@@ -194,7 +196,7 @@ Seed verificado em 2026-07-27; patches exatos passam a ser controlados pelo cód
 
 | Camada | Escolha |
 | --- | --- |
-| Frontend/BFF | Next.js 16.2.x + React 19.2.x + TypeScript |
+| Frontend/BFF | Next.js 16.4.3 + React 19.2.x + TypeScript |
 | Backend/API | PHP 8.5.x + Laravel 13.x |
 | Banco transacional | PostgreSQL 18.x |
 | Cache/fila | Redis |
@@ -276,7 +278,6 @@ JSDESIGN/
 | Decisão | Motivo do adiamento |
 | --- | --- |
 | Hospedagem final | Depende de conta, orçamento e preferência operacional para Next, Laravel, PostgreSQL, Redis, workers e storage. |
-| Estratégia exata de auth BFF↔Laravel | Sanctum SPA, sessão compartilhada ou token server-to-server dependem do domínio/hospedagem escolhido. |
 | Storage privado | Pode ser S3 compatível, Supabase Storage ou equivalente; regra fixa é autorização pelo Laravel. |
 | Provedor de pagamento | Stripe continua candidato, mas deve ser provado contra MB WAY, wallets, transferência, disputa, reembolso e conciliação. |
 | Provedor fiscal/fatura | Depende de validação Portugal/UE, contabilista e ferramentas da atividade. |

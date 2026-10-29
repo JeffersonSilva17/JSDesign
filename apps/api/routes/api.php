@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Modules\Cart\Interfaces\Http\Controllers\AddConfiguredCartItemController;
+use App\Modules\Cart\Interfaces\Http\Controllers\CreateGuestCartSessionController;
+use App\Modules\Cart\Interfaces\Http\Controllers\GetGuestCartController;
+use App\Modules\Cart\Interfaces\Http\Middleware\CartGuestSessionAuthorization;
+use App\Modules\Cart\Interfaces\Http\Middleware\CartServiceAuthorization;
 use App\Modules\Catalog\Interfaces\Http\Controllers\CreateCatalogProductController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublicCatalogFacetsController;
 use App\Modules\Catalog\Interfaces\Http\Controllers\GetPublishedCatalogProductController;
@@ -31,6 +36,15 @@ Route::prefix('v1')->group(function (): void {
     Route::post('/pricing/quotes', CreatePricingQuoteController::class)
         ->middleware(['App\\Modules\\Catalog\\Interfaces\\Http\\Middleware\\PublicCatalogNoStore', 'throttle:public-pricing-quote'])
         ->name('api.v1.pricing.quotes');
+    Route::middleware([CartServiceAuthorization::class, PublicCatalogNoStore::class])->group(function (): void {
+        Route::post('/cart/sessions', CreateGuestCartSessionController::class)->middleware('throttle:cart-session')->name('api.v1.cart.sessions.store');
+        Route::get('/cart/items', GetGuestCartController::class)
+            ->middleware(['throttle:cart-read-ip', CartGuestSessionAuthorization::class, 'throttle:cart-read'])
+            ->name('api.v1.cart.items.index');
+        Route::post('/cart/items', AddConfiguredCartItemController::class)
+            ->middleware(['throttle:cart-write-ip', CartGuestSessionAuthorization::class, 'throttle:cart-add-item'])
+            ->name('api.v1.cart.items.store');
+    });
 
     Route::prefix('catalog')->middleware([PublicCatalogNoStore::class, 'throttle:public-catalog'])->group(function (): void {
         Route::get('/products', ListPublicCatalogProductsController::class)->name('api.v1.catalog.products.index');

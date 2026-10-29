@@ -57,6 +57,7 @@ export type CatalogProduct = CatalogProductBase &
     file_description: string | null;
     usage_terms: string | null;
     minimum_quantity: number | null;
+    allows_deferred_briefing: boolean;
     models: readonly CatalogProductModel[];
   }>;
 export type CatalogFacets = Readonly<{

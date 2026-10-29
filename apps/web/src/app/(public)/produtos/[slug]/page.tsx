@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 import { CatalogApiError } from '@/bff/catalogApi';
 import type { CatalogImage, CatalogProductModel } from '@/bff/catalogApi';
@@ -16,6 +17,7 @@ import { StructuredData } from '@/features/catalog-seo/StructuredData';
 import { seoConfig } from '@/features/catalog-seo/siteUrl';
 import { PricingConfigurator } from '@/features/pricing/PricingConfigurator';
 import { defaultLocale } from '@/i18n/locales';
+import type { SupportedLocale } from '@/i18n/locales';
 
 type Props = Readonly<{
   params: Promise<{ slug: string }>;
@@ -45,9 +47,10 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
   const query = detailQuery(await searchParams);
   const returnHref = query.returnHref;
   const modelKey = 'modelKey' in query ? query.modelKey ?? null : null;
+  const localeCookie = (await cookies()).get('jsd_locale')?.value;
+  const pageLocale: SupportedLocale = localeCookie === 'en' || localeCookie === 'es' ? localeCookie : defaultLocale;
   const selectedModel = selectedProductModel(product.models, modelKey);
   const gallery = product.gallery.length > 0 ? product.gallery : product.primary_image ? [product.primary_image] : [];
-  const ctaHref = `/carrinho?produto=${encodeURIComponent(product.slug)}&modelo=${encodeURIComponent(selectedModel.key)}`;
   return <article className="catalog-detail">
     {seoConfig().indexing && query.valid && <StructuredData value={productStructuredData(product, seoConfig().origin)} />}
     <section className="catalog-detail__gallery" aria-label={catalogContent.detail.gallery}>
@@ -77,8 +80,8 @@ export default async function ProductDetailPage({ params, searchParams }: Props)
         {product.file_description && <Fact label={catalogContent.detail.fileDescription} value={product.file_description} />}
         {product.compatibility && <Fact label={catalogContent.detail.compatibility} value={product.compatibility} />}
       </dl>
-      <PricingConfigurator key={`${product.slug}:${product.models.length > 0 ? selectedModel.key : ''}:${product.minimum_quantity ?? ''}:${product.modality}:${defaultLocale}`} slug={product.slug} modelKey={product.models.length > 0 ? selectedModel.key : null}
-        minimumQuantity={product.minimum_quantity} modality={product.modality} ctaHref={ctaHref} locale={defaultLocale} />
+      <PricingConfigurator key={`${product.slug}:${product.models.length > 0 ? selectedModel.key : ''}:${product.minimum_quantity ?? ''}:${product.modality}:${pageLocale}`} slug={product.slug} modelKey={product.models.length > 0 ? selectedModel.key : null}
+        minimumQuantity={product.minimum_quantity} modality={product.modality} locale={pageLocale} themes={product.taxonomy} allowsDeferredBriefing={product.allows_deferred_briefing} available={product.availability !== 'unavailable'} />
       {product.usage_terms && <p className="catalog-detail__terms"><strong>{catalogContent.detail.usageTerms}:</strong> {product.usage_terms} <Link href="/termos">{catalogContent.detail.termsLink}</Link></p>}
       <section className="catalog-detail__models" aria-labelledby="product-models-title">
         <h2 id="product-models-title">{catalogContent.detail.models}</h2>

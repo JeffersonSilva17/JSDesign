@@ -43,7 +43,7 @@ components:
     Quote:
       type: object
       additionalProperties: false
-      required: [product_slug, model_key, quantity, minimum_quantity, maximum_quantity, base_unit_price_minor, unit_price_minor, subtotal_minor, discount_minor, total_minor, currency, pricing_rule_version, applied_tier]
+      required: [product_slug, model_key, quantity, minimum_quantity, maximum_quantity, base_unit_price_minor, unit_price_minor, subtotal_minor, discount_minor, total_minor, currency, pricing_rule_version, quote_snapshot_id, applied_tier]
       properties:
         product_slug: { type: string }
         model_key: { type: [string, 'null'] }
@@ -57,6 +57,7 @@ components:
         total_minor: { type: integer, minimum: 0 }
         currency: { type: string, const: EUR }
         pricing_rule_version: { type: integer, minimum: 1 }
+        quote_snapshot_id: { type: string, pattern: '^[a-f0-9]{64}$' }
         applied_tier:
           oneOf:
             - type: 'null'

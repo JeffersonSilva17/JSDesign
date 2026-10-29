@@ -201,6 +201,11 @@ final class Product
             }
         }
 
+        if (($this->attributes['allows_deferred_briefing'] ?? false) === true
+            && ! in_array($modality, [ProductModality::PhysicalPersonalized, ProductModality::DigitalPersonalized], true)) {
+            $errors[] = $this->error('deferred_briefing_not_supported', 'allows_deferred_briefing');
+        }
+
         return $errors;
     }
 

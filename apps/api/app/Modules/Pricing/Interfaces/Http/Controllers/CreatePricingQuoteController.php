@@ -43,7 +43,7 @@ final readonly class CreatePricingQuoteController
             ]);
             Log::info('pricing.quote', ['correlation_id' => $correlationId, 'result' => 'quoted']);
 
-            return response()->json($result->toArray())->header('Cache-Control', 'no-store, private');
+        return response()->json($result->toArray())->header('Cache-Control', 'no-store, private');
         } catch (QuoteFailure $failure) {
             Log::info('pricing.quote', ['correlation_id' => $correlationId, 'result' => 'rejected', 'reason' => $failure->publicCode]);
 
