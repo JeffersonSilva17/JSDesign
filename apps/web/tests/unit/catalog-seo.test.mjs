@@ -144,6 +144,7 @@ test('identidade de produto, labels de categoria, modalidade e IDs duplicados', 
     file_description: null,
     usage_terms: null,
     minimum_quantity: null,
+    allows_deferred_briefing: false,
     models: [{ key: 'padrao', label: 'Modelo padrão', difference: 'Versão padrão do produto.', is_default: true, image: null }],
   } };
   assert.equal(isCatalogProductEnvelope(detail, 'festa'), true);

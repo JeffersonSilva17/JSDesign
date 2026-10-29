@@ -1,9 +1,9 @@
 <?php
 
+use App\Modules\Cart\Application\DeleteExpiredGuestCarts;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
-use App\Modules\Cart\Application\DeleteExpiredGuestCarts;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
