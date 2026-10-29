@@ -27,6 +27,7 @@ final class AdminCatalogProductResource extends JsonResource
             'is_immediate_delivery' => $this->resource['is_immediate_delivery'],
             'requires_briefing' => $this->resource['requires_briefing'],
             'requires_approval' => $this->resource['requires_approval'],
+            'allows_deferred_briefing' => (bool) ($this->resource['allows_deferred_briefing'] ?? false),
             'production_lead_time_days' => $this->resource['production_lead_time_days'],
             'materials' => $this->resource['materials'],
             'composition' => $this->resource['composition'],

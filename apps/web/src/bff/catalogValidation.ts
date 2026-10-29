@@ -146,7 +146,7 @@ export function isSafeCatalogImagePath(value: unknown): value is string {
 function isProduct(value: unknown, detail: boolean): boolean {
   if (!isRecord(value)) return false;
   const common = detail
-    ? ['id','slug','name','description','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy','compatibility','gallery','materials','composition','file_description','usage_terms','minimum_quantity','models']
+    ? ['id','slug','name','description','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy','compatibility','gallery','materials','composition','file_description','usage_terms','minimum_quantity','allows_deferred_briefing','models']
     : ['id','slug','name','description_excerpt','category','modality','price_minor','currency','availability','delivery_type','production_lead_time_days','is_immediate_delivery','primary_image','taxonomy','compatibility_excerpt'];
   if (!hasOnlyKeys(value, common) || !nonEmpty(value.id) || !uuidPattern.test(value.id) || !nonEmptyMax(value.name, 180) || !nonEmpty(value.slug) || value.slug.length > 180 || !slugPattern.test(value.slug)) return false;
   if (!isCategory(value.category) || !modalities.includes(value.modality as (typeof modalities)[number])) return false;
@@ -162,7 +162,7 @@ function isProduct(value: unknown, detail: boolean): boolean {
   return Array.isArray(value.gallery) && value.gallery.length <= 8 && value.gallery.every(isImage) &&
     nullableText(value.materials, 5000) && nullableText(value.composition, 5000) &&
     nullableText(value.file_description, 5000) && nullableText(value.usage_terms, 5000) &&
-    (value.minimum_quantity === null || positiveInteger(value.minimum_quantity)) && isModelList(value.models);
+    (value.minimum_quantity === null || positiveInteger(value.minimum_quantity)) && typeof value.allows_deferred_briefing === 'boolean' && isModelList(value.models);
 }
 
 function isImage(value: unknown): boolean { return isRecord(value) && hasOnlyKeys(value, ['url', 'alt_text']) && isSafeCatalogImagePath(value.url) && nonEmptyMax(value.alt_text, 300); }

@@ -103,6 +103,18 @@ final class CatalogE2eSeeder extends Seeder
                     ],
                 ]);
             }
+            if ($modality === 'digital_personalized') {
+                DB::table('catalog_product_models')->insert([
+                    ['id' => (string) Str::uuid(), 'product_id' => $id, 'public_key' => 'standard', 'label' => 'Convite Padrão', 'difference' => 'Briefing simplificado após o pagamento.', 'sort_order' => 1, 'is_default' => true, 'created_at' => $now, 'updated_at' => $now],
+                    ['id' => (string) Str::uuid(), 'product_id' => $id, 'public_key' => 'complex', 'label' => 'Convite Complexo', 'difference' => 'Briefing completo após o pagamento.', 'sort_order' => 2, 'is_default' => false, 'created_at' => $now, 'updated_at' => $now],
+                ]);
+            }
+            if ($modality === 'physical_personalized') {
+                DB::table('catalog_product_models')->insert([
+                    'id' => (string) Str::uuid(), 'product_id' => $id, 'public_key' => 'padrao', 'label' => 'Modelo Padrão',
+                    'difference' => 'Modelo físico padrão.', 'sort_order' => 1, 'is_default' => true, 'created_at' => $now, 'updated_at' => $now,
+                ]);
+            }
         }
     }
 }

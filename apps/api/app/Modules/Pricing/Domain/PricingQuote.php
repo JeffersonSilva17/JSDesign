@@ -25,6 +25,7 @@ final readonly class PricingQuote
     {
         return [
             'product_slug' => $this->productSlug, 'model_key' => $this->modelKey,
+            'quote_snapshot_id' => $this->snapshotId(),
             'quantity' => $this->quantity, 'minimum_quantity' => $this->minimumQuantity,
             'maximum_quantity' => $this->maximumQuantity, 'base_unit_price_minor' => $this->baseUnitPriceMinor,
             'unit_price_minor' => $this->unitPriceMinor, 'subtotal_minor' => $this->subtotalMinor,
@@ -32,5 +33,10 @@ final readonly class PricingQuote
             'currency' => 'EUR', 'pricing_rule_version' => $this->pricingRuleVersion,
             'applied_tier' => $this->appliedTier,
         ];
+    }
+
+    public function snapshotId(): string
+    {
+        return hash('sha256', implode('|', [$this->productSlug, $this->modelKey ?? '', $this->quantity, $this->pricingRuleVersion]));
     }
 }

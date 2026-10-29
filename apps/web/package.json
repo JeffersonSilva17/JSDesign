@@ -2,24 +2,18 @@
   "name": "@jsdesign/web",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": "24.x"
-  },
+  "engines": { "node": "24.x" },
   "scripts": {
     "dev": "node scripts/server.mjs --dev",
     "build": "next build",
     "start": "node scripts/server.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test:bff": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/catalog-validation.test.mjs tests/unit/pricing-validation.test.mjs tests/unit/pricing-transport.test.mjs",
+    "test:bff": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/catalog-validation.test.mjs tests/unit/pricing-validation.test.mjs tests/unit/pricing-transport.test.mjs tests/unit/cart-validation.test.mjs",
     "test:e2e": "playwright test",
     "test:seo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/catalog-seo.test.mjs"
   },
-  "dependencies": {
-    "next": "16.3.8",
-    "react": "19.2.0",
-    "react-dom": "19.2.0"
-  },
+  "dependencies": { "next": "16.4.3", "react": "19.2.0", "react-dom": "19.2.0" },
   "devDependencies": {
     "@playwright/test": "1.60.0",
     "@types/node": "^24.0.0",

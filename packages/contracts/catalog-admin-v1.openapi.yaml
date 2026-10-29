@@ -114,6 +114,7 @@ components:
         is_immediate_delivery: { type: [boolean, 'null'] }
         requires_briefing: { type: [boolean, 'null'] }
         requires_approval: { type: [boolean, 'null'] }
+        allows_deferred_briefing: { type: [boolean, 'null'], description: Explicit catalog capability; defaults to false and is valid only for eligible personalized products. }
         production_lead_time_days: { type: [integer, 'null'], minimum: 1 }
         materials: { type: [string, 'null'] }
         composition: { type: [string, 'null'] }

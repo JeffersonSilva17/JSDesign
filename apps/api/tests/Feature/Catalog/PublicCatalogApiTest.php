@@ -171,7 +171,7 @@ final class PublicCatalogApiTest extends TestCase
             'id', 'slug', 'name', 'description', 'category', 'modality', 'price_minor', 'currency', 'availability',
             'delivery_type', 'production_lead_time_days', 'is_immediate_delivery', 'primary_image', 'taxonomy',
             'compatibility', 'gallery', 'materials', 'composition', 'file_description', 'usage_terms',
-            'minimum_quantity', 'models',
+            'minimum_quantity', 'allows_deferred_briefing', 'models',
         ], array_keys($data));
         self::assertSame('/catalog-e2e-product.svg', $data['primary_image']['url']);
         self::assertSame([
@@ -181,6 +181,7 @@ final class PublicCatalogApiTest extends TestCase
         self::assertSame('Papel fotográfico 180g', $data['materials']);
         self::assertSame('Topo de bolo em camadas', $data['composition']);
         self::assertSame(12, $data['minimum_quantity']);
+        self::assertFalse($data['allows_deferred_briefing']);
         self::assertSame([
             [
                 'key' => 'classico',
